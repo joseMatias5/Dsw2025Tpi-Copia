@@ -8,6 +8,15 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class OrderItem : EntityBase
 {
+    
+    public OrderItem(int quantity, decimal unitPrice, decimal subtotal)  
+    {
+        Quantity = quantity;
+        UnitPrice = unitPrice;
+        Subtotal = subtotal;
+
+    }
+    
     public required int Quantity 
     { 
         get => Quantity;

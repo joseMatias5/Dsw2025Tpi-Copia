@@ -8,6 +8,18 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class Product : EntityBase
 {
+
+    public Product (string sku, string internalCode, string name, string? description, decimal currentUnitPrice, int stockQuantity)
+    {
+        Sku = sku;
+        InternalCode = internalCode;
+        Name = name;
+        Description = description;
+        CurrentUnitPrice = currentUnitPrice; 
+        StockQuantity = stockQuantity;  
+        IsActive = true ;
+
+    }
     public required string Sku {  get; set; }
     public required string InternalCode { get; set; }
     public required string Name { get; set; }
