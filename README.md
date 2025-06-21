@@ -1,5 +1,11 @@
 # Trabajo Práctico Integrador
 ## Desarrollo de Software
+## Integrantes
+
+58096 + Coronel Arrieta, Ana Milena + coronelanamilena (Ana.CoronelArrieta@alu.frt.utn.edu.ar)
+58013 + Matias, Jose Augusto + josematias5 (jomatias108@gmail.com)
+57862 + Navarro Zavalia, Angeles Maria + anz05 (navarroanguie5@gmail.com)
+
 ### Backend
 
 ## Introducción
