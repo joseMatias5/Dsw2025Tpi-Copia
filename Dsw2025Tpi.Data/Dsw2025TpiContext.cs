@@ -1,5 +1,7 @@
-﻿using Dsw2025Tpi.Domain.Entities;
+﻿using System.Reflection.Metadata;
+using Dsw2025Tpi.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Dsw2025Tpi.Data;
 
@@ -10,8 +12,7 @@ public class Dsw2025TpiContext: DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder); 
-        
+        base.OnModelCreating(modelBuilder);
         #region Product
         modelBuilder.Entity<Product>(e =>
         {
@@ -109,3 +110,5 @@ public class Dsw2025TpiContext: DbContext
         #endregion
     }
 }
+
+
