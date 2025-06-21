@@ -10,7 +10,7 @@ public class Dsw2025TpiContext: DbContext
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder); //lo q mapea la tabla
+        base.OnModelCreating(modelBuilder); 
         
         #region Product
         modelBuilder.Entity<Product>(e =>
@@ -47,7 +47,7 @@ public class Dsw2025TpiContext: DbContext
         #region Order
         modelBuilder.Entity<Order>(e =>
         {
-            e.ToTable("Products");
+            e.ToTable("Orders");
             e.Property(e => e.Id)
             .IsRequired();
 
@@ -67,6 +67,43 @@ public class Dsw2025TpiContext: DbContext
 
             e.Property(e => e.TotalAmount)
             .HasPrecision(15, 2)
+            .IsRequired();
+        });
+        #endregion
+
+        #region OrderItem
+        modelBuilder.Entity<OrderItem>(e =>
+        {
+            e.ToTable("Order Items");
+            e.Property(e => e.Id)
+            .IsRequired();
+
+            e.Property(e => e.Quantity)
+            .HasMaxLength(5)
+            .IsRequired();
+
+            e.Property(e => e.UnitPrice)
+            .HasPrecision(15, 2)
+            .IsRequired();
+        });
+        #endregion
+
+        #region Customer
+        modelBuilder.Entity<Customer>(e =>
+        {
+            e.Property(e => e.Id)
+            .IsRequired();
+
+            e.Property(e => e.Email)
+            .HasMaxLength(100)
+            .IsRequired();
+
+            e.Property(e => e.Name)
+            .HasMaxLength(60)
+            .IsRequired();
+
+            e.Property(e => e.PhoneNumber)
+            .HasMaxLength(15)
             .IsRequired();
         });
         #endregion
