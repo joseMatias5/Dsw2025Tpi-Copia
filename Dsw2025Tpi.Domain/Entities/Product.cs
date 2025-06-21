@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Domain.Entities;
 
-public class Product
+public class Product : EntityBase
 {
     public string Sku {  get; set; }
     public string InternalCode { get; set; }
@@ -15,4 +15,6 @@ public class Product
     public decimal CurrentUnitPrice { get; set; }
     public int StockQuantity { get; set; }
     public bool IsActive { get; set; }
+
+    public ICollection<OrderItem> OrderItems { get; set; }
 }
