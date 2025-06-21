@@ -8,8 +8,28 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class OrderItem : EntityBase
 {
-    public int Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
+    public required int Quantity 
+    { 
+        get => Quantity;
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException("The quantity must be a positive number or 0");
+            }
+        }
+    }
+    public required decimal UnitPrice 
+    {
+        get => UnitPrice; 
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException("The unit price must be a positive number");
+            }
+        }
+    }
     public decimal Subtotal { get; set; }
 
     public Guid? OrderId { get; set; }

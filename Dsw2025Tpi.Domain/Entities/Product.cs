@@ -8,12 +8,33 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class Product : EntityBase
 {
-    public string Sku {  get; set; }
-    public string InternalCode { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public decimal CurrentUnitPrice { get; set; }
-    public int StockQuantity { get; set; }
+    public required string Sku {  get; set; }
+    public required string InternalCode { get; set; }
+    public required string Name { get; set; }
+    public string? Description { get; set; }
+    public required decimal CurrentUnitPrice 
+    { 
+        get => CurrentUnitPrice;
+        set 
+        {
+            if(value <= 0)
+            {
+                throw new ArgumentOutOfRangeException("The unit price must be a positive number");
+            }
+        }
+         
+    }
+    public required int StockQuantity 
+    {
+        get => StockQuantity;
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException("The stock quantity must be a positive number or 0");
+            }
+        }
+    }
     public bool IsActive { get; set; }
 
     public ICollection<OrderItem> OrderItems { get; set; }
