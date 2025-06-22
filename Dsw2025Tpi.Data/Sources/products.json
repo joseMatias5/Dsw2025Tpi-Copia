@@ -1,0 +1,40 @@
+[
+    {
+        "sku": "ABC123",
+        "internalCode": "INT-001",
+        "name": "Producto de ejemplo",
+        "description": "Descripción del producto de ejemplo.",
+        "currentUnitPrice": 199.99,
+        "stockQuantity": 50
+    },
+    {
+        "sku": "ABC124",
+        "internalCode": "INT-002",
+        "name": "CARAMELO MASTICABLE DROPSY X700G",
+        "currentUnitPrice": 6292.6,
+        "stockQuantity": 20
+    },
+    {
+        "sku": "ABC125",
+        "internalCode": "INT-003",
+        "name": "JUGO TUTTI NARANJA X200ML X1U",
+        "description": "De marca Baggio.",
+        "currentUnitPrice": 194.4,
+        "stockQuantity": 34
+    },
+    {
+        "sku": "ABC126",
+        "internalCode": "INT-004",
+        "name": "TOSTADA DE ARROZ DULCE X150G"
+        "currentUnitPrice": 921.2,
+        "stockQuantity": 55
+    },
+    {
+        "sku": "ABC127",
+        "internalCode": "INT-005",
+        "name": "CONFITE BILLIKEN X50G",
+        "description": "Multifrutales.",
+        "currentUnitPrice": 1380,
+        "stockQuantity": 100
+    }
+]
