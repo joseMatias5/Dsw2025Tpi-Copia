@@ -87,7 +87,7 @@ namespace Dsw2025Tpi.Application.Services
             return await _repository.GetById<OrderItem>(id);
         }
 
-        public async Task<IEnumerable<OrderItem?>> GetOrderItem()
+        public async Task<IEnumerable<OrderItem>?> GetOrderItem()
         {
             return await _repository.GetAll<OrderItem>();
         }
