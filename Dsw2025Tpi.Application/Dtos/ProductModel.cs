@@ -10,5 +10,5 @@ public record ProductMode
 {
     public record Request(string Sku, string InternalCode, decimal Price);
 
-    public record Response(Guid Id);
+    public record Response(Guid Id, string Sku, string InternalCode, decimal Price);
 }
