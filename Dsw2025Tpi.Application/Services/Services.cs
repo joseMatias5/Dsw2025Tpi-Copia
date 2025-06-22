@@ -87,16 +87,25 @@ namespace Dsw2025Tpi.Application.Services
             return await _repository.GetById<OrderItem>(id);
         }
 
-        public async Task<List<OrderItem>?> GetOrderItem()
+        public async Task<IEnumerable<OrderItem?>> GetOrderItem()
         {
             return await _repository.GetAll<OrderItem>();
         }
 
         public async Task<OrderItemModel.Response> AddOrderItem(OrderItemModel.Request request)
         {
-            var orderItem = new OrderItem(request.Name, request.Email);
-            await _repository.AddAsync(OrderItem);
-            return new OrderItemModel.Response(OrderItem.ReferenceEquals|);
+            if (string.IsNullOrWhiteSpace(request.Quantity.ToString()) ||
+                 string.IsNullOrWhiteSpace(request.UnitPrice.ToString()) ||
+                 string.IsNullOrWhiteSpace(request.Subtotal.ToString()))
+            {
+                throw new ArgumentException("Invalid values for order item");
+            }
+
+            var orderItem = new OrderItem(request.Quantity, request.UnitPrice, request.Subtotal);
+            await _repository.Add(orderItem);
+            return new OrderItemModel.Response(orderItem.Id, orderItem.Quantity, orderItem.UnitPrice, orderItem.Subtotal);
+        
+
         }
         #endregion
 
@@ -106,16 +115,26 @@ namespace Dsw2025Tpi.Application.Services
             return await _repository.GetById<Customer>(id);
         }
 
-        public async Task<List<Customer>?> GetCustomer()
+        public async Task<IEnumerable<Customer>?> GetCustomer()
         {
             return await _repository.GetAll<Customer>();
         }
 
         public async Task<CustomerModel.Response> AddCustomer(CustomerModel.Request request)
         {
-            var customer = new Customer(request.Name, request.Email);
-            await _repository.AddAsync(Customer);
-            return new Customer.Response(Customer.ReferenceEquals |);
+
+            if (string.IsNullOrWhiteSpace(request.Email) ||
+                string.IsNullOrWhiteSpace(request.Name) ||
+                string.IsNullOrWhiteSpace(request.PhoneNumber.ToString()))
+            {
+                throw new ArgumentException("Invalid values for customer");
+            }
+
+            var customer = new Customer(request.Email, request.Name, request.PhoneNumber);
+            await _repository.Add(customer);
+            return new CustomerModel.Response(customer.Id, customer.Email, customer.Name, customer.PhoneNumber);
+
+
         }
         #endregion
 
