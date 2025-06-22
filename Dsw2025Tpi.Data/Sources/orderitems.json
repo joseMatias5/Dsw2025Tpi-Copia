@@ -1,0 +1,24 @@
+[
+    //Falta FK de OrderId y de ProductId
+    {
+        "quantity": 5,
+        "unitPrice": 199.99
+    },
+    {
+        "quantity": 10,
+        "unitPrice": 194
+    },
+    {
+        "quantity": 1,
+        "unitPrice": 921
+    },
+    {
+        "quantity": 12,
+        "unitPrice": 1380
+    },
+    {
+        "quantity": 8,
+        "unitPrice": 1382
+    }
+
+]

@@ -1,0 +1,18 @@
+[
+    //falta FK CustomerId
+    {
+        "date": "2025-06-12T10:30:05",
+        "shippingAdress": "Rivadavia 1100",
+        "billingAdress": "Marcos Paz 657"
+    },
+    {
+        "date": "2025-06-13T11:30:05",
+        "shippingAdress": "San Juan 520",
+        "billingAdress": "Las Piedras 120"
+    },
+    {
+        "date": "2025-06-13T12:30:05",
+        "shippingAdress": "La Rioja 098",
+        "billingAdress": "Rivadavia 1050"
+    }
+]
