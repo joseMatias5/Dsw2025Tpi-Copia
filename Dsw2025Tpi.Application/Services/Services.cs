@@ -40,12 +40,12 @@ namespace Dsw2025Tpi.Application.Services
                 throw new ArgumentException("Valores para el producto no válidos");
             }
 
-            var exist = await _repository.First<Book>(p => p.ISBN == request.ISBN);
-            if (exist != null) throw new DuplicatedEntityException($"Ya existe un producto con el ISBN {request.ISBN}");
+            var exist = await _repository.First<Product>(p => p.Sku == request.Sku);
+            if (exist != null) throw new DuplicatedEntityException($"Ya existe un producto con el Sku {request.Sku}");
 
-            var book = new Book(request.Title, request.Author, request.Year, request.ISBN);
-            await _repository.AddAsync(book);
-            return new ProductModel.Response(book.Id);
+            var product = new Product(request.Title, request.Author, request.Year, request.ISBN);
+            await _repository.AddAsync(Product);
+            return new ProductModel.Response(Product.Id);
         }
         #endregion
         #region order
@@ -60,12 +60,51 @@ namespace Dsw2025Tpi.Application.Services
 
         }
 
-        public async Task<OrderModel.Response> AddLoan(OrderModel.Request request)
+        public async Task<OrderModel.Response> AddOrder(OrderModel.Request request)
         {
             var order = new Order(request.Date, request.);
-            await _repository.AddAsync(loan);
-            return new LoanModel.Response(loan.Id);
+            await _repository.AddAsync(Order);
+            return new OrderItemModel.Response(Order.);
         }
         #endregion
+
+        #region OrderItem
+        public async Task<OrderItem?> GetOrderItemById(Guid id)
+        {
+            return await _repository.GetById<OrderItem>(id);
+        }
+
+        public async Task<List<OrderItem>?> GetOrderItem()
+        {
+            return await _repository.GetAll<OrderItem>();
+        }
+
+        public async Task<OrderItemModel.Response> AddOrderItem(OrderItemModel.Request request)
+        {
+            var orderItem = new OrderItem(request.Name, request.Email);
+            await _repository.AddAsync(OrderItem);
+            return new OrderItemModel.Response(OrderItem.ReferenceEquals|);
+        }
+        #endregion
+
+        #region Customer
+        public async Task<Customer?> GetCustomerById(Guid id)
+        {
+            return await _repository.GetById<Customer>(id);
+        }
+
+        public async Task<List<Customer>?> GetCustomer()
+        {
+            return await _repository.GetAll<Customer>();
+        }
+
+        public async Task<CustomerModel.Response> AddCustomer(CustomerModel.Request request)
+        {
+            var customer = new Customer(request.Name, request.Email);
+            await _repository.AddAsync(Customer);
+            return new Customer.Response(Customer.ReferenceEquals |);
+        }
+        #endregion
+
     }
 }
