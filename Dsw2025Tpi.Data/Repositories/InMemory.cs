@@ -6,11 +6,12 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Dsw2025Tpi.Domain.Entities;
+using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Dsw2025Tpi.Data.Repositories;
 
-public class InMemory
+public class InMemory : IRepository
 {
     private List<Product>? _products;
     private List<Customer>? _customers; 
