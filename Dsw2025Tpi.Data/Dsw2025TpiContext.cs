@@ -13,6 +13,7 @@ public class Dsw2025TpiContext: DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        //modelBuilder.HasDefaultSchema("dsw2025tpi");
         #region Product
         modelBuilder.Entity<Product>(e =>
         {
