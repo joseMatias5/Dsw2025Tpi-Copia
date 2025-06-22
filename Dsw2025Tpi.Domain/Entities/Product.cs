@@ -20,11 +20,11 @@ public class Product : EntityBase
         IsActive = true ;
 
     }
-    public required string Sku {  get; set; }
-    public required string InternalCode { get; set; }
-    public required string Name { get; set; }
+    public string Sku {  get; set; }
+    public string InternalCode { get; set; }
+    public  string Name { get; set; }
     public string? Description { get; set; }
-    public required decimal CurrentUnitPrice 
+    public  decimal CurrentUnitPrice 
     { 
         get => CurrentUnitPrice;
         set 
@@ -36,7 +36,7 @@ public class Product : EntityBase
         }
          
     }
-    public required int StockQuantity 
+    public  int StockQuantity 
     {
         get => StockQuantity;
         set

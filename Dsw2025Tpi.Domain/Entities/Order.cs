@@ -19,12 +19,12 @@ public class Order : EntityBase
 
     }
 
-    public required OrderStatus Status { get; set; }
+    public  OrderStatus Status { get; set; }
 
-    public required DateTime Date {  get; set; } //pendiente la validacion de fecha
+    public  DateTime Date {  get; set; } //pendiente la validacion de fecha
 
-    public required string ShippingAddress { get; set; }
-    public required string BillingAddress { get; set; }
+    public  string ShippingAddress { get; set; }
+    public  string BillingAddress { get; set; }
     public string? Notes {  get; set; }
     public decimal TotalAmount { get ; set; }
 
