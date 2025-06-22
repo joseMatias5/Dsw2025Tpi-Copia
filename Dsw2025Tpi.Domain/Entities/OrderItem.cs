@@ -17,7 +17,7 @@ public class OrderItem : EntityBase
 
     }
     
-    public required int Quantity 
+    public  int Quantity 
     { 
         get => Quantity;
         set
@@ -28,7 +28,7 @@ public class OrderItem : EntityBase
             }
         }
     }
-    public required decimal UnitPrice 
+    public  decimal UnitPrice 
     {
         get => UnitPrice; 
         set
