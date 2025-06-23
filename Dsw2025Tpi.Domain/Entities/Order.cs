@@ -8,15 +8,15 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class Order : EntityBase
 {
-   public Order ( DateTime date, string shippingAddress, string billingAddress, string? notes, decimal totalAmount )
+   public Order ( DateTime date, string shippingAddress, string billingAddress, string? notes, Guid customerId)
     {
         Date = date;    
         ShippingAddress = shippingAddress;
         BillingAddress = billingAddress;
         Notes = notes;
-        TotalAmount = totalAmount;
+        TotalAmount = OrderItems.Sum(p => p.Subtotal);
         Status = OrderStatus.PENDING;
-
+        CustomerId = customerId;
     }
 
     public  OrderStatus Status { get; set; }
@@ -28,8 +28,8 @@ public class Order : EntityBase
     public string? Notes {  get; set; }
     public decimal TotalAmount { get ; set; }
 
-    public Guid? CustomerId { get; set; }
-    public Customer? Customer { get; set; }
+    public Guid CustomerId { get; set; }
+    public Customer Customer { get; set; }
 
     public ICollection<OrderItem> OrderItems { get; set; }
 }

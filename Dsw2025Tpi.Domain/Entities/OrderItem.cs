@@ -9,14 +9,25 @@ namespace Dsw2025Tpi.Domain.Entities;
 public class OrderItem : EntityBase
 {
     
-    public OrderItem(int quantity, decimal unitPrice, decimal subtotal)  
+    public OrderItem(int quantity, Guid orderId, Guid productId)  
     {
-        Quantity = quantity;
-        UnitPrice = unitPrice;
-        Subtotal = subtotal;
+        Quantity = StockControl(quantity);
+        UnitPrice = Product.CurrentUnitPrice;
+        Subtotal = UnitPrice * Quantity;
+        OrderId = orderId;
+        ProductId = productId;
 
     }
     
+    private int StockControl (int quantity) //------Consultar------
+    {
+        if (quantity <= Product.StockQuantity)
+        {
+            Product.StockQuantity -= quantity;
+            return quantity;
+        }
+        else throw new Exception("Problema de stock"); //-------CAMBIAR-------
+    }
     public  int Quantity 
     { 
         get => Quantity;
@@ -41,9 +52,9 @@ public class OrderItem : EntityBase
     }
     public decimal Subtotal { get; set; }
 
-    public Guid? OrderId { get; set; }
-    public Order? Order { get; set; }
+    public Guid OrderId { get; set; }
+    public Order Order { get; set; }
 
-    public Guid? ProductId { get; set; }
-    public Product? Product { get; set; }
+    public Guid ProductId { get; set; }
+    public Product Product { get; set; }
 }

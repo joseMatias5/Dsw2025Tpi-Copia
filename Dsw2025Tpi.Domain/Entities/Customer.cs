@@ -8,7 +8,7 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class Customer : EntityBase
 {
-    
+  
     public Customer (string email, string name, string phoneNumber)
     {
         Email = email;
