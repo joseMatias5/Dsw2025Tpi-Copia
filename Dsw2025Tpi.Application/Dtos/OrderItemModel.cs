@@ -8,7 +8,7 @@ namespace Dsw2025Tpi.Application.Dtos;
 
 public record OrderItemModel
 {
-    public record Request(int Quantity, decimal UnitPrice, decimal Subtotal);
-    public record Response(Guid Id, int Quantity, decimal UnitPrice, decimal Subtotal);
+    public record RequestItem(int Quantity, decimal UnitPrice, decimal Subtotal);
+    public record ResponseItem(Guid Id, int Quantity, decimal UnitPrice, decimal Subtotal);
 
 }
