@@ -32,7 +32,7 @@ namespace Dsw2025Tpi.Application.Services
             return await _repository.GetAll<Product>();
         }
         
-        public async Task<ProductModel.Response> AddProduct(ProductModel.Request request)
+        public async Task<ProductModel.ResponseProduct> AddProduct(ProductModel.RequestProduct request)
         {
             if (string.IsNullOrWhiteSpace(request.Sku) ||
                 string.IsNullOrWhiteSpace(request.InternalCode) ||
@@ -47,9 +47,9 @@ namespace Dsw2025Tpi.Application.Services
             if (exist != null) throw new DuplicatedEntityException($"A product with that Sku already exists {request.Sku}");
             if (exist != null) throw new DuplicatedEntityException($"A product with that Internal Code already exists {request.InternalCode}");
 
-            var product = new Product(request.Sku, request.InternalCode, request.Name, request?.Description, request.CurrentUnitPrice,request.StockQuantity);
+            var product = new Product(request.Sku, request.InternalCode, request.Name, request.Description, request.CurrentUnitPrice,request.StockQuantity);
             await _repository.Add(product);
-            return new ProductModel.Response(product.Id,product.Sku,product.InternalCode,product.Name,product?.Description,product.CurrentUnitPrice,product.StockQuantity);
+            return new ProductModel.ResponseProduct(product.Id,product.Sku,product.InternalCode,product.Name,product.Description,product.CurrentUnitPrice,product.StockQuantity);
         }
         #endregion
         
@@ -65,7 +65,7 @@ namespace Dsw2025Tpi.Application.Services
 
         }
 
-        public async Task<OrderModel.Response> AddOrder(OrderModel.Request request)
+        public async Task<OrderModel.ResponseOrder> AddOrder(OrderModel.RequestOrder request)
         {
             //falta lo de totalAmount (que se calcula)
             if (string.IsNullOrWhiteSpace(request.Date.ToString()) ||
@@ -75,9 +75,9 @@ namespace Dsw2025Tpi.Application.Services
                 throw new ArgumentException("Invalid values for order");
             }
 
-            var order = new Order(request.Date, request.ShippingAddress, request.BillingAddress,request?.Notes, request.TotalAmount);
+            var order = new Order(request.Date, request.ShippingAddress, request.BillingAddress,request.Notes, request.TotalAmount);
             await _repository.Add(order);
-            return new OrderModel.Response(order.Id,order.Date,order.ShippingAddress,order.BillingAddress,order?.Notes,order.TotalAmount);
+            return new OrderModel.ResponseOrder(order.Id,order.Date,order.ShippingAddress,order.BillingAddress,order.Notes,order.TotalAmount);
         }
         #endregion
 
@@ -92,7 +92,7 @@ namespace Dsw2025Tpi.Application.Services
             return await _repository.GetAll<OrderItem>();
         }
 
-        public async Task<OrderItemModel.Response> AddOrderItem(OrderItemModel.Request request)
+        public async Task<OrderItemModel.ResponseItem> AddOrderItem(OrderItemModel.RequestItem request)
         {
             if (string.IsNullOrWhiteSpace(request.Quantity.ToString()) ||
                  string.IsNullOrWhiteSpace(request.UnitPrice.ToString()) ||
@@ -103,7 +103,7 @@ namespace Dsw2025Tpi.Application.Services
 
             var orderItem = new OrderItem(request.Quantity, request.UnitPrice, request.Subtotal);
             await _repository.Add(orderItem);
-            return new OrderItemModel.Response(orderItem.Id, orderItem.Quantity, orderItem.UnitPrice, orderItem.Subtotal);
+            return new OrderItemModel.ResponseItem(orderItem.Id, orderItem.Quantity, orderItem.UnitPrice, orderItem.Subtotal);
         
 
         }
@@ -120,7 +120,7 @@ namespace Dsw2025Tpi.Application.Services
             return await _repository.GetAll<Customer>();
         }
 
-        public async Task<CustomerModel.Response> AddCustomer(CustomerModel.Request request)
+        public async Task<CustomerModel.ResponseCustomer> AddCustomer(CustomerModel.RequestCustomer request)
         {
 
             if (string.IsNullOrWhiteSpace(request.Email) ||
@@ -132,7 +132,7 @@ namespace Dsw2025Tpi.Application.Services
 
             var customer = new Customer(request.Email, request.Name, request.PhoneNumber);
             await _repository.Add(customer);
-            return new CustomerModel.Response(customer.Id, customer.Email, customer.Name, customer.PhoneNumber);
+            return new CustomerModel.ResponseCustomer(customer.Id, customer.Email, customer.Name, customer.PhoneNumber);
 
 
         }
