@@ -6,5 +6,7 @@ public abstract class EntityBase
     {
         Id = Guid.NewGuid();
     }
-    public Guid Id { get; }
+    public Guid Id { get; set; }
 }
+
+// si ke pongo el set, el constor genera uno pero yo lo sobreescribo
