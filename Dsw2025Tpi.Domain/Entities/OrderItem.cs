@@ -8,52 +8,28 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class OrderItem : EntityBase
 {
-    
-    public OrderItem(int quantity, Guid orderId, Guid productId)  
+    public OrderItem(int quantity, decimal unitPrice, Guid orderId, Guid productId)
     {
-        Quantity = StockControl(quantity);
-        UnitPrice = Product!.CurrentUnitPrice;
-        Subtotal = UnitPrice * Quantity;
+        if (quantity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(quantity), "La cantidad debe ser positiva.");
+
+        if (unitPrice < 0)
+            throw new ArgumentOutOfRangeException(nameof(unitPrice), "El precio unitario debe ser positivo.");
+
+        Quantity = quantity;
+        UnitPrice = unitPrice;
+        Subtotal = unitPrice * quantity;
         OrderId = orderId;
         ProductId = productId;
     }
 
-    private int StockControl(int quantity) //------Consultar------
-    {
-        if (quantity <= Product.StockQuantity)
-        {
-            Product.StockQuantity -= quantity;
-            return quantity;
-        }
-        else throw new Exception("Problema de stock"); //-------CAMBIAR-------
-    }
-    public  int Quantity 
-    { 
-        get => Quantity;
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException("The quantity must be a positive number or 0");
-            }
-        }
-    }
-    public  decimal UnitPrice 
-    {
-        get => UnitPrice; 
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException("The unit price must be a positive number");
-            }
-        }
-    }
-    public decimal Subtotal { get; set; }
+    public int Quantity { get; private set; }
+    public decimal UnitPrice { get; private set; }
+    public decimal Subtotal { get; private set; }
 
     public Guid OrderId { get; set; }
-    public Order Order { get; set; }
+    public Order? Order { get; set; }
 
     public Guid ProductId { get; set; }
-    public Product Product { get; set; }
+    public Product? Product { get; set; }
 }

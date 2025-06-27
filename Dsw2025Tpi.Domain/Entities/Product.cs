@@ -11,6 +11,12 @@ public class Product : EntityBase
 
     public Product (string sku, string internalCode, string name, string? description, decimal currentUnitPrice, int stockQuantity)
     {
+        if (stockQuantity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(stockQuantity), "La cantidad debe ser positiva.");
+
+        if (currentUnitPrice < 0)
+            throw new ArgumentOutOfRangeException(nameof(currentUnitPrice), "El precio unitario debe ser positivo.");
+
         Sku = sku;
         InternalCode = internalCode;
         Name = name;
@@ -24,30 +30,9 @@ public class Product : EntityBase
     public string InternalCode { get; set; }
     public  string Name { get; set; }
     public string? Description { get; set; }
-    public  decimal CurrentUnitPrice 
-    { 
-        get => CurrentUnitPrice;
-        set 
-        {
-            if(value <= 0)
-            {
-                throw new ArgumentOutOfRangeException("The unit price must be a positive number");
-            }
-        }
-         
-    }
-    public  int StockQuantity 
-    {
-        get => StockQuantity;
-        set
-        {
-            if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException("The stock quantity must be a positive number or 0");
-            }
-        }
-    }
+    public decimal CurrentUnitPrice { get; private set; }
+    public int StockQuantity { get; private set; }
     public bool IsActive { get; set; }
 
-    public ICollection<OrderItem> OrderItems { get; set; }
+    public ICollection<OrderItem>? OrderItems { get; set; }
 }

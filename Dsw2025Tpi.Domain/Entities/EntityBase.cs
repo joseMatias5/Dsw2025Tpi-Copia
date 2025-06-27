@@ -9,4 +9,3 @@ public abstract class EntityBase
     public Guid Id { get; set; }
 }
 
-// si ke pongo el set, el constor genera uno pero yo lo sobreescribo

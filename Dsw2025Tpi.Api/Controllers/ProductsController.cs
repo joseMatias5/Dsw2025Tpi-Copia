@@ -34,7 +34,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpPost()]
-    public async Task<IActionResult> AddProduct([FromBody] ProductModel.Request request)
+    public async Task<IActionResult> AddProduct([FromBody] ProductModel.RequestProduct request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -54,6 +54,33 @@ public class ProductsController : ControllerBase
         catch (Exception)
         {
             return Problem("There was a problem saving the product");
+        }
+    }
+
+    [HttpPatch()]
+    [Route("{id:guid}")]
+    public async Task<IActionResult> PatchProduct(Guid id)
+    {
+        try
+        {
+            var product = await _service.DeactivateProduct(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return Ok(product);
+        }
+        catch (ArgumentException ae)
+        {
+            return BadRequest(ae.Message);
+        }
+        catch (ApplicationException de)
+        {
+            return Conflict(de.Message);
+        }
+        catch (Exception)
+        {
+            return Problem("There was a problem updating the product");
         }
     }
 }
