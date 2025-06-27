@@ -53,7 +53,7 @@ public class ProductsController : ControllerBase
         }
         catch (Exception)
         {
-            return Problem("Se produjo un error al guardar el producto");
+            return Problem("There was a problem saving the product");
         }
     }
 }
