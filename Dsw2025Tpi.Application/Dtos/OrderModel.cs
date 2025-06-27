@@ -8,7 +8,7 @@ namespace Dsw2025Tpi.Application.Dtos;
 
 public record OrderModel
 {
-    public record Request(DateTime Date, string ShippingAddress, string BillingAddress, string? Notes, decimal TotalAmount);
-    public record Response(Guid Id, DateTime Date, string ShippingAddress, string BillingAddress, string? Notes, decimal TotalAmount);
+    public record Request(DateTime Date, string ShippingAddress, string BillingAddress, string? Notes, Guid CustomerId);
+    public record Response(Guid Id, DateTime Date, string ShippingAddress, string BillingAddress, string? Notes, decimal TotalAmount, Guid CustomerId);
 
 }

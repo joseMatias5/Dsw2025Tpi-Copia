@@ -3,16 +3,16 @@ using Dsw2025Tpi.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 
-namespace Dsw2025Tpi.Api;
+namespace Dsw2025Tpi.Api.Controllers;
 
 
 [ApiController]
 [Route("api/products")]
 public class ProductsController : ControllerBase
 {
-    private readonly Services _service;
+    private readonly ProductsManagementServices _service;
 
-    public ProductsController(Services service)
+    public ProductsController(ProductsManagementServices service)
     {
         _service = service;
     }
@@ -21,8 +21,8 @@ public class ProductsController : ControllerBase
     public async Task<IActionResult> GetProducts()
     {
         var products = await _service.GetProduct();
-        if (products == null || !products.Any()) return NoContent();
-        return Ok(products);
+
+        return products?.Any() == true ? Ok(products) : NoContent();
     }
 
     [HttpGet("{id}")]
@@ -36,6 +36,8 @@ public class ProductsController : ControllerBase
     [HttpPost()]
     public async Task<IActionResult> AddProduct([FromBody] ProductModel.Request request)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
         try
         {
             var product = await _service.AddProduct(request);

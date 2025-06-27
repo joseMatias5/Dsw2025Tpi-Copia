@@ -1,5 +1,6 @@
 [
     {
+        "id": "b4h8e7f6-5a4b-3c2d-1e0f-9a8b7c6d5e4f",
         "sku": "ABC123",
         "internalCode": "INT-001",
         "name": "Producto de ejemplo",
@@ -8,6 +9,7 @@
         "stockQuantity": 50
     },
     {
+        "id": "mhl9e7f6-5a4b-3c2d-1e0f-9a8b7c6d5e4f",
         "sku": "ABC124",
         "internalCode": "INT-002",
         "name": "CARAMELO MASTICABLE DROPSY X700G",
@@ -15,6 +17,7 @@
         "stockQuantity": 20
     },
     {
+        "id": "j9ko7jg6-5a4b-3c2d-1e0f-9a8b7c6d5e4f",
         "sku": "ABC125",
         "internalCode": "INT-003",
         "name": "JUGO TUTTI NARANJA X200ML X1U",
@@ -23,13 +26,15 @@
         "stockQuantity": 34
     },
     {
+        "id": "1k9n7h4c-5a4b-3c2d-1e0f-9a8b7c6d5e4f",
         "sku": "ABC126",
         "internalCode": "INT-004",
-        "name": "TOSTADA DE ARROZ DULCE X150G"
+        "name": "TOSTADA DE ARROZ DULCE X150G",
         "currentUnitPrice": 921.2,
         "stockQuantity": 55
     },
     {
+        "id": "2hcm0ka6-5a4b-3c2d-1e0f-9a8b7c6d5e4f",
         "sku": "ABC127",
         "internalCode": "INT-005",
         "name": "CONFITE BILLIKEN X50G",

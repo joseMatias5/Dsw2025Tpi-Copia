@@ -1,18 +1,24 @@
 [
     //falta FK CustomerId
     {
+        "id": "b4h8e7f6-9kio-3c2d-1e0f-9a8b7c6d5e4f",
         "date": "2025-06-12T10:30:05",
         "shippingAdress": "Rivadavia 1100",
-        "billingAdress": "Marcos Paz 657"
+        "billingAdress": "Marcos Paz 657",
+        "customerId" "h48jdo0q-5a4b-3c2d-a9ki-9a8b7c6d5e4f"
     },
     {
+        "id": "f8dj0c99-5a4b-3c2d-a9ki-9a8b7c6d5e4f",
         "date": "2025-06-13T11:30:05",
         "shippingAdress": "San Juan 520",
-        "billingAdress": "Las Piedras 120"
+        "billingAdress": "Las Piedras 120",
+        "customerId": "dk0l2ja2m-5a4b-49jc-a9ki-9a8b7c6d5e4f"
     },
     {
+        "id": "ak78dhn4-5a4b-op30-a9ki-9a8b7c6d5e4f",
         "date": "2025-06-13T12:30:05",
         "shippingAdress": "La Rioja 098",
-        "billingAdress": "Rivadavia 1050"
+        "billingAdress": "Rivadavia 1050",
+        "customerId": "4jmsl702-sk34-49jc-a9ki-9a8b7c6d5e4f"
     }
 ]
