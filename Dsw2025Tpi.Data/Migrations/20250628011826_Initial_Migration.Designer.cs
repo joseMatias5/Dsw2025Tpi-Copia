@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2025Tpi.Data.Migrations
 {
     [DbContext(typeof(Dsw2025TpiContext))]
-    [Migration("20250627024455_Second_Model")]
-    partial class Second_Model
+    [Migration("20250628011826_Initial_Migration")]
+    partial class Initial_Migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -80,10 +80,6 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalAmount")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -106,10 +102,6 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.Property<int>("Quantity")
                         .HasMaxLength(5)
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(15, 2)

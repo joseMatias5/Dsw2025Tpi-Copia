@@ -10,5 +10,4 @@ public record OrderItemModel
 {
     public record OrderItemRequest(int Quantity, ProductModel product);
     public record Response(Guid Id, int Quantity);
-
 }

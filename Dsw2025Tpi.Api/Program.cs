@@ -6,6 +6,7 @@ using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Dsw2025Tpi.Data.Helpers;
+using Dsw2025Tpi.Application.Interfaces;
 
 namespace Dsw2025Tpi.Api;
 
@@ -23,24 +24,17 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
 
-        /* builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
-         {
-             //options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Dsw2025tpi;Integrated Security=True;");
-             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-         });*/
-
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
-        {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiEntities"));
-            options.UseSeeding((c, t) =>
-            {
-                ((Dsw2025TpiContext)c).Seedwork<Order>("Sources\\orders.json");
-                ((Dsw2025TpiContext)c).Seedwork<Product>("Sources\\products.json");
-            });
-        });
+         {
+             options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Dsw2025tpi;Integrated Security=True;");
+             //options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+         });
+
+
 
         builder.Services.AddScoped<IRepository, EfRepository>();
-        builder.Services.AddTransient<ProductsManagementServices>();
+        builder.Services.AddScoped<IProductsManagementService, ProductsManagementServices>();
+        builder.Services.AddScoped<IOrdersManagementService, OrdersManagementService>();
 
         var app = builder.Build();
         // Configure the HTTP request pipeline.

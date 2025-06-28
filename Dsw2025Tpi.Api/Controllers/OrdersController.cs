@@ -8,8 +8,8 @@ namespace Dsw2025Tpi.Api.Controllers;
 [Route("api/orders")]
 public class OrdersController : ControllerBase
 {
-    private readonly OrdersManagementService _service;
-    public OrdersController(OrdersManagementService service)
+    private readonly IOrdersManagementService _service;
+    public OrdersController(IOrdersManagementService service)
     {
         _service = service;
     }

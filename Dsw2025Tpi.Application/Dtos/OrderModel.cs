@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dsw2025Tpi.Domain.Entities;
-using static Dsw2025Tpi.Application.Dtos.OrderItemModel;
 
 namespace Dsw2025Tpi.Application.Dtos;
 

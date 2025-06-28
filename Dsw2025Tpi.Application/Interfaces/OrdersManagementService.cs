@@ -4,14 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Data.Repositories;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 
-namespace Dsw2025Tpi.Application.Services;
+namespace Dsw2025Tpi.Application.Interfaces;
 
 
-public class OrdersManagementService
+public class OrdersManagementService : IOrdersManagementService
 {
     //private readonly EfRepository _repository;
 

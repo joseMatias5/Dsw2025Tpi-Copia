@@ -77,10 +77,6 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalAmount")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -103,10 +99,6 @@ namespace Dsw2025Tpi.Data.Migrations
                     b.Property<int>("Quantity")
                         .HasMaxLength(5)
                         .HasColumnType("int");
-
-                    b.Property<decimal>("Subtotal")
-                        .HasPrecision(15, 2)
-                        .HasColumnType("decimal(15,2)");
 
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(15, 2)
