@@ -1,5 +1,5 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
-using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 
@@ -84,7 +84,7 @@ public class ProductsController : ControllerBase
             {
                 return NotFound();
             }
-            return Ok(product);
+            return NoContent();
         }
         catch (ArgumentException ae)
         {

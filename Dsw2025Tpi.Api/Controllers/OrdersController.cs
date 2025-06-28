@@ -1,5 +1,5 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
-using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api.Controllers;

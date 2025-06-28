@@ -25,12 +25,15 @@ public class Program
         builder.Services.AddHealthChecks();
 
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
-         {
-             options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Dsw2025tpi;Integrated Security=True;");
-             //options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-         });
-
-
+        {
+            options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Dsw2025tpi;Integrated Security=True;");
+            options.UseSeeding((c, t) =>
+            {
+                ((Dsw2025TpiContext)c).Seedwork<Order>("Sources\\orders.json");
+                ((Dsw2025TpiContext)c).Seedwork<Product>("Sources\\products.json");
+                ((Dsw2025TpiContext)c).Seedwork<Customer>("Sources\\customers.json");
+            });
+        });
 
         builder.Services.AddScoped<IRepository, EfRepository>();
         builder.Services.AddScoped<IProductsManagementService, ProductsManagementServices>();

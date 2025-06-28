@@ -1,7 +1,7 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Domain.Entities;
 
-namespace Dsw2025Tpi.Application.Services
+namespace Dsw2025Tpi.Application.Interfaces
 {
     public interface IProductsManagementService
     {
@@ -11,6 +11,6 @@ namespace Dsw2025Tpi.Application.Services
         Task<IEnumerable<Product>?> GetProduct();
         Task<Product?> GetProductById(Guid id);
         Task<ProductModel.ResponseProduct> UpdateProduct(Guid id, ProductModel.RequestProduct request);
-        Task<T> UpdateProduct<T>(T entity) where T : EntityBase;
+        //Task<T> UpdateProduct<T>(T entity) where T : EntityBase;
     }
 }

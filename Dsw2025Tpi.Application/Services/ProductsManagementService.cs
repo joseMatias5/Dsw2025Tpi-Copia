@@ -8,9 +8,9 @@ using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Exceptions;
-using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Application.Interfaces;
 
-namespace Dsw2025Tpi.Application.Interfaces;
+namespace Dsw2025Tpi.Application.Services;
 
 public class ProductsManagementServices : IProductsManagementService
 {
@@ -22,12 +22,21 @@ public class ProductsManagementServices : IProductsManagementService
     }
     public async Task<Product?> GetProductById(Guid id)
     {
-        return await _repository.GetById<Product>(id);
+        var product = await _repository.GetById<Product>(id);
+        if (product == null)
+            throw new System.ApplicationException("Product not found.");
+        return product;
     }
 
     public async Task<IEnumerable<Product>?> GetProduct()
     {
-        return await _repository.GetAll<Product>();
+        var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
+
+        if (!activeProducts.Any())
+            throw new Exceptions.ApplicationException("There are no active products");
+
+        return (IEnumerable<Product>?)activeProducts.Select(p => new ProductModel.ResponseProduct(
+            p.Id, p.Sku, p.InternalCode, p.Name, p.Description, p.CurrentUnitPrice, p.StockQuantity));
     }
 
     public async Task<ProductModel.ResponseProduct> AddProduct(ProductModel.RequestProduct request)
@@ -43,17 +52,15 @@ public class ProductsManagementServices : IProductsManagementService
 
         var exist = await _repository.First<Product>(p => p.Sku == request.Sku);
         if (await _repository.First<Product>(p => p.Sku == request.Sku) != null)
-            throw new DuplicatedEntityException($"Ya existe un producto con el SKU {request.Sku}");
+            throw new DuplicatedEntityException($"A product with that SKU already exists {request.Sku}");
 
         if (await _repository.First<Product>(p => p.InternalCode == request.InternalCode) != null)
-            throw new DuplicatedEntityException($"Ya existe un producto con el código interno {request.InternalCode}");
+            throw new DuplicatedEntityException($"A product with that internal code already exists {request.InternalCode}");
 
         var product = new Product(request.Sku, request.InternalCode, request.Name, request.Description, request.CurrentUnitPrice, request.StockQuantity);
         await _repository.Add(product);
         return new ProductModel.ResponseProduct(product.Id, product.Sku, product.InternalCode, product.Name, product.Description, product.CurrentUnitPrice, product.StockQuantity);
     }
-    public async Task<T> UpdateProduct<T>(T entity) where T : EntityBase
-         => await _repository.Update(entity);
 
     public async Task DeleteProduct<T>(T entity) where T : EntityBase
         => await _repository.Delete(entity);
@@ -62,9 +69,16 @@ public class ProductsManagementServices : IProductsManagementService
     {
         var product = await _repository.GetById<Product>(id);
         if (product == null)
-            throw new System.ApplicationException("Producto no encontrado.");
-        if (string.IsNullOrWhiteSpace(request.Sku) || string.IsNullOrWhiteSpace(request.Name))
-            throw new ArgumentException("SKU y nombre son obligatorios.");
+            throw new System.ApplicationException("Product not found.");
+        if (string.IsNullOrWhiteSpace(request.Sku) ||
+            string.IsNullOrWhiteSpace(request.InternalCode) ||
+            string.IsNullOrWhiteSpace(request.Name) ||
+            string.IsNullOrWhiteSpace(request.CurrentUnitPrice.ToString()) ||
+            string.IsNullOrWhiteSpace(request.StockQuantity.ToString()))
+        {
+            throw new ArgumentException("Invalid values for product");
+        }
+        
         product.Sku = request.Sku;
         product.InternalCode = request.InternalCode;
         product.Name = request.Name;

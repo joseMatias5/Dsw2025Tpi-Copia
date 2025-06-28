@@ -22,9 +22,6 @@
     <None Update="Sources\customers.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Sources\orderitems.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Sources\orders.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
