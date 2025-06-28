@@ -1,20 +1,27 @@
 [
     {
-        "id": "b4h8e7f6-9kio-3c2d-1e0f-9a8b7c6d5e4f",
-        "shippingAdress": "Rivadavia 1100",
-        "billingAdress": "Marcos Paz 657",
-        "customerId": "h48jdo0q-5a4b-3c2d-a9ki-9a8b7c6d5e4f"
-    },
-    {
-        "id": "f8dj0c99-5a4b-3c2d-a9ki-9a8b7c6d5e4f",
-        "shippingAdress": "San Juan 520",
-        "billingAdress": "Las Piedras 120",
-        "customerId": "dk0l2ja2m-5a4b-49jc-a9ki-9a8b7c6d5e4f"
-    },
-    {
-        "id": "ak78dhn4-5a4b-op30-a9ki-9a8b7c6d5e4f",
-        "shippingAdress": "La Rioja 098",
-        "billingAdress": "Rivadavia 1050",
-        "customerId": "4jmsl702-sk34-49jc-a9ki-9a8b7c6d5e4f"
+        "Id": "b4h8e7f6-9kio-3c2d-1e0f-9a8b7c6d5e4f",
+        "ShippingAddress": "Calle Falsa 123, Ciudad, País",
+        "BillingAddress": "Calle Falsa 234, Ciudad, País",
+        "Notes": "Entregar en horario comercial",
+        "CustomerId": "h48jdo0q-5a4b-3c2d-a9ki-9a8b7c6d5e4f",
+        "OrderItems": [
+            {
+                "productId": "9318924F-92DC-445E-9D5E-19EC67AFC244",
+                "quantity": 1,
+                "name": "Producto 1",
+                "description": "Descripción del producto 1",
+                "currentUnitPrice": 100.00
+            },
+            {
+                "productId": "1k9n7h4c-5a4b-3c2d-1e0f-9a8b7c6d5e4f",
+                "quantity": 3,
+                "name": "Producto 2",
+                "description": "Descripción del producto 2",
+                "currentUnitPrice": 1000.00
+            }
+        ]
     }
+
 ]
+

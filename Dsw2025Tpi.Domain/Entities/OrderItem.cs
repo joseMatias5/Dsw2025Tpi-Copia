@@ -8,6 +8,7 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class OrderItem : EntityBase
 {
+    public OrderItem() { }
     public OrderItem(int quantity,Product product )
     {
         if (quantity <= 0)

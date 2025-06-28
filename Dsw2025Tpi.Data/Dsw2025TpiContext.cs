@@ -37,7 +37,7 @@ public class Dsw2025TpiContext: DbContext
             e.Property(e => e.ShippingAddress).HasMaxLength(50).IsRequired();
             e.Property(e => e.BillingAddress).HasMaxLength(50).IsRequired();
             e.Property(e => e.Notes).HasMaxLength(80);
-            e.Property(e => e.TotalAmount).HasPrecision(15, 2).IsRequired();
+            e.Ignore(e => e.TotalAmount);
         });
         #endregion
 
@@ -48,7 +48,7 @@ public class Dsw2025TpiContext: DbContext
             e.Property(e => e.Id).IsRequired();
             e.Property(e => e.Quantity).HasMaxLength(5).IsRequired();
             e.Property(e => e.UnitPrice).HasPrecision(15, 2).IsRequired();
-            e.Property(e => e.Subtotal).HasPrecision(15, 2).IsRequired();
+            e.Ignore(e => e.Subtotal);
         });
         #endregion
 
