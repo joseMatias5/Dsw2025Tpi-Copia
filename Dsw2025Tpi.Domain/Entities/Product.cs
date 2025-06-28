@@ -24,15 +24,24 @@ public class Product : EntityBase
         CurrentUnitPrice = currentUnitPrice; 
         StockQuantity = stockQuantity;  
         IsActive = true ;
-
     }
     public string Sku {  get; set; }
     public string InternalCode { get; set; }
     public  string Name { get; set; }
     public string? Description { get; set; }
-    public decimal CurrentUnitPrice { get; private set; }
-    public int StockQuantity { get; private set; }
+    public decimal CurrentUnitPrice { get;  set; }
+    public int StockQuantity { get;  set; }
     public bool IsActive { get; set; }
 
     public ICollection<OrderItem>? OrderItems { get; set; }
+
+    public bool ControlStock(int quantity)
+    {
+        if (quantity < StockQuantity)
+        {
+            StockQuantity -= quantity;
+            return true;
+        }
+        return false;
+    }
 }

@@ -42,8 +42,11 @@ public class ProductsManagementServices
         }
 
         var exist = await _repository.First<Product>(p => p.Sku == request.Sku);
-        if (exist != null) throw new DuplicatedEntityException($"A product with that Sku already exists {request.Sku}");
-        if (exist != null) throw new DuplicatedEntityException($"A product with that Internal Code already exists {request.InternalCode}");
+        if (await _repository.First<Product>(p => p.Sku == request.Sku) != null)
+            throw new DuplicatedEntityException($"Ya existe un producto con el SKU {request.Sku}");
+
+        if (await _repository.First<Product>(p => p.InternalCode == request.InternalCode) != null)
+            throw new DuplicatedEntityException($"Ya existe un producto con el código interno {request.InternalCode}");
 
         var product = new Product(request.Sku, request.InternalCode, request.Name, request.Description, request.CurrentUnitPrice,request.StockQuantity);
         await _repository.Add(product);
@@ -55,9 +58,31 @@ public class ProductsManagementServices
     public async Task DeleteProduct<T>(T entity) where T : EntityBase
         => await _repository.Delete(entity);
 
+    public async Task<ProductModel.ResponseProduct> UpdateProduct(Guid id, ProductModel.RequestProduct request)
+    {
+        var product = await _repository.GetById<Product>(id);
+        if (product == null)
+            throw new System.ApplicationException("Producto no encontrado.");
+        if (string.IsNullOrWhiteSpace(request.Sku) || string.IsNullOrWhiteSpace(request.Name))
+            throw new ArgumentException("SKU y nombre son obligatorios.");
+        product.Sku = request.Sku;
+        product.InternalCode = request.InternalCode;
+        product.Name = request.Name;
+        product.CurrentUnitPrice = request.CurrentUnitPrice;
+        product.StockQuantity = request.StockQuantity;
 
-
-public async Task<ProductModel.ResponseProduct?> DeactivateProduct(Guid id)
+        var updated = await _repository.Update(product);
+        return new ProductModel.ResponseProduct(
+            updated.Id,
+            updated.Sku,
+            updated.InternalCode,
+            updated.Name,
+            updated.Description,
+            updated.CurrentUnitPrice,
+            updated.StockQuantity
+        );
+    }
+    public async Task<ProductModel.ResponseProduct?> DeactivateProduct(Guid id)
     {
         var product = await _repository.GetById<Product>(id);
         if (product == null)

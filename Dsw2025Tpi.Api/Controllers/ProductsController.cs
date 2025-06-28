@@ -26,7 +26,7 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductBySku(Guid id)
+    public async Task<IActionResult> GetProductById(Guid id)
     {
         var product = await _service.GetProductById(id);
         if (product == null) return NotFound();
@@ -55,6 +55,22 @@ public class ProductsController : ControllerBase
         {
             return Problem("There was a problem saving the product");
         }
+    }
+
+    [HttpPut]
+    [Route("{id:guid}")]
+    public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] ProductModel.RequestProduct request)
+    {
+        if (request == null)
+        {
+            return BadRequest("Product data is invalid.");
+        }
+        var updatedProduct = await _service.UpdateProduct(id, request);
+        if (updatedProduct == null)
+        {
+            return NotFound();
+        }
+        return Ok(updatedProduct);
     }
 
     [HttpPatch()]
