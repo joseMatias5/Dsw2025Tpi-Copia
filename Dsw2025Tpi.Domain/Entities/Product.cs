@@ -15,7 +15,7 @@ public class Product : EntityBase
     public string? Description { get; set; }
     public decimal? CurrentUnitPrice { get; set; }
     public int? StockQuantity {  get; set;}
-    public bool? IsActive { get; set; }
+    public bool IsActive { get; set; }
     public ICollection<OrderItem>? OrderItems { get; set; }
 
     public Product(string? sku, string? internalCode, string? name, string? description, 
