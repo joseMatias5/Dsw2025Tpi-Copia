@@ -1,0 +1,37 @@
+﻿[
+    {
+        "shippingAddress": "123 Main St, Springfield",
+        "billingAddress": "123 Main St, Springfield",
+        "customerId": "h48jdo0q-5a4b-3c2d-a9ki-9a8b7c6d5e4f",
+        "orderItems": [
+            {
+                "productId": "p1q2r3s4-t5u6-v7w8-x9y0-z1a2b3c4d5e6",
+                "quantity": 2,
+                "name": "Wireless Mouse",
+                "description": "Ergonomic wireless mouse",
+                "unitPrice": 25.99
+            },
+            {
+                "productId": "p7q8r9s0-t1u2-v3w4-x5y6-z7a8b9c0d1e2",
+                "quantity": 1,
+                "name": "Mechanical Keyboard",
+                "description": "RGB mechanical keyboard",
+                "unitPrice": 79.50
+            }
+        ]
+    },
+    {
+        "shippingAddress": "125 Main St, Springfield",
+        "billingAddress": "123 Main St, Springfield",
+        "customerId": "dk0l2ja2m-5a4b-49jc-a9ki-9a8b7c6d5e4f", 
+        "orderItems": [
+            {
+                "productId": "", //Completar
+                "quantity": 2,
+                "name": "Wireless Mouse",
+                "description": "Ergonomic wireless mouse",
+                "unitPrice": 25.99
+            }
+        ]
+    }
+]

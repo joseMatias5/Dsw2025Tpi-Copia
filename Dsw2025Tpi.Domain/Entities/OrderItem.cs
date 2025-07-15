@@ -13,7 +13,7 @@ public class OrderItem : EntityBase
     public decimal? SubTotal => Quantity * UnitPrice;
     public Guid ProductId { get; set; }
 
-    private Product _product;
+    private Product? _product;
     public Product? Product
     {
         get=> _product;
@@ -31,10 +31,10 @@ public class OrderItem : EntityBase
 
     public OrderItem(int quantity, Product product)
     {
+        Product = product ?? throw new ArgumentNullException(nameof(product), "Product cannot be null");
         Quantity = quantity < 0? 
             throw new ArgumentOutOfRangeException(nameof(quantity), "The Unit Price must be positive") : 
             Product.StockControl(quantity)? quantity : throw new ArgumentException(nameof(quantity), "Stock problems");
         UnitPrice = Product?.CurrentUnitPrice;
-        Product = product ?? throw new ArgumentNullException(nameof(product), "Product cannot be null");
     }
 }

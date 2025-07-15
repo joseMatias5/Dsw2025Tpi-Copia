@@ -1,0 +1,43 @@
+﻿[
+    {
+        "id": "p1q2r3s4-t5u6-v7w8-x9y0-z1a2b3c4d5e6",
+        "sku": "SKU-1001",
+        "internalCode": "INT-2001",
+        "name": "Gaming Headset",
+        "description": "Surround sound gaming headset with microphone.",
+        "currentUnitPrice": 59.99,
+        "stockQuantity": 30
+    },
+    {
+        "id": "p7q8r9s0-t1u2-v3w4-x5y6-z7a8b9c0d1e2",
+        "sku": "SKU-1002",
+        "internalCode": "INT-2002",
+        "name": "Webcam HD",
+        "description": "1080p USB webcam.",
+        "currentUnitPrice": 39.99,
+        "stockQuantity": 20
+    },
+    {
+        "sku": "SKU-1003",
+        "internalCode": "INT-2003",
+        "name": "USB Hub",
+        "description": "4-port USB 3.0 hub.",
+        "currentUnitPrice": 19.99,
+        "stockQuantity": 50
+    },
+    {
+        "sku": "SKU-1004",
+        "internalCode": "INT-2004",
+        "description": "Wireless charger for smartphones.",
+        "currentUnitPrice": 24.99,
+        "stockQuantity": 40
+    },
+    {
+        "sku": "SKU-1005",
+        "internalCode": "INT-2005",
+        "name": "Bluetooth Speaker",
+        "description": "Portable Bluetooth speaker.",
+        "currentUnitPrice": 0,
+        "stockQuantity": 15
+    }
+]
