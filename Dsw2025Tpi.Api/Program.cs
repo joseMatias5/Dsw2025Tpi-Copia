@@ -1,4 +1,11 @@
 
+using Dsw2025Tpi.Application.Interfaces;
+using Dsw2025Tpi.Application.Services;
+using Dsw2025Tpi.Data;
+using Dsw2025Tpi.Data.Repositories;
+using Dsw2025Tpi.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
 namespace Dsw2025Tpi.Api;
 
 public class Program
@@ -15,7 +22,19 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
 
+        builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
+            { 
+                options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiEntities"));
+            }
+        );
+
+        builder.Services.AddScoped<Dsw2025TpiContext>();
+        builder.Services.AddScoped<IRepository, EfRepository>();
+        builder.Services.AddScoped<IProductsManagementService, ProductsManagementService>();
+
+
         var app = builder.Build();
+
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

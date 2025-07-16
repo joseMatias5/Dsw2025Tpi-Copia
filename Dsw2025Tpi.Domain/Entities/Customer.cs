@@ -14,6 +14,7 @@ public class Customer : EntityBase
 
     public ICollection<Order>? Orders { get; set; }
    
+    public Customer() { }
     public Customer(string email, string name, string phoneNumber)
     {
         Email = email;

@@ -29,6 +29,7 @@ public class OrderItem : EntityBase
     public Guid OrderId { get; set; }
     public Order? Order { get; set; }
 
+    public OrderItem() { }
     public OrderItem(int quantity, Product product)
     {
         {

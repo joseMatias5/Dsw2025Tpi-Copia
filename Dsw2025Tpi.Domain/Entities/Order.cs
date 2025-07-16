@@ -19,8 +19,28 @@ public class Order : EntityBase
     public Customer? Customer { get; set; }
     public OrderStatus? Status { get; set; }
 
+    /*
     public Order(string? shippingAddress, string? billingAddress,
         string? notes, Guid customerId, List<(int, Product)> products)
+    {
+        Date = DateTime.UtcNow;
+        ShippingAddress = shippingAddress;
+        BillingAddress = billingAddress;
+        Notes = notes;
+        CustomerId = customerId;
+        Status = OrderStatus.PENDING;
+        OrderItems = products.Select(p => new OrderItem(p.Item1, p.Item2)).ToList();
+    }*/
+
+
+    //Probando
+    protected Order()
+    {
+        OrderItems = new List<OrderItem>();
+    }
+    public Order(string? shippingAddress, string? billingAddress,
+        string? notes, Guid customerId, List<(int, Product)> products)
+        : this()
     {
         Date = DateTime.UtcNow;
         ShippingAddress = shippingAddress;
