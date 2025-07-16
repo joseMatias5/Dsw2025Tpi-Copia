@@ -8,6 +8,7 @@ using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
+using Dsw2025Tpi.Application.Validations;
 
 
 namespace Dsw2025Tpi.Application.Services;
@@ -30,16 +31,10 @@ public class ProductsManagementService : IProductsManagementService
             new ProductModel.Response(product.Id, product.Sku, product.InternalCode, product.Name, product.Description,
                 product.CurrentUnitPrice, product.StockQuantity) :
             null;
-
     }
 
     public async Task<IEnumerable<ProductModel.Response>?> GetProducts()
     {
-        /*return (await _repository
-            .GetFiltered<Product>(p => p.IsActive)?
-            .Select(p => new ProductModel.Response(p.Id, p.Sku,p.InternalCode, p.Name,
-                p.Description,p.CurrentUnitPrice,p.StockQuantity));*/
-
         var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
 
         if (!activeProducts.Any())
@@ -52,25 +47,14 @@ public class ProductsManagementService : IProductsManagementService
             p.Name,
             p.Description,
             p.CurrentUnitPrice,
-            p.StockQuantity));
+            p.StockQuantity)
+        );
     }
 
     public async Task<ProductModel.Response> AddProduct(ProductModel.Request request)
     {
-        if (string.IsNullOrWhiteSpace(request.sku) ||
-            string.IsNullOrWhiteSpace(request.internalCode) ||
-            string.IsNullOrWhiteSpace(request.name) ||
-            request.currentUnitPrice <= 0 ||
-            request.stockQuantity <= 0
-            )
-        {
-            throw new ArgumentException("A product cannot be created with those values");
-        }
-
-        if (await _repository.First<Product>(p => p.Sku == request.sku) != null)
-            throw new DuplicatedEntityException($"A product with this SKU already exists {request.sku}");
-        if (await _repository.First<Product>(p => p.InternalCode == request.internalCode) != null)
-            throw new DuplicatedEntityException($"A product with this Internal Code already exists {request.internalCode}");
+        Validations.ProductValidations.ValidateProduct(request);
+        Validations.ProductValidations.ValidateAddedProduct(request, _repository);
 
         var product = new Product(request.sku, request.internalCode, request.name, request.description, request.currentUnitPrice, request.stockQuantity);
         await _repository.Add(product);
@@ -90,15 +74,7 @@ public class ProductsManagementService : IProductsManagementService
         if (product == null)
             throw new EntityNotFoundException($"Product with ID {id} not found");
 
-        if (string.IsNullOrWhiteSpace(request.sku) ||
-            string.IsNullOrWhiteSpace(request.internalCode) ||
-            string.IsNullOrWhiteSpace(request.name) ||
-            request.currentUnitPrice <= 0 ||
-            request.stockQuantity <= 0
-            )
-        {
-            throw new ArgumentException("A product cannot be updated with those values");
-        }
+        Validations.ProductValidations.ValidateProduct(request);
 
         product.Sku = request.sku;
         product.InternalCode = request.internalCode;
