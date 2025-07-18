@@ -1,6 +1,4 @@
-﻿using System.Net;
-using System.Security.Claims;
-using Dsw2025Tpi.Application.Dtos;
+﻿using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -70,38 +68,10 @@ public class OrderController : Controller
     [HttpPut]
     [Route("{id:guid}")]
 
-    public async Task<IActionResult> UpdateOrderAsync(Guid id, [FromBody] OrderModel.Request request)
+    public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.Request request)
     {
         if (request == null)
             return BadRequest("Order data is required");
-        try
-        {
-            var updatedOrder = await _service.UpdateOrder(id, request);
-            if (updatedOrder == null)
-            {
-                return NotFound();
-            }
-            return Ok(updatedOrder);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (ApplicationException de)
-        {
-            return Conflict(de.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem updating the Order");
-        }
-    }
-
-    [HttpPatch()]
-    [Route("{id:guid}")]
-
-    public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.Request request)
-    {
         try
         {
             var changedOrder = await _service.ChangeOrderStatus(id, request);
