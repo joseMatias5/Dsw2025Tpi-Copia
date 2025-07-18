@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Dsw2025Tpi.Domain.Entities;
 
 public class Order : EntityBase
-{
+{/*
     public DateTime? Date { get; set; }
     public string? ShippingAddress { get; set; }
     public string? BillingAddress { get; set; }
@@ -34,6 +34,7 @@ public class Order : EntityBase
 
 
     //Probando
+    /*
     protected Order()
     {
         OrderItems = new List<OrderItem>();
@@ -49,5 +50,5 @@ public class Order : EntityBase
         CustomerId = customerId;
         Status = OrderStatus.PENDING;
         OrderItems = products.Select(p => new OrderItem(p.Item1, p.Item2)).ToList();
-    }
+    }*/
 }

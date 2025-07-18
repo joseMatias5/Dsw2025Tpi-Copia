@@ -18,6 +18,7 @@ public class Product : EntityBase
     public bool IsActive { get; set; }
     public ICollection<OrderItem>? OrderItems { get; set; }
 
+    public Product() { }
     public Product(string? sku, string? internalCode, string? name, string? description, 
         decimal? currentUnitPrice, int? stockQuantity)
     {

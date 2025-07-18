@@ -2,7 +2,9 @@
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Application.Services;
 using Dsw2025Tpi.Data;
+using Dsw2025Tpi.Data.Helpers;
 using Dsw2025Tpi.Data.Repositories;
+using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,26 +17,23 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         // Add services to the container.
-
         builder.Services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddHealthChecks();
-
         builder.Services.AddDbContext<Dsw2025TpiContext>(options =>
-            { 
-                options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiEntities"));
-            }
-        );
-
-        builder.Services.AddScoped<Dsw2025TpiContext>();
+        {
+            options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
+            options.UseSeeding((c, t) =>
+            {
+                var jsonPath = @"C:\Users\Jose\OneDrive - frt.utn.edu.ar\Facultad\TERCERA AÑO UTN\Desarrollo de software\TPI\TPI de nuevo\Dsw2025Tpi-Copia\Dsw2025Tpi.Data\Sources\products.json";
+                ((Dsw2025TpiContext)c).Seedwork<Product>(jsonPath);
+            });
+        });
         builder.Services.AddScoped<IRepository, EfRepository>();
-        builder.Services.AddScoped<IProductsManagementService, ProductsManagementService>();
-
+        builder.Services.AddTransient<IProductsManagementService, ProductsManagementService>();
 
         var app = builder.Build();
-
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -44,12 +43,9 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-
         app.UseAuthorization();
-
         app.MapControllers();
-        
-        app.MapHealthChecks("/healthcheck");
+        app.MapHealthChecks("/health-check");
 
         app.Run();
     }
