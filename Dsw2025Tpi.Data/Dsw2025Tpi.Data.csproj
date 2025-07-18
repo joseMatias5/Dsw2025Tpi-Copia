@@ -7,10 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Sources\customers.json" />
+    <None Remove="Sources\orders.json" />
     <None Remove="Sources\products.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Sources\customers.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Sources\orders.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Sources\products.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -26,15 +34,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dsw2025Tpi.Domain\Dsw2025Tpi.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Sources\customers.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Sources\orders.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <ItemGroup>

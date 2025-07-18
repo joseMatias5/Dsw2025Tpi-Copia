@@ -26,8 +26,14 @@ public class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
             options.UseSeeding((c, t) =>
             {
-                var jsonPath = @"C:\Users\Jose\OneDrive - frt.utn.edu.ar\Facultad\TERCERA AÑO UTN\Desarrollo de software\TPI\TPI de nuevo\Dsw2025Tpi-Copia\Dsw2025Tpi.Data\Sources\products.json";
+                var jsonPath = @"C:\Users\54381\Documents\Angeles\DesarrolloSW\TPI\TPIDeNuevo\Dsw2025Tpi-Copia\Dsw2025Tpi.Data\Sources\products.json";
                 ((Dsw2025TpiContext)c).Seedwork<Product>(jsonPath);
+                var jsonPath1 = @"C:\Users\54381\Documents\Angeles\DesarrolloSW\TPI\TPIDeNuevo\Dsw2025Tpi-Copia\Dsw2025Tpi.Data\Sources\customers.json";
+                ((Dsw2025TpiContext)c).Seedwork<Customer>(jsonPath1);
+                //var dataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dsw2025Tpi.Data", "Sources");
+                //var jsonPath = Path.Combine(dataDirectory, "products.json");
+                //((Dsw2025TpiContext)c).Seedwork<Product>(jsonPath);
+
             });
         });
         builder.Services.AddScoped<IRepository, EfRepository>();

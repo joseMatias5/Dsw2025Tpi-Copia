@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace Dsw2025Tpi.Domain.Entities;
 
 public class OrderItem : EntityBase
-{/*
-    public int? Quantity { get; set; }
+{
+    public int Quantity { get; set; }
     public decimal? UnitPrice { get; set; }
     public decimal? SubTotal => Quantity * UnitPrice;
     public Guid ProductId { get; set; }
@@ -46,5 +46,5 @@ public class OrderItem : EntityBase
             Quantity = quantity;
             UnitPrice = product.CurrentUnitPrice;
         }
-    }*/
+    }
 }

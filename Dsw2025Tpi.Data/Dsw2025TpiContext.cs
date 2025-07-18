@@ -26,7 +26,7 @@ public class Dsw2025TpiContext: DbContext
             e.Property(e => e.CurrentUnitPrice).HasPrecision(15, 2).IsRequired();
             e.Property(e => e.StockQuantity).HasMaxLength(3).IsRequired();
         });
-/*
+
         modelBuilder.Entity<Order>(e =>
         {
             e.Property(e => e.Id).HasMaxLength(36).IsRequired();
@@ -59,6 +59,6 @@ public class Dsw2025TpiContext: DbContext
                 .WithOne(e => e.Customer)
                 .HasForeignKey(e => e.CustomerId)
                 .OnDelete(DeleteBehavior.Cascade);
-        });*/
+        });
     }
 }

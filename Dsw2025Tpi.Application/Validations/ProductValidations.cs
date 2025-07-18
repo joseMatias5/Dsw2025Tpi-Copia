@@ -32,7 +32,11 @@ public class ProductValidations
         if (await _repository.First<Product>(p => p.InternalCode == request.internalCode) != null)
             throw new DuplicatedEntityException($"A product with this Internal Code already exists {request.internalCode}");
     }
-
+    public async static void ValidateExistingProduct(Guid id, IRepository _repository)
+    {
+        if (await _repository.First<Product>(p => p.Id == id) == null)
+            throw new EntityNotFoundException($"Product with ID {id} not found");
+    }
 }
 
 
