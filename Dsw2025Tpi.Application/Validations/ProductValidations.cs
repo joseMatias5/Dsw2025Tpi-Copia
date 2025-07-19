@@ -12,7 +12,7 @@ namespace Dsw2025Tpi.Application.Validations;
 
 public class ProductValidations
 {
-    public static void ValidateProduct(ProductModel.Request request)
+    public static void ValidateProduct(ProductModel.RequestProduct request)
     {
         if (string.IsNullOrWhiteSpace(request.sku))
             throw new ArgumentException("SKU cannot be null or empty", nameof(request.sku));
@@ -25,14 +25,14 @@ public class ProductValidations
         if (request.stockQuantity < 0)
             throw new ArgumentException("Stock quantity cannot be negative", nameof(request.stockQuantity));
     }
-    public async static void ValidateAddedProduct(ProductModel.Request request, IRepository _repository)
+    public async static Task ValidateAddedProduct(ProductModel.RequestProduct request, IRepository _repository)
     {
         if (await _repository.First<Product>(p => p.Sku == request.sku) != null)
             throw new DuplicatedEntityException($"A product with this SKU already exists {request.sku}");
         if (await _repository.First<Product>(p => p.InternalCode == request.internalCode) != null)
             throw new DuplicatedEntityException($"A product with this Internal Code already exists {request.internalCode}");
     }
-    public async static void ValidateExistingProduct(Guid id, IRepository _repository)
+    public async static Task ValidateExistingProduct(Guid id, IRepository _repository)
     {
         if (await _repository.First<Product>(p => p.Id == id) == null)
             throw new EntityNotFoundException($"Product with ID {id} not found");

@@ -23,17 +23,17 @@ public class ProductsManagementService : IProductsManagementService
     {
         _repository = repository;
     }
-    public async Task<ProductModel.Response?> GetProductById(Guid id)
+    public async Task<ProductModel.ResponseProduct?> GetProductById(Guid id)
     {
         var product = await _repository.GetById<Product>(id);
         return product != null ?
-            new ProductModel.Response(product.Id, product.Sku, product.InternalCode, product.Name, product.Description,
+            new ProductModel.ResponseProduct(product.Id, product.Sku, product.InternalCode, product.Name, product.Description,
                 product.CurrentUnitPrice, product.StockQuantity) :
             null;
 
     }
 
-    public async Task<IEnumerable<ProductModel.Response>?> GetProducts()
+    public async Task<IEnumerable<ProductModel.ResponseProduct>?> GetProducts()
     {
 
         var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
@@ -51,7 +51,7 @@ public class ProductsManagementService : IProductsManagementService
             p.StockQuantity));*/
         return (await _repository
             .GetFiltered<Product>(p => p.IsActive))?
-            .Select(p => new ProductModel.Response(
+            .Select(p => new ProductModel.ResponseProduct(
                 p.Id,
                 p.Sku,
                 p.InternalCode,
@@ -62,14 +62,14 @@ public class ProductsManagementService : IProductsManagementService
             );
     }
 
-    public async Task<ProductModel.Response> AddProduct(ProductModel.Request request)
+    public async Task<ProductModel.ResponseProduct> AddProduct(ProductModel.RequestProduct request)
     {
         Validations.ProductValidations.ValidateProduct(request);
-        Validations.ProductValidations.ValidateAddedProduct(request, _repository);
+        await Validations.ProductValidations.ValidateAddedProduct(request, _repository);
 
         var product = new Product(request.sku, request.internalCode, request.name, request.description, request.currentUnitPrice, request.stockQuantity);
         await _repository.Add(product);
-        return new ProductModel.Response(
+        return new ProductModel.ResponseProduct(
             product.Id,
             product.Sku,
             product.InternalCode,
@@ -79,9 +79,9 @@ public class ProductsManagementService : IProductsManagementService
             product.StockQuantity);
     }
 
-    public async Task<ProductModel.Response> UpdateProduct(Guid id, ProductModel.Request request)
+    public async Task<ProductModel.ResponseProduct> UpdateProduct(Guid id, ProductModel.RequestProduct request)
     {
-        Validations.ProductValidations.ValidateExistingProduct(id, _repository);
+        await Validations.ProductValidations.ValidateExistingProduct(id, _repository);
         var product = await _repository.First<Product>(p => p.Id == id);
         Validations.ProductValidations.ValidateProduct(request);
 
@@ -93,7 +93,7 @@ public class ProductsManagementService : IProductsManagementService
         product.StockQuantity = request.stockQuantity;
 
         var updated = await _repository.Update(product);
-        return new ProductModel.Response(
+        return new ProductModel.ResponseProduct(
             updated.Id,
             updated.Sku,
             updated.InternalCode,
@@ -104,13 +104,13 @@ public class ProductsManagementService : IProductsManagementService
         );
     }
 
-    public async Task<ProductModel.Response> DeleteProduct(Guid id)
+    public async Task<ProductModel.ResponseProduct> DeleteProduct(Guid id)
     {
         var product = await _repository.First<Product>(p => p.Id == id);
-        Validations.ProductValidations.ValidateExistingProduct(id, _repository);
+        await Validations.ProductValidations.ValidateExistingProduct(id, _repository);
         product.IsActive = false;
         var deleted = await _repository.Update(product);
-        return new ProductModel.Response(
+        return new ProductModel.ResponseProduct(
             deleted.Id,
             deleted.Sku,
             deleted.InternalCode,
@@ -121,17 +121,17 @@ public class ProductsManagementService : IProductsManagementService
         );
     }
     //Para el PATCH
-    public async Task<ProductModel.Response?> DeactivateProduct(Guid id)
+    public async Task<ProductModel.ResponseProduct?> DeactivateProduct(Guid id)
     {
         var product = await _repository.GetById<Product>(id);
-        Validations.ProductValidations.ValidateExistingProduct(id, _repository);
+        await Validations.ProductValidations.ValidateExistingProduct(id, _repository);
         if (product == null)
             return null;
 
         product.IsActive = false;
         var updated = await _repository.Update(product);
 
-        return new ProductModel.Response(
+        return new ProductModel.ResponseProduct(
             updated.Id,
             updated.Sku,
             updated.InternalCode,

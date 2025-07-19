@@ -41,7 +41,7 @@ public class OrderController : Controller
 
     [HttpPost()]
 
-    public async Task<IActionResult> AddOrder([FromBody] OrderModel.Request request)
+    public async Task<IActionResult> AddOrder([FromBody] OrderModel.RequestOrder request)
     {
         if (request == null)
             return BadRequest("Order data is required");
@@ -68,7 +68,7 @@ public class OrderController : Controller
     [HttpPut]
     [Route("{id:guid}")]
 
-    public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.Request request)
+    public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.RequestOrder request)
     {
         if (request == null)
             return BadRequest("Order data is required");

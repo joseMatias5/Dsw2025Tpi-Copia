@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,9 @@ public class Order : EntityBase
     public string? ShippingAddress { get; set; }
     public string? BillingAddress { get; set; }
     public string? Notes { get; set; }
-    public decimal? TotalAmount => OrderItems.Sum(item => item.SubTotal);
+
+    [NotMapped]
+    public decimal? TotalAmount => OrderItems?.Sum(item => item.SubTotal) ?? 0;
     
     public ICollection<OrderItem> OrderItems { get; set; }
     public Guid CustomerId { get; set; }

@@ -34,7 +34,6 @@ public class Dsw2025TpiContext: DbContext
             e.Property(e => e.ShippingAddress).HasMaxLength(50).IsRequired();
             e.Property(e => e.BillingAddress).HasMaxLength(50).IsRequired();
             e.Property(e => e.Notes).HasMaxLength(100).IsRequired();
-            e.Property(e => e.TotalAmount).HasPrecision(15, 2).IsRequired();
             e.HasMany(e => e.OrderItems)
                 .WithOne(e => e.Order)
                 .HasForeignKey(e => e.OrderId)

@@ -9,5 +9,5 @@ namespace Dsw2025Tpi.Application.Dtos;
 public record OrderItemModel
 {
     public record OrderItemRequest(int Quantity, ProductModel product);
-    public record Response(Guid Id, int Quantity, ProductModel.Response product);
+    public record Response(Guid Id, int Quantity, ProductModel.ResponseProduct product);
 }

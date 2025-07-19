@@ -12,7 +12,7 @@ namespace Dsw2025Tpi.Application.Validations;
 
 public class OrderValidations
 {
-    public static void ValidateOrder(OrderModel.Request request)
+    public static void ValidateOrder(OrderModel.RequestOrder request)
     {
         if (request.products == null || !request.products.Any())
             throw new ArgumentException("Order must contain at least one item", nameof(request.products));
@@ -27,7 +27,7 @@ public class OrderValidations
             throw new ArgumentException("Customer ID cannot be empty", nameof(request.customerId));
     }
 
-    public async static void ValidateExistingOrder(Guid id, IRepository _repository)
+    public async static Task ValidateExistingOrder(Guid id, IRepository _repository)
     {
         if (await _repository.First<Order>(p => p.Id == id) == null)
             throw new EntityNotFoundException($"Order with ID {id} not found");

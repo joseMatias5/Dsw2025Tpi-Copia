@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Security.Claims;
 using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,7 +44,7 @@ public class ProductController : Controller
 
     [HttpPost()]
 
-    public async Task<IActionResult> AddProduct([FromBody] ProductModel.Request request)
+    public async Task<IActionResult> AddProduct([FromBody] ProductModel.RequestProduct request)
     {
         if (request == null)
             return BadRequest("Product data is required");
@@ -53,13 +54,17 @@ public class ProductController : Controller
             return CreatedAtAction(nameof(GetProductById), new { id = product.id }, product);
 
         }
+        catch (DuplicatedEntityException de) 
+        {
+            return BadRequest(de.Message);
+        }
         catch (ArgumentException ae)
         {
             return BadRequest(ae.Message);
         }
-        catch (ApplicationException de)
+        catch (Application.Exceptions.ApplicationException ape)
         {
-            return Conflict(de.Message);
+            return Conflict(ape.Message);
         }
         catch (Exception)
         {
@@ -70,7 +75,7 @@ public class ProductController : Controller
     [HttpPut]
     [Route("{id:guid}")]
 
-    public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] ProductModel.Request request)
+    public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] ProductModel.RequestProduct request)
     {
         if (request == null)
             return BadRequest("Product data is required");
@@ -87,7 +92,7 @@ public class ProductController : Controller
         {
             return BadRequest(ae.Message);
         }
-        catch (ApplicationException de)
+        catch (Application.Exceptions.ApplicationException de)
         {
             return Conflict(de.Message);
         }
@@ -115,7 +120,7 @@ public class ProductController : Controller
         {
             return BadRequest(ae.Message);
         }
-        catch (ApplicationException de)
+        catch (Application.Exceptions.ApplicationException de)
         {
             return Conflict(de.Message);
         }

@@ -8,8 +8,8 @@ namespace Dsw2025Tpi.Application.Dtos;
 
 public record ProductModel
 {
-    public record Request(string sku, string internalCode, string name, string description,
+    public record RequestProduct(string sku, string internalCode, string name, string description,
         decimal currentUnitPrice, int stockQuantity);
-    public record Response(Guid id, string? sku, string? internalCode, string? name, string? description,
+    public record ResponseProduct(Guid id, string? sku, string? internalCode, string? name, string? description,
         decimal? currentUnitPrice, int? stockQuantity);
 }
