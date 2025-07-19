@@ -58,7 +58,7 @@ public class OrdersManagementService : IOrdersManagementService
         Validations.OrderValidations.ValidateOrder(request);
 
         var order = new Order(request.shippingAddress, request.billingAddress, request.notes,
-            request.customerId, request.products);
+            request.customerId, request.orderItems);
         return new OrderModel.ResponseOrder(
             order.Id,
             order.Date,

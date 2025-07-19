@@ -14,8 +14,8 @@ public class OrderValidations
 {
     public static void ValidateOrder(OrderModel.RequestOrder request)
     {
-        if (request.products == null || !request.products.Any())
-            throw new ArgumentException("Order must contain at least one item", nameof(request.products));
+        if (request.orderItems == null || !request.orderItems.Any())
+            throw new ArgumentException("Order must contain at least one item", nameof(request.orderItems));
 
         if (string.IsNullOrWhiteSpace(request.shippingAddress))
             throw new ArgumentException("Shipping address cannot be null or empty", nameof(request.shippingAddress));
