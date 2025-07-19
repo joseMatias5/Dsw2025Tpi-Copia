@@ -34,8 +34,17 @@ public class ProductValidations
     }
     public async static Task ValidateExistingProduct(Guid id, IRepository _repository)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Product ID cannot be empty", nameof(id));
         if (await _repository.First<Product>(p => p.Id == id) == null)
             throw new EntityNotFoundException($"Product with ID {id} not found");
+
+    }
+
+    public static void ValidateActiveProduct(Product product)
+    {
+        if (!product.IsActive)
+            throw new EntityNotFoundException($"Product with ID {product.Id} is not active");
     }
 }
 

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dsw2025Tpi.Application.Dtos;
-using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
+using Dsw2025Tpi.Application.Validations;
 
 
 namespace Dsw2025Tpi.Application.Services;
@@ -64,8 +64,8 @@ public class ProductsManagementService : IProductsManagementService
 
     public async Task<ProductModel.ResponseProduct> AddProduct(ProductModel.RequestProduct request)
     {
-        Validations.ProductValidations.ValidateProduct(request);
-        await Validations.ProductValidations.ValidateAddedProduct(request, _repository);
+        ProductValidations.ValidateProduct(request);
+        await ProductValidations.ValidateAddedProduct(request, _repository);
 
         var product = new Product(request.sku, request.internalCode, request.name, request.description, request.currentUnitPrice, request.stockQuantity);
         await _repository.Add(product);
@@ -81,11 +81,11 @@ public class ProductsManagementService : IProductsManagementService
 
     public async Task<ProductModel.ResponseProduct> UpdateProduct(Guid id, ProductModel.RequestProduct request)
     {
-        await Validations.ProductValidations.ValidateExistingProduct(id, _repository);
+        await ProductValidations.ValidateExistingProduct(id, _repository);
         var product = await _repository.First<Product>(p => p.Id == id);
-        Validations.ProductValidations.ValidateProduct(request);
+        ProductValidations.ValidateProduct(request);
 
-        product.Sku = request.sku;
+        product!.Sku = request.sku;
         product.InternalCode = request.internalCode;
         product.Name = request.name;
         product.Description = request.description;
@@ -107,8 +107,8 @@ public class ProductsManagementService : IProductsManagementService
     public async Task<ProductModel.ResponseProduct> DeleteProduct(Guid id)
     {
         var product = await _repository.First<Product>(p => p.Id == id);
-        await Validations.ProductValidations.ValidateExistingProduct(id, _repository);
-        product.IsActive = false;
+        await ProductValidations.ValidateExistingProduct(id, _repository);
+        product!.IsActive = false;
         var deleted = await _repository.Update(product);
         return new ProductModel.ResponseProduct(
             deleted.Id,
@@ -124,11 +124,9 @@ public class ProductsManagementService : IProductsManagementService
     public async Task<ProductModel.ResponseProduct?> DeactivateProduct(Guid id)
     {
         var product = await _repository.GetById<Product>(id);
-        await Validations.ProductValidations.ValidateExistingProduct(id, _repository);
-        if (product == null)
-            return null;
-
-        product.IsActive = false;
+        await ProductValidations.ValidateExistingProduct(id, _repository);
+        ProductValidations.ValidateActiveProduct(product!);
+        product!.IsActive = false;
         var updated = await _repository.Update(product);
 
         return new ProductModel.ResponseProduct(

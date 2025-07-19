@@ -26,7 +26,7 @@ public class ProductController : Controller
         var products = await _service.GetProducts();
         if (products == null || !products.Any())
         {
-            Response.Headers.Add("X-Message", "No se encontraron productos activos.");
+            Response.Headers.Add("X-Message", "There are no active products");
             return NoContent();
         }
         return Ok(products);
@@ -115,6 +115,10 @@ public class ProductController : Controller
                 return NotFound();
             }
             return NoContent();
+        }
+        catch(EntityNotFoundException en)
+        {
+            return NotFound(en.Message);
         }
         catch (ArgumentException ae)
         {

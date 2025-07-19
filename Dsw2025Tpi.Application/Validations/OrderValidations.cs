@@ -29,7 +29,18 @@ public class OrderValidations
 
     public async static Task ValidateExistingOrder(Guid id, IRepository _repository)
     {
+        if (id == Guid.Empty)
+            throw new ArgumentException("Order ID cannot be empty", nameof(id));
         if (await _repository.First<Order>(p => p.Id == id) == null)
             throw new EntityNotFoundException($"Order with ID {id} not found");
+    }
+
+    public static void ValidateOrderStatus(Order order, string status)
+    {
+        if(order.Status.ToString() == status)
+            throw new ArgumentException($"Order is already in {status} status", nameof(status));
+        var validStatuses = Enum.GetNames(typeof(OrderStatus));
+        if (!validStatuses.Contains(status))
+            throw new ArgumentException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", validStatuses)}", nameof(status));
     }
 }

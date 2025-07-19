@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dsw2025Tpi.Application.Dtos;
-using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
+using Dsw2025Tpi.Application.Validations;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Dsw2025Tpi.Application.Services;
@@ -21,6 +21,7 @@ public class OrdersManagementService : IOrdersManagementService
     }
     public async Task<OrderModel.ResponseOrder?> GetOrderById(Guid id)
     {
+        await OrderValidations.ValidateExistingOrder(id, _repository);
         var order = await _repository.GetById<Order>(id);
         return order != null ?
             new OrderModel.ResponseOrder(
@@ -55,7 +56,7 @@ public class OrdersManagementService : IOrdersManagementService
 
     public async Task<OrderModel.ResponseOrder> AddOrder(OrderModel.RequestOrder request)
     {
-        Validations.OrderValidations.ValidateOrder(request);
+        OrderValidations.ValidateOrder(request);
 
         var order = new Order(request.shippingAddress, request.billingAddress, request.notes,
             request.customerId, request.orderItems);
@@ -73,11 +74,11 @@ public class OrdersManagementService : IOrdersManagementService
 
     public async Task<OrderModel.ResponseOrder> UpdateOrder(Guid id, OrderModel.RequestOrder request)
     {
-        await Validations.OrderValidations.ValidateExistingOrder(id, _repository);
+        await OrderValidations.ValidateExistingOrder(id, _repository);
         var order = await _repository.First<Order>(p => p.Id == id);
-        Validations.OrderValidations.ValidateOrder(request);
+        OrderValidations.ValidateOrder(request);
 
-        order.ShippingAddress = request.shippingAddress;
+        order!.ShippingAddress = request.shippingAddress;
         order.BillingAddress = request.billingAddress;
         order.Notes = request.notes;
         order.CustomerId = request.customerId;
@@ -99,11 +100,11 @@ public class OrdersManagementService : IOrdersManagementService
     public async Task<OrderModel.ResponseOrder> DeleteOrder(Guid id)
     {
         var order = await _repository.First<Order>(p => p.Id == id);
-        await Validations.OrderValidations.ValidateExistingOrder(id, _repository);
+        await OrderValidations.ValidateExistingOrder(id, _repository);
 
         var deleted = await _repository.Update(order);
         return new OrderModel.ResponseOrder(
-            deleted.Id,
+            deleted!.Id,
             deleted.Date,
             deleted.ShippingAddress,
             deleted.BillingAddress,
@@ -115,12 +116,13 @@ public class OrdersManagementService : IOrdersManagementService
         );
     }
     //Para el PUT
-    public async Task<OrderModel.ResponseOrder?> ChangeOrderStatus(Guid id, OrderModel.RequestOrder request)
+    public async Task<OrderModel.ResponseOrder?> ChangeOrderStatus(Guid id, OrderModel.RequestChangeStatus request)
     {
         var order = await _repository.GetById<Order>(id);
-        await Validations.OrderValidations.ValidateExistingOrder(id, _repository);
+        await OrderValidations.ValidateExistingOrder(id, _repository);
+        OrderValidations.ValidateOrderStatus(order!, request.newStatus.ToString());
 
-        order.Status = request.status;
+        order!.Status = Enum.Parse<OrderStatus>(request.newStatus.ToString(), true);
         var updated = await _repository.Update(order);
 
         return new OrderModel.ResponseOrder(

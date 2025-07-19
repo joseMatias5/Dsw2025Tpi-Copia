@@ -1,5 +1,6 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Interfaces;
+using Dsw2025Tpi.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api.Controllers;
@@ -68,10 +69,10 @@ public class OrderController : Controller
     [HttpPut]
     [Route("{id:guid}")]
 
-    public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.RequestOrder request)
+    public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.RequestChangeStatus request)
     {
         if (request == null)
-            return BadRequest("Order data is required");
+            return BadRequest("New order status is required");
         try
         {
             var changedOrder = await _service.ChangeOrderStatus(id, request);
@@ -79,7 +80,7 @@ public class OrderController : Controller
             {
                 return NotFound();
             }
-            return NoContent();
+            return Ok(changedOrder);
         }
         catch (ArgumentException ae)
         {
