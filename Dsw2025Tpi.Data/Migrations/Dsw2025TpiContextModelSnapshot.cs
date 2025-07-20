@@ -76,7 +76,7 @@ namespace Dsw2025Tpi.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("Status")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -93,10 +93,18 @@ namespace Dsw2025Tpi.Data.Migrations
                         .HasMaxLength(36)
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Description")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("OrderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ProductId")
+                        .HasMaxLength(36)
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")

@@ -9,6 +9,7 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class Order : EntityBase
 {
+    /*
     public DateTime Date { get; set; }
     public string? ShippingAddress { get; set; }
     public string? BillingAddress { get; set; }
@@ -37,5 +38,29 @@ public class Order : EntityBase
         CustomerId = customerId;
         Status = OrderStatus.PENDING;
         OrderItems = orderItems.Select(p => new OrderItem(p.Item1, p.Item2)).ToList();
+    }*/
+
+    public DateTime Date { get; set; }
+    public string? ShippingAddress { get; set; }
+    public string? BillingAddress { get; set; }
+    public Guid CustomerId { get; set; }
+    public Customer? Customer { get; set; }
+    public string? Notes { get; set; }
+    public OrderStatus? Status { get; set; } 
+
+    [NotMapped]
+    public decimal? TotalAmount => OrderItems.Sum(i => i.Quantity * i.UnitPrice);
+
+    public List<OrderItem> OrderItems { get; set; } = new();
+
+    public Order(string shippingAddress, string billingAddress, Guid customerId, List<OrderItem> orderItems)
+    {
+        Date = DateTime.UtcNow;
+        ShippingAddress = shippingAddress;
+        BillingAddress = billingAddress;
+        CustomerId = customerId;
+        OrderItems = orderItems ?? new List<OrderItem>();
+        Status = OrderStatus.PENDING;
     }
+    private Order() { }
 }

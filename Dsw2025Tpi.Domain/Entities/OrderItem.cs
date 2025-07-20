@@ -8,6 +8,7 @@ namespace Dsw2025Tpi.Domain.Entities;
 
 public class OrderItem : EntityBase
 {
+    /*
     public int Quantity { get; set; }
     public decimal? UnitPrice { get; set; }
     public decimal? SubTotal => Quantity * UnitPrice;
@@ -46,5 +47,26 @@ public class OrderItem : EntityBase
             Quantity = quantity;
             UnitPrice = product.CurrentUnitPrice;
         }
+    }*/
+    public Guid ProductId { get; set; }
+    public Product? Product { get; set; } = null!;
+    public string? Name { get; set; }
+    public string? Description { get; set; }
+    public decimal? UnitPrice { get; set; }
+    public int? Quantity { get; set; }
+
+    public Guid OrderId { get; set; }
+    public Order? Order { get; set; }
+
+    public OrderItem(Guid productId, string name, string description, decimal unitPrice, int quantity)
+    {
+        ProductId = productId;
+        Name = name;
+        Description = description;
+        UnitPrice = Product.CurrentUnitPrice;
+        Quantity = quantity;
     }
+
+    private OrderItem() { }
+
 }

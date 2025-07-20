@@ -14,17 +14,17 @@ public class OrderValidations
 {
     public static void ValidateOrder(OrderModel.RequestOrder request)
     {
-        if (request.orderItems == null || !request.orderItems.Any())
-            throw new ArgumentException("Order must contain at least one item", nameof(request.orderItems));
+        if (request.OrderItems == null || !request.OrderItems.Any())
+            throw new ArgumentException("Order must contain at least one item", nameof(request.OrderItems));
 
-        if (string.IsNullOrWhiteSpace(request.shippingAddress))
-            throw new ArgumentException("Shipping address cannot be null or empty", nameof(request.shippingAddress));
+        if (string.IsNullOrWhiteSpace(request.ShippingAddress))
+            throw new ArgumentException("Shipping address cannot be null or empty", nameof(request.ShippingAddress));
 
-        if (string.IsNullOrWhiteSpace(request.billingAddress))
-            throw new ArgumentException("Billing address cannot be null or empty", nameof(request.billingAddress));
+        if (string.IsNullOrWhiteSpace(request.BillingAddress))
+            throw new ArgumentException("Billing address cannot be null or empty", nameof(request.BillingAddress));
 
-        if (request.customerId == Guid.Empty)
-            throw new ArgumentException("Customer ID cannot be empty", nameof(request.customerId));
+        if (request.CustomerId == Guid.Empty)
+            throw new ArgumentException("Customer ID cannot be empty", nameof(request.CustomerId));
     }
 
     public async static Task ValidateExistingOrder(Guid id, IRepository _repository)
