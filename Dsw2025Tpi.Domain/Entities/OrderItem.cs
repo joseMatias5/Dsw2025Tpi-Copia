@@ -31,10 +31,19 @@ public class OrderItem : EntityBase
 
     public OrderItem(int quantity, Product product)
     {
-        Product = product ?? throw new ArgumentNullException(nameof(product), "Product cannot be null");
-        Quantity = quantity < 0? 
-            throw new ArgumentOutOfRangeException(nameof(quantity), "The Unit Price must be positive") : 
-            Product.StockControl(quantity)? quantity : throw new ArgumentException(nameof(quantity), "Stock problems");
-        UnitPrice = Product?.CurrentUnitPrice;
+        {
+            if (product is null)
+                throw new ArgumentNullException(nameof(product), "Product cannot be null");
+
+            if (quantity < 0)
+                throw new ArgumentOutOfRangeException(nameof(quantity), "The quantity must be positive");
+
+            if (!product.StockControl(quantity))
+                throw new ApplicationException("Not enough stock");
+
+            Product = product;
+            Quantity = quantity;
+            UnitPrice = product.CurrentUnitPrice;
+        }
     }
 }
