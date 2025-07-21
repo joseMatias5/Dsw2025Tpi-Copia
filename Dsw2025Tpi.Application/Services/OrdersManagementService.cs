@@ -1,0 +1,286 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Interfaces;
+using Dsw2025Tpi.Domain.Entities;
+using Dsw2025Tpi.Domain.Interfaces;
+using Dsw2025Tpi.Application.Validations;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using static Dsw2025Tpi.Application.Dtos.OrderItemModel;
+
+namespace Dsw2025Tpi.Application.Services;
+
+public class OrdersManagementService : IOrdersManagementService
+{
+    IRepository _repository;
+    public OrdersManagementService(IRepository repository)
+    {
+        _repository = repository;
+    }
+
+    /*
+    public async Task<OrderModel.ResponseOrder?> GetOrderById(Guid id)
+    {
+        await OrderValidations.ValidateExistingOrder(id, _repository);
+        var order = await _repository.GetById<Order>(id);
+        return order != null ?
+            new OrderModel.ResponseOrder(
+                order.Id,
+                order.Date,
+                order.ShippingAddress,
+                order.BillingAddress,
+                order.Notes,
+                order.CustomerId,
+                order.Status,
+                order.OrderItems.Select(oi => (oi.Quantity, oi.Product!)).ToList(),
+                order.TotalAmount) :
+            null;
+    }
+
+    public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders()
+    {
+        return (await _repository
+            .GetFiltered<Order>(o => o.Status.Value == OrderStatus.CANCELLED))?
+            .Select(order => new OrderModel.ResponseOrder(
+                order.Id,
+                order.Date,
+                order.ShippingAddress,
+                order.BillingAddress,
+                order.Notes,
+                order.CustomerId,
+                order.Status,
+                order.OrderItems.Select(oi => (oi.Quantity, oi.Product!)).ToList(),
+                order.TotalAmount)
+            );
+    }
+    
+    public async Task<OrderModel.ResponseOrder> AddOrder(OrderModel.RequestOrder request)
+    {
+        OrderValidations.ValidateOrder(request);
+
+        var order = new Order(request.shippingAddress, request.billingAddress, request.notes,
+            request.customerId, request.orderItems);
+        return new OrderModel.ResponseOrder(
+            order.Id,
+            order.Date,
+            order.ShippingAddress,
+            order.BillingAddress,
+            order.Notes,
+            order.CustomerId,
+            order.Status,
+            order.OrderItems.Select(oi => (oi.Quantity, oi.Product!)).ToList(),
+            order.TotalAmount);
+    }
+    public async Task<OrderModel.ResponseOrder> UpdateOrder(Guid id, OrderModel.RequestOrder request)
+    {
+        await OrderValidations.ValidateExistingOrder(id, _repository);
+        var order = await _repository.First<Order>(p => p.Id == id);
+        OrderValidations.ValidateOrder(request);
+
+        order!.ShippingAddress = request.shippingAddress;
+        order.BillingAddress = request.billingAddress;
+        order.Notes = request.notes;
+        order.CustomerId = request.customerId;
+
+        var updated = await _repository.Update(order);
+        return new OrderModel.ResponseOrder(
+            updated.Id,
+            updated.Date,
+            updated.ShippingAddress,
+            updated.BillingAddress,
+            updated.Notes,
+            updated.CustomerId,
+            updated.Status,
+            updated.OrderItems.Select(oi => (oi.Quantity, oi.Product!)).ToList(),
+            updated.TotalAmount
+            );
+    }
+
+    public async Task<OrderModel.ResponseOrder> DeleteOrder(Guid id)
+    {
+        var order = await _repository.First<Order>(p => p.Id == id);
+        await OrderValidations.ValidateExistingOrder(id, _repository);
+
+        var deleted = await _repository.Update(order);
+        return new OrderModel.ResponseOrder(
+            deleted!.Id,
+            deleted.Date,
+            deleted.ShippingAddress,
+            deleted.BillingAddress,
+            deleted.Notes,
+            deleted.CustomerId,
+            deleted.Status,
+            deleted.OrderItems.Select(oi => (oi.Quantity, oi.Product!)).ToList(),
+            deleted.TotalAmount
+        );
+    }
+    //Para el PUT
+    public async Task<OrderModel.ResponseOrder?> ChangeOrderStatus(Guid id, OrderModel.RequestChangeStatus request)
+    {
+        var order = await _repository.GetById<Order>(id);
+        await OrderValidations.ValidateExistingOrder(id, _repository);
+        OrderValidations.ValidateOrderStatus(order!, request.newStatus.ToString());
+
+        order!.Status = Enum.Parse<OrderStatus>(request.newStatus.ToString(), true);
+        var updated = await _repository.Update(order);
+
+        return new OrderModel.ResponseOrder(
+            updated.Id,
+            updated.Date,
+            updated.ShippingAddress,
+            updated.BillingAddress,
+            updated.Notes,
+            updated.CustomerId,
+            updated.Status,
+            updated.OrderItems.Select(oi => (oi.Quantity, oi.Product!)).ToList(),
+            updated.TotalAmount
+            );
+    }
+
+    */
+
+    public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders()
+    {
+        return (await _repository
+            .GetFiltered<Order>(o => o.Status.Value == OrderStatus.CANCELLED))?
+            .Select(order => new OrderModel.ResponseOrder(
+                order.Id,
+                order.Date,
+                order.ShippingAddress,
+                order.BillingAddress,
+                order.Notes,
+                order.CustomerId,
+                order.Status,
+                order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
+                    i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
+                order.TotalAmount)
+            );
+    }
+
+    public async Task<OrderModel.ResponseOrder?> GetOrderById(Guid id)
+    {
+        await OrderValidations.ValidateExistingOrder(id, _repository);
+        var order = await _repository.GetById<Order>(id);
+        return order != null ?
+            new OrderModel.ResponseOrder(
+                order.Id,
+                order.Date,
+                order.ShippingAddress,
+                order.BillingAddress,
+                order.Notes,
+                order.CustomerId,
+                order.Status,
+                order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
+                    i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
+                order.TotalAmount) :
+            null;
+    }
+
+
+    public async Task<OrderModel.ResponseOrder> AddOrder(OrderModel.RequestOrder request)
+    {
+        var items = request.OrderItems.Select(item => new OrderItem(
+            item.ProductId,
+            item.Name,
+            item.Description,
+            item.UnitPrice,
+            item.Quantity
+        )).ToList();
+
+        var order = new Order(request.ShippingAddress, request.BillingAddress, request.CustomerId, items);
+        await _repository.Add(order);
+
+        return new OrderModel.ResponseOrder(
+            order.Id,
+            order.Date,
+            order.ShippingAddress,
+            order.BillingAddress,
+            order.Notes,
+            order.CustomerId,
+            order.Status,
+            order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
+                i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
+            order.TotalAmount
+        );
+    }
+
+    public async Task<OrderModel.ResponseOrder> UpdateOrder(Guid id, OrderModel.RequestOrder request)
+    {
+        await OrderValidations.ValidateExistingOrder(id, _repository);
+        var order = await _repository.First<Order>(p => p.Id == id);
+        OrderValidations.ValidateOrder(request);
+
+        order!.ShippingAddress = request.ShippingAddress;
+        order.BillingAddress = request.BillingAddress;
+        order.Notes = request.Notes;
+        order.CustomerId = request.CustomerId;
+        order.OrderItems = request.OrderItems.Select(item => new OrderItem(
+            item.ProductId,
+            item.Name,
+            item.Description,
+            item.UnitPrice,
+            item.Quantity
+        )).ToList();
+
+        var updated = await _repository.Update(order);
+        return new OrderModel.ResponseOrder(
+            updated.Id,
+            updated.Date,
+            updated.ShippingAddress,
+            updated.BillingAddress,
+            updated.Notes,
+            updated.CustomerId,
+            updated.Status,
+            updated.OrderItems.Select(i => new OrderItemModel.ResponseItem(
+                i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
+            updated.TotalAmount
+        );
+    }
+
+    public async Task<OrderModel.ResponseOrder> DeleteOrder(Guid id)
+    {
+        var order = await _repository.First<Order>(p => p.Id == id);
+        await OrderValidations.ValidateExistingOrder(id, _repository);
+        order!.Status = OrderStatus.CANCELLED;
+        var deleted = await _repository.Update(order);
+        return new OrderModel.ResponseOrder(
+            deleted!.Id,
+            deleted.Date,
+            deleted.ShippingAddress,
+            deleted.BillingAddress,
+            deleted.Notes,
+            deleted.CustomerId,
+            deleted.Status,
+            deleted.OrderItems.Select(i => new OrderItemModel.ResponseItem(
+                i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
+            deleted.TotalAmount
+        );
+    }
+    //Para el PUT
+    public async Task<OrderModel.ResponseOrder?> ChangeOrderStatus(Guid id, OrderModel.RequestChangeStatus request)
+    {
+        var order = await _repository.GetById<Order>(id);
+        await OrderValidations.ValidateExistingOrder(id, _repository);
+        OrderValidations.ValidateOrderStatus(order!, request.newStatus.ToString());
+
+        order!.Status = Enum.Parse<OrderStatus>(request.newStatus.ToString(), true);
+        var updated = await _repository.Update(order);
+
+        return new OrderModel.ResponseOrder(
+            updated.Id,
+            updated.Date,
+            updated.ShippingAddress,
+            updated.BillingAddress,
+            updated.Notes,
+            updated.CustomerId,
+            updated.Status,
+            updated.OrderItems.Select(i => new OrderItemModel.ResponseItem(
+                i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
+            updated.TotalAmount
+            );
+    }
+}
+

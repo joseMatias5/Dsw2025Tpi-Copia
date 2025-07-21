@@ -2,17 +2,17 @@
     {
         "shippingAddress": "123 Main St, Springfield",
         "billingAddress": "123 Main St, Springfield",
-        "customerId": "h48jdo0q-5a4b-3c2d-a9ki-9a8b7c6d5e4f",
+        "customerId": "a3f1c2d4-5b6e-4f89-8abc-1234567890ab",
         "orderItems": [
             {
-                "productId": "p1q2r3s4-t5u6-v7w8-x9y0-z1a2b3c4d5e6",
+                "productId": "3b9f5c8e-2b2d-4c4d-9b5f-90e7c9edb7e1",
                 "quantity": 2,
                 "name": "Wireless Mouse",
                 "description": "Ergonomic wireless mouse",
                 "unitPrice": 25.99
             },
             {
-                "productId": "p7q8r9s0-t1u2-v3w4-x5y6-z7a8b9c0d1e2",
+                "productId": "a1b2c3d4-6f7a-8e9b-0c1d-2e3f4a5b6c7d",
                 "quantity": 1,
                 "name": "Mechanical Keyboard",
                 "description": "RGB mechanical keyboard",
@@ -23,10 +23,10 @@
     {
         "shippingAddress": "125 Main St, Springfield",
         "billingAddress": "123 Main St, Springfield",
-        "customerId": "dk0l2ja2m-5a4b-49jc-a9ki-9a8b7c6d5e4f", 
+        "customerId": "c5f3e4d6-7a8b-4c9d-0efa-3456789012cd",
         "orderItems": [
             {
-                "productId": "", //Completar
+                "productId": "b2f3c1d4-5e6a-4b8d-9f6c-12e5a9c8e1b2",
                 "quantity": 2,
                 "name": "Wireless Mouse",
                 "description": "Ergonomic wireless mouse",
