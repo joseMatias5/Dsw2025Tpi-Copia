@@ -14,13 +14,12 @@ public class Order : EntityBase
     public string? Notes { get; set; }
     public decimal? TotalAmount => OrderItems.Sum(item => item.SubTotal);
     
-
     public ICollection<OrderItem> OrderItems { get; set; }
     public Guid CustomerId { get; set; }
     public Customer? Customer { get; set; }
     public OrderStatus? Status { get; set; }
 
-    public Order( string? shippingAddress, string? billingAddress,
+    public Order(string? shippingAddress, string? billingAddress,
         string? notes, Guid customerId, List<(int, Product)> products)
     {
         Date = DateTime.UtcNow;
