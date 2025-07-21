@@ -164,6 +164,7 @@ public class OrdersManagementService : IOrdersManagementService
     {
         await OrderValidations.ValidateExistingOrder(id, _repository);
         var order = await _repository.GetById<Order>(id);
+        OrderValidations.ValidateCancelledOrder(order!);
         return order != null ?
             new OrderModel.ResponseOrder(
                 order.Id,
@@ -182,15 +183,40 @@ public class OrdersManagementService : IOrdersManagementService
 
     public async Task<OrderModel.ResponseOrder> AddOrder(OrderModel.RequestOrder request)
     {
-        var items = request.OrderItems.Select(item => new OrderItem(
+        OrderValidations.ValidateItem(request);
+        var items = request!.OrderItems!.Select(item => new RequestItem(
             item.ProductId,
-            item.Name,
-            item.Description,
-            item.UnitPrice,
             item.Quantity
         )).ToList();
 
-        var order = new Order(request.ShippingAddress, request.BillingAddress, request.CustomerId, items);
+        List<OrderItem> orderItems = new List<OrderItem>();
+
+        foreach (var item in items)
+        {
+            var product = await _repository.GetById<Product>(item.ProductId);
+            await ProductValidations.ValidateExistingProduct(item.ProductId, _repository);
+            ProductValidations.ValidateActiveProduct(product!);
+
+            ItemValidations.ValidateItem(item);
+            ItemValidations.StockControl(item.Quantity, product!);
+
+            OrderItem orderItem= new OrderItem(
+                item.ProductId,
+                product!.Name!,
+                product.Description,
+                product.CurrentUnitPrice,
+                item.Quantity
+            );
+            orderItem.Product = product;
+            
+            orderItems.Add(orderItem);
+        }
+
+        OrderValidations.ValidateOrder(request);
+        OrderValidations.ValidateCancelledOrder(request);
+        OrderValidations.ValidateCustomer(request, _repository);
+        
+        var order = new Order(request!.ShippingAddress!, request.BillingAddress!, request.CustomerId, orderItems);
         await _repository.Add(order);
 
         return new OrderModel.ResponseOrder(
@@ -212,18 +238,43 @@ public class OrdersManagementService : IOrdersManagementService
         await OrderValidations.ValidateExistingOrder(id, _repository);
         var order = await _repository.First<Order>(p => p.Id == id);
         OrderValidations.ValidateOrder(request);
+        OrderValidations.ValidateCancelledOrder(order!);
+        OrderValidations.ValidateItem(request);
 
         order!.ShippingAddress = request.ShippingAddress;
         order.BillingAddress = request.BillingAddress;
         order.Notes = request.Notes;
         order.CustomerId = request.CustomerId;
-        order.OrderItems = request.OrderItems.Select(item => new OrderItem(
-            item.ProductId,
-            item.Name,
-            item.Description,
-            item.UnitPrice,
-            item.Quantity
-        )).ToList();
+
+        var items = request!.OrderItems!.Select(item => new RequestItem(
+             item.ProductId,
+             item.Quantity
+         )).ToList();
+
+        List<OrderItem> orderItems = new List<OrderItem>();
+
+        foreach (var item in items)
+        {
+            var product = await _repository.GetById<Product>(item.ProductId);
+            await ProductValidations.ValidateExistingProduct(item.ProductId, _repository);
+            ProductValidations.ValidateActiveProduct(product!);
+
+            ItemValidations.ValidateItem(item);
+            ItemValidations.StockControl(item.Quantity, product!);
+
+            OrderItem orderItem = new OrderItem(
+                item.ProductId,
+                product!.Name!,
+                product.Description,
+                product.CurrentUnitPrice,
+                item.Quantity
+            );
+            orderItem.Product = product;
+
+            orderItems.Add(orderItem);
+        }
+
+        order.OrderItems = orderItems;
 
         var updated = await _repository.Update(order);
         return new OrderModel.ResponseOrder(

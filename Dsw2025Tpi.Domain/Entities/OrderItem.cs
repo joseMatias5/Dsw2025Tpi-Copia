@@ -60,13 +60,18 @@ public class OrderItem : EntityBase
 
     public OrderItem(Guid productId, string name, string description, decimal unitPrice, int quantity)
     {
+        if (productId == Guid.Empty)
+            throw new ArgumentNullException(nameof(productId), "Product cannot be null");
+
+        if (quantity < 0)
+            throw new ArgumentOutOfRangeException(nameof(quantity), "The quantity must be positive");
+
         ProductId = productId;
         Name = name;
         Description = description;
         UnitPrice = Product.CurrentUnitPrice;
         Quantity = quantity;
     }
-
     private OrderItem() { }
 
 }

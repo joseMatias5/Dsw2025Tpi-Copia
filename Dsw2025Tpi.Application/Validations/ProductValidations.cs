@@ -14,6 +14,8 @@ public class ProductValidations
 {
     public static void ValidateProduct(ProductModel.RequestProduct request)
     {
+        if (request == null)
+            throw new ArgumentException(nameof(request), "Product request cannot be null");
         if (string.IsNullOrWhiteSpace(request.sku))
             throw new ArgumentException("SKU cannot be null or empty", nameof(request.sku));
         if (string.IsNullOrWhiteSpace(request.internalCode))

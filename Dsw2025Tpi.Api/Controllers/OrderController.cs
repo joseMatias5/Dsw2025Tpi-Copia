@@ -1,4 +1,5 @@
 ﻿using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -52,11 +53,15 @@ public class OrderController : Controller
             return CreatedAtAction(nameof(GetOrderById), new { id = order.id }, order);
 
         }
+        catch (EntityNotFoundException enf)
+        {
+            return NotFound(enf.Message);
+        }
         catch (ArgumentException ae)
         {
             return BadRequest(ae.Message);
         }
-        catch (ApplicationException de)
+        catch (Application.Exceptions.ApplicationException de)
         {
             return Conflict(de.Message);
         }
@@ -86,7 +91,7 @@ public class OrderController : Controller
         {
             return BadRequest(ae.Message);
         }
-        catch (ApplicationException de)
+        catch (Application.Exceptions.ApplicationException de)
         {
             return Conflict(de.Message);
         }
