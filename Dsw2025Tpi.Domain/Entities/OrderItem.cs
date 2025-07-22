@@ -53,25 +53,25 @@ public class OrderItem : EntityBase
     public string? Name { get; set; }
     public string? Description { get; set; }
     public decimal? UnitPrice { get; set; }
-    public int? Quantity { get; set; }
+    public int Quantity { get; set; }
 
     public Guid OrderId { get; set; }
     public Order? Order { get; set; }
 
-    public OrderItem(Guid productId, string name, string description, decimal unitPrice, int quantity)
+    public OrderItem(Guid productId, string name, string? description, decimal unitPrice, int quantity)
     {
         if (productId == Guid.Empty)
-            throw new ArgumentNullException(nameof(productId), "Product cannot be null");
+            throw new ArgumentNullException(nameof(productId), "ProductId cannot be empty");
 
-        if (quantity < 0)
-            throw new ArgumentOutOfRangeException(nameof(quantity), "The quantity must be positive");
+        if (quantity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(quantity), "The quantity must be greater than zero");
 
         ProductId = productId;
-        Name = name;
-        Description = description;
-        UnitPrice = Product.CurrentUnitPrice;
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Description = description ?? "";
+        UnitPrice = unitPrice; 
         Quantity = quantity;
     }
-    private OrderItem() { }
+    public OrderItem() { }
 
 }

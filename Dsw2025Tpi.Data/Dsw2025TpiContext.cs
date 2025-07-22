@@ -11,7 +11,8 @@ public class Dsw2025TpiContext: DbContext
     }
 
     public DbSet<Product> Products { get; set; } = null!;
-    public DbSet<Product> Orders { get; set; } = null!;
+    public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<Customer> Customers { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -30,11 +31,12 @@ public class Dsw2025TpiContext: DbContext
 
         modelBuilder.Entity<Order>(e =>
         {
+            e.ToTable("Orders");
             e.Property(e => e.Id).HasMaxLength(36).IsRequired();
             e.Property(e => e.Date).IsRequired();
             e.Property(e => e.ShippingAddress).HasMaxLength(50).IsRequired();
             e.Property(e => e.BillingAddress).HasMaxLength(50).IsRequired();
-            e.Property(e => e.Notes).HasMaxLength(100).IsRequired();
+            e.Property(e => e.Notes).HasMaxLength(100);
             e.Property(e => e.Status).IsRequired();
             e.Property(e => e.CustomerId).IsRequired();
             e.HasMany(e => e.OrderItems)
@@ -45,6 +47,7 @@ public class Dsw2025TpiContext: DbContext
 
         modelBuilder.Entity<OrderItem>(e =>
         {
+            e.ToTable("OrderItems");
             e.Property(e => e.Id).HasMaxLength(36).IsRequired();
             e.Property(e => e.ProductId).HasMaxLength(36).IsRequired();
             e.Property(e => e.Description).HasMaxLength(50);
