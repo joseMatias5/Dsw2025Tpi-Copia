@@ -6,17 +6,11 @@
         "orderItems": [
             {
                 "productId": "3b9f5c8e-2b2d-4c4d-9b5f-90e7c9edb7e1",
-                "quantity": 2,
-                "name": "Wireless Mouse",
-                "description": "Ergonomic wireless mouse",
-                "unitPrice": 25.99
+                "quantity": 2
             },
             {
                 "productId": "a1b2c3d4-6f7a-8e9b-0c1d-2e3f4a5b6c7d",
-                "quantity": 1,
-                "name": "Mechanical Keyboard",
-                "description": "RGB mechanical keyboard",
-                "unitPrice": 79.50
+                "quantity": 1
             }
         ]
     },
@@ -27,10 +21,7 @@
         "orderItems": [
             {
                 "productId": "b2f3c1d4-5e6a-4b8d-9f6c-12e5a9c8e1b2",
-                "quantity": 2,
-                "name": "Wireless Mouse",
-                "description": "Ergonomic wireless mouse",
-                "unitPrice": 25.99
+                "quantity": 2
             }
         ]
     }

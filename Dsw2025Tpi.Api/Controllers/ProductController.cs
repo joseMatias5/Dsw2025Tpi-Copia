@@ -26,7 +26,7 @@ public class ProductController : Controller
         var products = await _service.GetProducts();
         if (products == null || !products.Any())
         {
-            Response.Headers.Add("X-Message", "There are no active products");
+            Response.Headers.Append("X-Message", "There are no active products");
             return NoContent();
         }
         return Ok(products);

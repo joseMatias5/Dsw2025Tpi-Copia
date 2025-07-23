@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dsw2025Tpi.Data.Migrations
 {
     [DbContext(typeof(Dsw2025TpiContext))]
-    [Migration("20250720135730_Modelo")]
+    [Migration("20250723191544_Modelo")]
     partial class Modelo
     {
         /// <inheritdoc />
@@ -70,7 +70,6 @@ namespace Dsw2025Tpi.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Notes")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
@@ -86,7 +85,7 @@ namespace Dsw2025Tpi.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Order");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.OrderItem", b =>
@@ -123,7 +122,7 @@ namespace Dsw2025Tpi.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItem");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("Dsw2025Tpi.Domain.Entities.Product", b =>

@@ -44,7 +44,7 @@
         "internalCode": "INT-2005",
         "name": "Bluetooth Speaker",
         "description": "Portable Bluetooth speaker.",
-        "currentUnitPrice": 0,
+        "currentUnitPrice": 10,
         "stockQuantity": 15,
         "isActive": true
     }
