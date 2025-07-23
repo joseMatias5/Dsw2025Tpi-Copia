@@ -26,16 +26,11 @@ public class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
             options.UseSeeding((c, t) =>
             {
-                var jsonPath = @"C:\Users\54381\Documents\Angeles\DesarrolloSW\TPI\TPIDeNuevo\Dsw2025Tpi-Copia\Dsw2025Tpi.Data\Sources\products.json";
-                ((Dsw2025TpiContext)c).Seedwork<Product>(jsonPath);
-                var jsonPath1 = @"C:\Users\54381\Documents\Angeles\DesarrolloSW\TPI\TPIDeNuevo\Dsw2025Tpi-Copia\Dsw2025Tpi.Data\Sources\customers.json";
-                ((Dsw2025TpiContext)c).Seedwork<Customer>(jsonPath1);
-                var jsonPath2 = @"C:\Users\54381\Documents\Angeles\DesarrolloSW\TPI\TPIDeNuevo\Dsw2025Tpi-Copia\Dsw2025Tpi.Data\Sources\orders.json";
-                ((Dsw2025TpiContext)c).SeedOrders(jsonPath2);
-                //var dataDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Dsw2025Tpi.Data", "Sources");
-                //var jsonPath = Path.Combine(dataDirectory, "products.json");
-                //((Dsw2025TpiContext)c).Seedwork<Product>(jsonPath);
+                var dataDir = Path.Combine(AppContext.BaseDirectory, "Sources");
 
+                ((Dsw2025TpiContext)c).Seedwork<Product>(Path.Combine(dataDir, "products.json"));
+                ((Dsw2025TpiContext)c).Seedwork<Customer>(Path.Combine(dataDir, "customers.json"));
+                ((Dsw2025TpiContext)c).SeedOrders(Path.Combine(dataDir, "orders.json"));
             });
         });
         builder.Services.AddScoped<IRepository, EfRepository>();

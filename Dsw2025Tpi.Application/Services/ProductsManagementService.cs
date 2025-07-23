@@ -14,10 +14,6 @@ namespace Dsw2025Tpi.Application.Services;
 
 public class ProductsManagementService : IProductsManagementService
 {
-    // This service will handle the business logic for managing products.
-    // It will interact with the repository to perform CRUD operations on products.
-    // It will also handle validation and any other business rules related to products.
-    // Example method to add a product
     IRepository _repository;
     public ProductsManagementService(IRepository repository)
     {
@@ -28,7 +24,7 @@ public class ProductsManagementService : IProductsManagementService
         var product = await _repository.GetById<Product>(id);
         return product != null ?
             new ProductModel.ResponseProduct(product.Id, product.Sku, product.InternalCode, product.Name, product.Description,
-                product.CurrentUnitPrice, product.StockQuantity) :
+                product.CurrentUnitPrice, product.StockQuantity, product.IsActive) :
             null;
 
     }
@@ -38,17 +34,6 @@ public class ProductsManagementService : IProductsManagementService
 
         var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
 
-        /*if (!activeProducts.Any())
-            throw new Exceptions.ApplicationException("There are no active products");*/
-
-        /*return activeProducts.Select(p => new ProductModel.Response(
-            p.Id,
-            p.Sku,
-            p.InternalCode,
-            p.Name,
-            p.Description,
-            p.CurrentUnitPrice,
-            p.StockQuantity));*/
         return (await _repository
             .GetFiltered<Product>(p => p.IsActive))?
             .Select(p => new ProductModel.ResponseProduct(
@@ -58,7 +43,8 @@ public class ProductsManagementService : IProductsManagementService
                 p.Name,
                 p.Description,
                 p.CurrentUnitPrice,
-                p.StockQuantity)
+                p.StockQuantity,
+                p.IsActive)
             );
     }
 
@@ -76,7 +62,8 @@ public class ProductsManagementService : IProductsManagementService
             product.Name,
             product.Description,
             product.CurrentUnitPrice,
-            product.StockQuantity);
+            product.StockQuantity,
+            product.IsActive);
     }
 
     public async Task<ProductModel.ResponseProduct> UpdateProduct(Guid id, ProductModel.RequestProduct request)
@@ -100,7 +87,8 @@ public class ProductsManagementService : IProductsManagementService
             updated.Name,
             updated.Description,
             updated.CurrentUnitPrice,
-            updated.StockQuantity
+            updated.StockQuantity,
+            updated.IsActive
         );
     }
 
@@ -117,7 +105,8 @@ public class ProductsManagementService : IProductsManagementService
             deleted.Name,
             deleted.Description,
             deleted.CurrentUnitPrice,
-            deleted.StockQuantity
+            deleted.StockQuantity,
+            deleted.IsActive
         );
     }
     //Para el PATCH
@@ -136,7 +125,8 @@ public class ProductsManagementService : IProductsManagementService
             updated.Name,
             updated.Description,
             updated.CurrentUnitPrice,
-            updated.StockQuantity
+            updated.StockQuantity,
+            updated.IsActive
         );
     }
 }

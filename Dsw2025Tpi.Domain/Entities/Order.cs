@@ -24,11 +24,12 @@ public class Order : EntityBase
 
     public List<OrderItem> OrderItems { get; set; } = new();
     
-    public Order(string shippingAddress, string billingAddress, Guid customerId, List<OrderItem> orderItems)
+    public Order(string shippingAddress, string billingAddress, string notes, Guid customerId, List<OrderItem> orderItems)
     {
         Date = DateTime.UtcNow;
         ShippingAddress = shippingAddress;
         BillingAddress = billingAddress;
+        Notes = notes;
         CustomerId = customerId;
         OrderItems = orderItems ?? new List<OrderItem>();
         Status = OrderStatus.PENDING;
@@ -36,17 +37,18 @@ public class Order : EntityBase
     public Order() { }
 
     [JsonConstructor]
-    public Order(string shippingAddress, string billingAddress, Guid customerId)
+    public Order(string shippingAddress, string billingAddress, string notes, Guid customerId)
     {
         Date = DateTime.UtcNow;
         ShippingAddress = shippingAddress;
         BillingAddress = billingAddress;
+        Notes = notes;
         CustomerId = customerId;
         OrderItems =  new List<OrderItem>();
         Status = OrderStatus.PENDING;
     }
-    public void AddOrderItem(Guid productId, int quantity, string name, string? description, decimal unitPrice)
+    public void AddOrderItem(Guid productId, Product product, int quantity, string name, string? description, decimal unitPrice)
     {
-        OrderItems.Add(new OrderItem(productId, name, description, unitPrice, quantity));
+        OrderItems.Add(new OrderItem(productId, product, name, description, unitPrice, quantity));
     }
 }

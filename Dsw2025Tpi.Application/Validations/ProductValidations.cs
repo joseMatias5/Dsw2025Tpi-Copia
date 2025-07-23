@@ -45,6 +45,8 @@ public class ProductValidations
 
     public static void ValidateActiveProduct(Product product)
     {
+        if (product == null)
+            throw new ArgumentNullException(nameof(product), "Product cannot be null");
         if (!product.IsActive)
             throw new EntityNotFoundException($"Product with ID {product.Id} is not active");
     }

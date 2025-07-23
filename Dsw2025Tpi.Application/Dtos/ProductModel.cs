@@ -11,5 +11,5 @@ public record ProductModel
     public record RequestProduct(string sku, string internalCode, string name, string? description,
         decimal currentUnitPrice, int stockQuantity);
     public record ResponseProduct(Guid id, string? sku, string? internalCode, string? name, string? description,
-        decimal? currentUnitPrice, int? stockQuantity);
+        decimal? currentUnitPrice, int? stockQuantity, bool isActive);
 }

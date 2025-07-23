@@ -18,13 +18,11 @@ public class ItemValidations
             throw new ArgumentOutOfRangeException(nameof(item.Quantity), "Quantity must be greater than zero");
     }
 
-    public static bool StockControl(int quantity, Product product)
+    public static void StockControl(int quantity, Product product)
     {
-        if (quantity < product.StockQuantity)
+        if (quantity > product.StockQuantity)
         {
-            product.StockQuantity -= quantity;
-            return true;
+            throw new Exceptions.ApplicationException("Not enough stock");
         }
-        throw new ApplicationException("Not enough stock");
     }
 }

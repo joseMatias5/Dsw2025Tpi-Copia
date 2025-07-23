@@ -12,6 +12,11 @@ namespace Dsw2025Tpi.Application.Validations;
 
 public class OrderValidations
 {
+    public static void ValidateNotNullOrders(IEnumerable<Order>? orders)
+    {
+        if (orders == null || !orders.Any())
+            throw new EntityNotFoundException("No orders found");
+    }
     public static void ValidateOrder(OrderModel.RequestOrder request)
     {
         if (request == null)
@@ -35,7 +40,7 @@ public class OrderValidations
         if (id == Guid.Empty)
             throw new ArgumentException("Order ID cannot be empty", nameof(id));
         if (await _repository.First<Order>(p => p.Id == id) == null)
-            throw new EntityNotFoundException($"Order with ID {id} not found");
+            throw new Exceptions.EntityNotFoundException($"Order with ID {id} not found");
     }
 
     public static void ValidateOrderStatus(Order order, string status)
@@ -64,6 +69,6 @@ public class OrderValidations
             throw new ArgumentException("Customer ID cannot be empty", nameof(customerId));
         var customer = _repository.First<Customer>(c => c.Id == customerId).Result;
         if (customer == null)
-            throw new EntityNotFoundException($"Customer with ID {customerId} not found");
+            throw new Exceptions.EntityNotFoundException($"Customer with ID {customerId} not found");
     }
 }

@@ -28,6 +28,7 @@ public class OrdersManagementService : IOrdersManagementService
                 o => o.Status.Value != OrderStatus.CANCELLED,
                 include: new[] { "OrderItems" }
             );
+        OrderValidations.ValidateNotNullOrders(orders);
 
         return orders?.Select(order => new OrderModel.ResponseOrder(
             order.Id,
@@ -85,6 +86,7 @@ public class OrdersManagementService : IOrdersManagementService
 
             OrderItem orderItem= new OrderItem(
                 item.ProductId,
+                product!,
                 product!.Name!,
                 product.Description,
                 product.CurrentUnitPrice,
@@ -98,7 +100,7 @@ public class OrdersManagementService : IOrdersManagementService
         OrderValidations.ValidateOrder(request);
         OrderValidations.ValidateCustomer(request.CustomerId, _repository);
         
-        var order = new Order(request!.ShippingAddress!, request.BillingAddress!, request.CustomerId, orderItems);
+        var order = new Order(request!.ShippingAddress!, request.BillingAddress!, request.Notes, request.CustomerId, orderItems);
         await _repository.Add(order);
 
         return new OrderModel.ResponseOrder(
@@ -146,6 +148,7 @@ public class OrdersManagementService : IOrdersManagementService
 
             OrderItem orderItem = new OrderItem(
                 item.ProductId,
+                product!,
                 product!.Name!,
                 product.Description,
                 product.CurrentUnitPrice,

@@ -23,43 +23,6 @@ public static class DbContextExtensions
         context.SaveChanges();
     }
 
-    /*
-    public static void SeedOrders(this Dsw2025TpiContext context, string jsonPath)
-    {
-        if (context.Orders.Any()) return;
-
-        var fullPath = Path.Combine(AppContext.BaseDirectory, jsonPath);
-        var json = File.ReadAllText(fullPath);
-
-        var orders = JsonSerializer.Deserialize<List<Order>>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
-
-        if (orders == null || orders.Count == 0) return;
-
-        foreach (var order in orders)
-        {
-            // Setea fecha y status si no están en el JSON
-            order.Date = DateTime.UtcNow;
-            order.Status = OrderStatus.PENDING;
-
-            // Vincular manualmente los productos
-            foreach (var item in order.OrderItems)
-            {
-                var product = context.Products.Find(item.ProductId);
-                if (product == null) continue;
-
-                item.Product = product;
-                item.UnitPrice = product.CurrentUnitPrice;
-            }
-
-            context.Orders.Add(order);
-        }
-
-        context.SaveChanges();
-    }*/
-
     public static void SeedOrders(this Dsw2025TpiContext context, string jsonPath)
     {
         if (context.Orders.Any()) return;
@@ -79,18 +42,17 @@ public static class DbContextExtensions
             var customer = context.Customers.Find(dto.CustomerId);
             if (customer == null) continue;
 
-            var order = new Order(dto.ShippingAddress, dto.BillingAddress, dto.CustomerId);
+            var order = new Order(dto.ShippingAddress, dto.BillingAddress, dto.Notes, dto.CustomerId);
 
             foreach (var item in dto.OrderItems)
             {
                 var product = context.Products.Find(item.ProductId);
                 if (product == null) continue;
 
-                // Evitás nulls que rompan el constructor
                 var name = product.Name ?? "Producto sin nombre";
                 var description = product.Description ?? "";
 
-                order.AddOrderItem(product.Id, item.Quantity, name, description, product.CurrentUnitPrice);
+                order.AddOrderItem(product.Id, product, item.Quantity, name, description, product.CurrentUnitPrice);
             }
 
             context.Orders.Add(order);
