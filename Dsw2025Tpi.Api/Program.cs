@@ -102,9 +102,7 @@ public class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
         });
 
-
-        builder.Services.AddSingleton<JwtTokenService>();
-
+        builder.Services.AddTransient<IAuthenticateService, AuthenticateService>();
 
         builder.Services.AddHealthChecks();
 

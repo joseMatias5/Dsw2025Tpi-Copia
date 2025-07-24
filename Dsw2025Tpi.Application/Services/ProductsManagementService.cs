@@ -31,7 +31,6 @@ public class ProductsManagementService : IProductsManagementService
             new ProductModel.ResponseProduct(product.Id, product.Sku, product.InternalCode, product.Name, product.Description,
                 product.CurrentUnitPrice, product.StockQuantity, product.IsActive) :
             null;
-
     }
 
     public async Task<IEnumerable<ProductModel.ResponseProduct>?> GetProducts()
@@ -61,6 +60,7 @@ public class ProductsManagementService : IProductsManagementService
 
         var product = new Product(request.sku, request.internalCode, request.name, request.description, request.currentUnitPrice, request.stockQuantity);
         await _repository.Add(product);
+        _logger.LogInformation("Creacion de producto exitosa");
         return new ProductModel.ResponseProduct(
             product.Id,
             product.Sku,
@@ -87,6 +87,7 @@ public class ProductsManagementService : IProductsManagementService
         product.StockQuantity = request.stockQuantity;
 
         var updated = await _repository.Update(product);
+        _logger.LogInformation("Modificacion de producto exitosa");
         return new ProductModel.ResponseProduct(
             updated.Id,
             updated.Sku,
@@ -99,24 +100,6 @@ public class ProductsManagementService : IProductsManagementService
         );
     }
 
-    public async Task<ProductModel.ResponseProduct> DeleteProduct(Guid id)
-    {
-        _logger.LogInformation("Eliminacion de producto con Id: {id}", id);
-        var product = await _repository.First<Product>(p => p.Id == id);
-        await ProductValidations.ValidateExistingProduct(id, _repository);
-        product!.IsActive = false;
-        var deleted = await _repository.Update(product);
-        return new ProductModel.ResponseProduct(
-            deleted.Id,
-            deleted.Sku,
-            deleted.InternalCode,
-            deleted.Name,
-            deleted.Description,
-            deleted.CurrentUnitPrice,
-            deleted.StockQuantity,
-            deleted.IsActive
-        );
-    }
     //Para el PATCH
     public async Task<ProductModel.ResponseProduct?> DeactivateProduct(Guid id)
     {
@@ -126,7 +109,7 @@ public class ProductsManagementService : IProductsManagementService
         ProductValidations.ValidateActiveProduct(product!);
         product!.IsActive = false;
         var updated = await _repository.Update(product);
-
+        _logger.LogInformation("Desactivacion de producto exitosa");
         return new ProductModel.ResponseProduct(
             updated.Id,
             updated.Sku,

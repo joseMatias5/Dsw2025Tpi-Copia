@@ -69,8 +69,6 @@ public class OrdersManagementService : IOrdersManagementService
                 order.TotalAmount) :
             null;
     }
-
-
     public async Task<OrderModel.ResponseOrder> AddOrder(OrderModel.RequestOrder request)
     {
         _logger.LogInformation("Creacion de orden");
@@ -109,7 +107,7 @@ public class OrdersManagementService : IOrdersManagementService
         
         var order = new Order(request!.ShippingAddress!, request.BillingAddress!, request.Notes, request.CustomerId, orderItems);
         await _repository.Add(order);
-
+        _logger.LogInformation("Creacion de orden exitosa");
         return new OrderModel.ResponseOrder(
             order.Id,
             order.Date,
@@ -134,7 +132,7 @@ public class OrdersManagementService : IOrdersManagementService
 
         order!.Status = Enum.Parse<OrderStatus>(request.newStatus.ToString(), true);
         var updated = await _repository.Update(order);
-
+        _logger.LogInformation("Modificacion de orden exitosa");
         return new OrderModel.ResponseOrder(
             updated.Id,
             updated.Date,

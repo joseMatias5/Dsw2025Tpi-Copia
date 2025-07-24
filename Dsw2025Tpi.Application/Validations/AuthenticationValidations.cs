@@ -5,13 +5,22 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Dsw2025Tpi.Application.Dtos;
+using Microsoft.AspNetCore.Identity;
 
 namespace Dsw2025Tpi.Application.Validations;
 
-public static class RegisterValidation
+public static class AuthenticationValidations
 {
-
-    public static void ValidateModel(RegisterModel model)
+    //public static void ValidateNotNull()
+    public static void ValidateLogin(LoginModel.RequestLogin request)
+    {
+        if (request is null)
+            throw new ArgumentNullException(nameof(request));
+        
+        ValidateUsername(request.Username);
+        ValidatePassword(request.Password);
+    }
+    public static void ValidateRegistration(RegisterModel.RequestRegister model)
     {
         if (model is null)
             throw new ArgumentNullException(nameof(model));
@@ -20,7 +29,6 @@ public static class RegisterValidation
         ValidateEmail(model.Email);
         ValidateUsername(model.Username);
     }
-
     public static void ValidatePassword(string password)
     {
         if (password == null)
