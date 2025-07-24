@@ -2,11 +2,13 @@
 using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/orders")]
 public class OrderController : Controller
 {

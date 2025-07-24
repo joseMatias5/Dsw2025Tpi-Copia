@@ -8,6 +8,7 @@ using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using Dsw2025Tpi.Application.Validations;
+using Microsoft.Extensions.Logging;
 
 
 namespace Dsw2025Tpi.Application.Services;
@@ -15,12 +16,16 @@ namespace Dsw2025Tpi.Application.Services;
 public class ProductsManagementService : IProductsManagementService
 {
     IRepository _repository;
-    public ProductsManagementService(IRepository repository)
+    private readonly ILogger<ProductsManagementService> _logger;
+    public ProductsManagementService(IRepository repository,
+        ILogger<ProductsManagementService> logger)
     {
         _repository = repository;
+        _logger = logger;
     }
     public async Task<ProductModel.ResponseProduct?> GetProductById(Guid id)
     {
+        _logger.LogInformation("Consulta de producto por Id: {id}", id);
         var product = await _repository.GetById<Product>(id);
         return product != null ?
             new ProductModel.ResponseProduct(product.Id, product.Sku, product.InternalCode, product.Name, product.Description,
@@ -31,7 +36,7 @@ public class ProductsManagementService : IProductsManagementService
 
     public async Task<IEnumerable<ProductModel.ResponseProduct>?> GetProducts()
     {
-
+        _logger.LogInformation("Consulta de productos");
         var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
 
         return (await _repository
@@ -50,6 +55,7 @@ public class ProductsManagementService : IProductsManagementService
 
     public async Task<ProductModel.ResponseProduct> AddProduct(ProductModel.RequestProduct request)
     {
+        _logger.LogInformation("Solicitud de agregar productos");
         ProductValidations.ValidateProduct(request);
         await ProductValidations.ValidateAddedProduct(request, _repository);
 
@@ -68,6 +74,7 @@ public class ProductsManagementService : IProductsManagementService
 
     public async Task<ProductModel.ResponseProduct> UpdateProduct(Guid id, ProductModel.RequestProduct request)
     {
+        _logger.LogInformation("Modificacion de producto con Id: {id}", id);
         await ProductValidations.ValidateExistingProduct(id, _repository);
         var product = await _repository.First<Product>(p => p.Id == id);
         ProductValidations.ValidateProduct(request);
@@ -94,6 +101,7 @@ public class ProductsManagementService : IProductsManagementService
 
     public async Task<ProductModel.ResponseProduct> DeleteProduct(Guid id)
     {
+        _logger.LogInformation("Eliminacion de producto con Id: {id}", id);
         var product = await _repository.First<Product>(p => p.Id == id);
         await ProductValidations.ValidateExistingProduct(id, _repository);
         product!.IsActive = false;
@@ -112,6 +120,7 @@ public class ProductsManagementService : IProductsManagementService
     //Para el PATCH
     public async Task<ProductModel.ResponseProduct?> DeactivateProduct(Guid id)
     {
+        _logger.LogInformation("Desactivacion de producto con Id: {id}", id);
         var product = await _repository.GetById<Product>(id);
         await ProductValidations.ValidateExistingProduct(id, _repository);
         ProductValidations.ValidateActiveProduct(product!);
