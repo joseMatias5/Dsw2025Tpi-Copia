@@ -28,8 +28,12 @@ public class Program
         {
             config.AddConsole()
                 .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Error)
-                .AddFilter("Microsoft.AspNetCore", LogLevel.Error);
-            config.AddFile(builder.Configuration.GetSection("LogPath").Value);
+                .AddFilter("Microsoft.AspNetCore", LogLevel.Error)
+                .AddFilter("Dsw2025Tpi", LogLevel.Information);
+            config.AddFile(builder.Configuration.GetSection("LogPath").Value)
+                .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Error)
+                .AddFilter("Microsoft.AspNetCore", LogLevel.Error)
+                .AddFilter("Dsw2025Tpi", LogLevel.Information); 
         });
         // Add services to the container.
         builder.Services.AddControllers();
@@ -103,7 +107,7 @@ public class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
         });
 
-        builder.Services.AddTransient<IAuthenticateService, AuthenticateService>();
+        builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 
         builder.Services.AddHealthChecks();
 

@@ -18,17 +18,29 @@ public class AuthenticateController : ControllerBase
     public AuthenticateController(IAuthenticateService service,
         SignInManager<IdentityUser> signInManager)
     {
-        service = _service;
+        _service = service ?? throw new ArgumentNullException(nameof(service));
         _signInManager = signInManager;
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginModel.RequestLogin request, SignInManager<IdentityUser> _signInManager)
+    public async Task<IActionResult> Login([FromBody] LoginModel.RequestLogin request)
     {
         try
         {
-            var token = await _service.Login(request, _signInManager);
+            var user = await _service.Login(request);
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+            if (!result.Succeeded)
+            {
+                throw new Application.Exceptions.ApplicationException("The username or password is incorrect");
+            }
+            var token = _service.GenerateToken(request.Username);
+
             return Ok(token);
+        }
+        catch (Application.Exceptions.ApplicationException ape)
+        {
+            return NotFound(ape.Message);
         }
         catch (ArgumentNullException ane)
         {
@@ -40,7 +52,7 @@ public class AuthenticateController : ControllerBase
         }
         catch (Exception)
         {
-            return Problem("There was a problem adding new user");
+            return Problem("There was a problem logging in");
         }
     }
 
