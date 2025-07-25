@@ -19,8 +19,7 @@ public class OrderValidations
     }
     public static void ValidateOrder(OrderModel.RequestOrder request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request), "Order request cannot be null");
+        NullValidations.ValidateNotNull(request, nameof(request));
 
         if (request.OrderItems == null || !request.OrderItems.Any())
             throw new ArgumentException("Order must contain at least one item", nameof(request.OrderItems));

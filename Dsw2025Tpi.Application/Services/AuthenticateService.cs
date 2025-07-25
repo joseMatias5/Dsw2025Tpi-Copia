@@ -59,18 +59,16 @@ public class AuthenticateService : IAuthenticateService
         _logger.LogInformation("Solicitud de ingreso");
 
         var user = await _userManager.FindByNameAsync(request.Username);
-        if (user == null)
-        {
-            _logger.LogWarning("Solicitud de ingreso rechazada");
-            throw new Application.Exceptions.ApplicationException("The username or password is incorrect");
-        }
+        
+        Validations.AuthenticateValidations.ValidateLogin(request, user!);
+
         _logger.LogInformation("Solicitud de ingreso exitosa");
-        return user;
+        return user!;
     }
     public async Task<RegisterModel.ResponseRegister> Register(RegisterModel.RequestRegister model)
     {
         _logger.LogInformation("Solicitud de registro");
-        AuthenticateValidations.ValidateRegistration(model);
+        AuthenticateValidations.ValidateRegistration(model, _userManager);
         var user = new IdentityUser { UserName = model.Username, Email = model.Email };
         var result = await _userManager.CreateAsync(user, model.Password);
 

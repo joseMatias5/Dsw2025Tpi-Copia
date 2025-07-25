@@ -12,8 +12,7 @@ public class ItemValidations
 {
     public static void ValidateItem(OrderItemModel.RequestItem item)
     {
-        if (item == null)
-            throw new ArgumentNullException(nameof(item), "Order item cannot be null");
+        NullValidations.ValidateNotNull(item, nameof(item));
         if (item.Quantity <= 0)
             throw new ArgumentOutOfRangeException(nameof(item.Quantity), "Quantity must be greater than zero");
     }

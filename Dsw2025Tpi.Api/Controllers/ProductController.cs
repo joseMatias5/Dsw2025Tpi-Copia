@@ -21,7 +21,7 @@ public class ProductController : Controller
     }
 
     [HttpGet()]
-
+    [AllowAnonymous]
     public async Task<IActionResult> GetProducts()
     {
 

@@ -12,39 +12,44 @@ namespace Dsw2025Tpi.Application.Validations;
 public static class AuthenticateValidations
 {
     //public static void ValidateNotNull()
-    public static void ValidateLogin(LoginModel.RequestLogin request)
+    public static void ValidateLogin(LoginModel.RequestLogin request,IdentityUser user)
     {
-        if (request is null)
-            throw new ArgumentNullException(nameof(request));
-        
+        NullValidations.ValidateNotNull(request, nameof(request));
+
         ValidateUsername(request.Username);
         ValidatePassword(request.Password);
+
+        NullValidations.ValidateNotNull(user, nameof(user));
     }
-    public static void ValidateRegistration(RegisterModel.RequestRegister model)
+    public static void ValidateRegistration(RegisterModel.RequestRegister model, UserManager<IdentityUser> _userManager)
     {
-        if (model is null)
-            throw new ArgumentNullException(nameof(model));
+        NullValidations.ValidateNotNull(model, nameof(model));
 
         ValidatePassword(model.Password);
         ValidateEmail(model.Email);
         ValidateUsername(model.Username);
+
+        var user = _userManager.FindByNameAsync(model.Username).Result;
+        if (user != null)
+            throw new ArgumentException($"Username {model.Username} already exists");
+
+        user = _userManager.FindByEmailAsync(model.Email).Result;
+        if (user != null)
+            throw new ArgumentException($"Email {model.Email} already exists");
     }
     public static void ValidatePassword(string password)
     {
-        if (password == null)
-            throw new ArgumentNullException(nameof(password));
+        NullValidations.ValidateNotNull(password, nameof(password));
     }
     public static void ValidateUsername(string username)
     {
-        if (username == null) 
-            throw new ArgumentNullException("Username cannot be null");
+        NullValidations.ValidateNotNull(username, nameof(username));
         if (username.Length < 6)
             throw new ArgumentException("Username must have at least 6 characters");
     }
     public static void ValidateEmail(string email)
     {
-        if (email == null)
-            throw new ArgumentNullException(nameof(email));
+        NullValidations.ValidateNotNull(email, nameof(email));
         if (!email.Contains("@"))
             throw new ArgumentException("Email must contain '@'");
         if (!email.Contains("."))
