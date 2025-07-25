@@ -27,8 +27,9 @@ public class Program
         builder.Services.AddLogging(config =>
         {
             config.AddConsole()
-            .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Error)
-            .AddFilter("Microsoft.AspNetCore", LogLevel.Error);
+                .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Error)
+                .AddFilter("Microsoft.AspNetCore", LogLevel.Error);
+            config.AddFile(builder.Configuration.GetSection("LogPath").Value);
         });
         // Add services to the container.
         builder.Services.AddControllers();

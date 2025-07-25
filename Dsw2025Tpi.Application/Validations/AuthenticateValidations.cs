@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Dsw2025Tpi.Application.Validations;
 
-public static class AuthenticationValidations
+public static class AuthenticateValidations
 {
     //public static void ValidateNotNull()
     public static void ValidateLogin(LoginModel.RequestLogin request)
@@ -60,6 +60,12 @@ public static class AuthenticationValidations
             "confluencia.net"
         };
 
+        //    var pattern = @"^[a-zA-Z0-9.!#$%&'+-/=?^_`{|}~]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)$";
+        var name = email.Split('@').FirstOrDefault();
+        if (string.IsNullOrEmpty(name) || name.Length < 3)
+        {
+            throw new ArgumentException("Email must have at least 3 characters before '@'");
+        }
         var domain = email.Split('@').Last();
         if (!allowedDomains.Contains(domain))
         {

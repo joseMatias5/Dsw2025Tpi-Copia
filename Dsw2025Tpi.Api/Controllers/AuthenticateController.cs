@@ -13,18 +13,21 @@ namespace Dsw2025Tpi.Api.Controllers;
 public class AuthenticateController : ControllerBase
 {
     private readonly IAuthenticateService _service;
+    private readonly SignInManager<IdentityUser> _signInManager;
 
-    public AuthenticateController(IAuthenticateService service)
+    public AuthenticateController(IAuthenticateService service,
+        SignInManager<IdentityUser> signInManager)
     {
         service = _service;
+        _signInManager = signInManager;
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginModel.RequestLogin request)
+    public async Task<IActionResult> Login([FromBody] LoginModel.RequestLogin request, SignInManager<IdentityUser> _signInManager)
     {
         try
         {
-            var token = await _service.Login(request);
+            var token = await _service.Login(request, _signInManager);
             return Ok(token);
         }
         catch (ArgumentNullException ane)

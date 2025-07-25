@@ -19,18 +19,15 @@ public class AuthenticateService : IAuthenticateService
 {
     private readonly IConfiguration _config;
     private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
     private readonly ILogger<AuthenticateService> _logger;
 
     public AuthenticateService(
         IConfiguration config,
         UserManager<IdentityUser> userManager,
-        SignInManager<IdentityUser> signInManager,
         ILogger<AuthenticateService> logger)
     {
         _config = config;
         _userManager = userManager;
-        _signInManager = signInManager;
         _logger = logger;
     }
 
@@ -57,20 +54,20 @@ public class AuthenticateService : IAuthenticateService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public async Task<LoginModel.ResponseLogin> Login(LoginModel.RequestLogin request)
+    public async Task<LoginModel.ResponseLogin> Login(LoginModel.RequestLogin request, SignInManager<IdentityUser> _signInManager)
     {
         _logger.LogInformation("Solicitud de ingreso");
 
         var user = await _userManager.FindByNameAsync(request.Username);
         if (user == null)
         {
-            _logger.LogError("Solicitud de ingreso rechazada");
+            _logger.LogWarning("Solicitud de ingreso rechazada");
             throw new ApplicationException("The username or password is incorrect");
         }
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
         if (!result.Succeeded)
         {
-            _logger.LogError("Solicitud de ingreso rechazada");
+            _logger.LogWarning("Solicitud de ingreso rechazada");
             throw new ApplicationException("The username or password is incorrect");
         }
         var token = GenerateToken(request.Username);
@@ -81,7 +78,7 @@ public class AuthenticateService : IAuthenticateService
     {
         _logger.LogInformation("Solicitud de registro");
 
-        AuthenticationValidations.ValidateRegistration(model);
+        AuthenticateValidations.ValidateRegistration(model);
         var user = new IdentityUser { UserName = model.Username, Email = model.Email };
         var result = await _userManager.CreateAsync(user, model.Password);
 
