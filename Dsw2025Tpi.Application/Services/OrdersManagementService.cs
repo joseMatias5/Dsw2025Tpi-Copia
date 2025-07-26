@@ -73,7 +73,7 @@ public class OrdersManagementService : IOrdersManagementService
     public async Task<OrderModel.ResponseOrder> AddOrder(OrderModel.RequestOrder request)
     {
         _logger.LogInformation("Creacion de orden");
-        OrderValidations.ValidateItem(request);
+        GeneralValidations.ValidateNotNull(request, nameof(request));
         var items = request!.OrderItems!.Select(item => new RequestItem(
             item.ProductId,
             item.Quantity

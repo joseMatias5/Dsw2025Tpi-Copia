@@ -17,12 +17,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
+using System.Security.Claims;
 
 namespace Dsw2025Tpi.Api;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -111,7 +112,8 @@ public class Program
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtConfig["Issuer"],
                     ValidAudience = jwtConfig["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    RoleClaimType = ClaimTypes.Role
                 };
             });
 
@@ -152,18 +154,20 @@ public class Program
 
         var app = builder.Build();
 
+        var rolesToCreate = new[] { "ADMIN", "USER" };
+
         using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<Dsw2025TpiContext>();
+        {
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-    var dataDir = Path.Combine(AppContext.BaseDirectory, "Sources");
-
-    context.Seedwork<Product>(Path.Combine(dataDir, "products.json"));
-    context.Seedwork<Customer>(Path.Combine(dataDir, "customers.json"));
-    context.SeedOrders(Path.Combine(dataDir, "orders.json"));
-
-    context.SaveChanges();
-}
+            foreach (var roleName in rolesToCreate)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

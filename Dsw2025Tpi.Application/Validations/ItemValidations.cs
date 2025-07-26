@@ -12,7 +12,12 @@ public class ItemValidations
 {
     public static void ValidateItem(OrderItemModel.RequestItem item)
     {
-        NullValidations.ValidateNotNull(item, nameof(item));
+        GeneralValidations.ValidateNotNull(item, nameof(item));
+        GeneralValidations.ValidateWholeNumber(item.ProductId.ToString(), nameof(item.ProductId));
+        if (item.ProductId == Guid.Empty)
+            throw new ArgumentException("Product ID cannot be empty", nameof(item.ProductId));
+        GeneralValidations.ValidateWholeNumber(item.Quantity.ToString(), nameof(item.Quantity));
+
         if (item.Quantity <= 0)
             throw new ArgumentOutOfRangeException(nameof(item.Quantity), "Quantity must be greater than zero");
     }
