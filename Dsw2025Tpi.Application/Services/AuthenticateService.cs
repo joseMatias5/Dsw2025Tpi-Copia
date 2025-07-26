@@ -19,16 +19,20 @@ public class AuthenticateService : IAuthenticateService
 {
     private readonly IConfiguration _config;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
     private readonly ILogger<AuthenticateService> _logger;
 
     public AuthenticateService(
         IConfiguration config,
+        SignInManager<IdentityUser> signInManager,
         UserManager<IdentityUser> userManager,
+
         ILogger<AuthenticateService> logger)
     {
-        _config = config ?? throw new ArgumentNullException(nameof(config)); 
-        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager)); 
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger)); 
+        _config = config;
+        _userManager = userManager;
+        _signInManager = signInManager;
+        _logger = logger; 
     }
 
     public string GenerateToken(string username)
@@ -54,7 +58,7 @@ public class AuthenticateService : IAuthenticateService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public async Task<IdentityUser> Login(LoginModel.RequestLogin request)
+    public async Task<LoginModel.ResponseLogin> Login(LoginModel.RequestLogin request)
     {
         _logger.LogInformation("Solicitud de ingreso");
 
@@ -62,8 +66,15 @@ public class AuthenticateService : IAuthenticateService
         
         Validations.AuthenticateValidations.ValidateLogin(request, user!);
 
+        var result = await _signInManager.CheckPasswordSignInAsync(user!, request.Password, false);
+        if (!result.Succeeded)
+        {
+            throw new Application.Exceptions.ApplicationException("The username or password is incorrect");
+        }
+        var token = GenerateToken(request.Username);
+
         _logger.LogInformation("Solicitud de ingreso exitosa");
-        return user!;
+        return new LoginModel.ResponseLogin(token);
     }
     public async Task<RegisterModel.ResponseRegister> Register(RegisterModel.RequestRegister model)
     {
@@ -74,6 +85,11 @@ public class AuthenticateService : IAuthenticateService
 
         if (!result.Succeeded)
             throw new ApplicationException(result.Errors.ToString());
+
+        var roleResult = await _userManager.AddToRoleAsync(user, model.Role);
+
+        if (!roleResult.Succeeded)
+            throw new ApplicationException("There was a problem assigning the role");
 
         _logger.LogInformation("Solicitud de registro exitosa");
         return new RegisterModel.ResponseRegister();

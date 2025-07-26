@@ -136,6 +136,7 @@ public class Program
                 ((Dsw2025TpiContext)c).SeedOrders(Path.Combine(dataDir, "orders.json"));
             });
         });
+
         builder.Services.AddScoped<IRepository, EfRepository>();
         builder.Services.AddTransient<IOrdersManagementService, OrdersManagementService>();
         builder.Services.AddTransient<IProductsManagementService, ProductsManagementService>();
@@ -150,6 +151,19 @@ public class Program
         
 
         var app = builder.Build();
+
+        using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<Dsw2025TpiContext>();
+
+    var dataDir = Path.Combine(AppContext.BaseDirectory, "Sources");
+
+    context.Seedwork<Product>(Path.Combine(dataDir, "products.json"));
+    context.Seedwork<Customer>(Path.Combine(dataDir, "customers.json"));
+    context.SeedOrders(Path.Combine(dataDir, "orders.json"));
+
+    context.SaveChanges();
+}
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())

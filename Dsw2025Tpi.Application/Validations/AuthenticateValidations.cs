@@ -11,7 +11,6 @@ namespace Dsw2025Tpi.Application.Validations;
 
 public static class AuthenticateValidations
 {
-    //public static void ValidateNotNull()
     public static void ValidateLogin(LoginModel.RequestLogin request,IdentityUser user)
     {
         NullValidations.ValidateNotNull(request, nameof(request));
@@ -28,6 +27,7 @@ public static class AuthenticateValidations
         ValidatePassword(model.Password);
         ValidateEmail(model.Email);
         ValidateUsername(model.Username);
+        ValidateRole(model.Role);
 
         var user = _userManager.FindByNameAsync(model.Username).Result;
         if (user != null)
@@ -50,31 +50,18 @@ public static class AuthenticateValidations
     public static void ValidateEmail(string email)
     {
         NullValidations.ValidateNotNull(email, nameof(email));
-        if (!email.Contains("@"))
-            throw new ArgumentException("Email must contain '@'");
-        if (!email.Contains("."))
-            throw new ArgumentException("Email must contain '.'");
+        var pattern = @"^[a-zA-Z0-9.!#$%&'+-/=?^_`{|}~]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)$";
 
-        var allowedDomains = new[] { 
-            "gmail.com", 
-            "hotmail.com", 
-            "yahoo.com.ar", 
-            "outlook.com",
-            "alu.utn.frt.edu.ar",
-            "doc.utn.frt.edu.ar",
-            "confluencia.net"
-        };
+        var regex = new Regex(pattern);
+        if (!regex.IsMatch(email))
+            throw new ArgumentException("Invalid email adress");
+    }
 
-        //    var pattern = @"^[a-zA-Z0-9.!#$%&'+-/=?^_`{|}~]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)$";
-        var name = email.Split('@').FirstOrDefault();
-        if (string.IsNullOrEmpty(name) || name.Length < 3)
-        {
-            throw new ArgumentException("Email must have at least 3 characters before '@'");
-        }
-        var domain = email.Split('@').Last();
-        if (!allowedDomains.Contains(domain))
-        {
-            throw new ArgumentException("Use an allowed domain.");
-        }
+    public static void ValidateRole(string role)
+    {
+        NullValidations.ValidateNotNull(role, nameof(role));
+        var validRoles = new[] { "ADMIN", "USER" };
+        if (!validRoles.Contains(role.ToUpper()))
+            throw new ArgumentException($"Invalid role: {role}. Valid roles are: {string.Join(", ", validRoles)}");
     }
 }

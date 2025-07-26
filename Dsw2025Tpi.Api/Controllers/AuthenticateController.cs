@@ -13,13 +13,11 @@ namespace Dsw2025Tpi.Api.Controllers;
 public class AuthenticateController : ControllerBase
 {
     private readonly IAuthenticateService _service;
-    private readonly SignInManager<IdentityUser> _signInManager;
 
     public AuthenticateController(IAuthenticateService service,
         SignInManager<IdentityUser> signInManager)
     {
         _service = service ?? throw new ArgumentNullException(nameof(service));
-        _signInManager = signInManager;
     }
 
     [HttpPost("login")]
@@ -27,14 +25,7 @@ public class AuthenticateController : ControllerBase
     {
         try
         {
-            var user = await _service.Login(request);
-
-            var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
-            if (!result.Succeeded)
-            {
-                throw new Application.Exceptions.ApplicationException("The username or password is incorrect");
-            }
-            var token = _service.GenerateToken(request.Username);
+            var token = await _service.Login(request);
 
             return Ok(token);
         }
