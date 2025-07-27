@@ -35,7 +35,7 @@ public class AuthenticateService : IAuthenticateService
         _logger = logger; 
     }
 
-    public string GenerateToken(string username)
+    public string GenerateToken(string userName, string role)
     {
         var jwtConfig = _config.GetSection("Jwt");
         var keyText = jwtConfig["Key"] ?? throw new ArgumentNullException("Jwt Key");
@@ -44,8 +44,9 @@ public class AuthenticateService : IAuthenticateService
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(JwtRegisteredClaimNames.Sub,userName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role, role)
         };
 
         var token = new JwtSecurityToken(
@@ -71,7 +72,12 @@ public class AuthenticateService : IAuthenticateService
         {
             throw new Application.Exceptions.ApplicationException("The username or password is incorrect");
         }
-        var token = GenerateToken(request.Username);
+
+        var roles = await _userManager.GetRolesAsync(user!);
+
+        var role = roles.FirstOrDefault() ?? throw new Application.Exceptions.ApplicationException("User has no assigned role");
+
+        var token = GenerateToken(user!.UserName!, role);
 
         _logger.LogInformation("Solicitud de ingreso exitosa");
         return new LoginModel.ResponseLogin(token);
