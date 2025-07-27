@@ -90,12 +90,12 @@ public class AuthenticateService : IAuthenticateService
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (!result.Succeeded)
-            throw new ApplicationException(result.Errors.ToString());
+            throw new Application.Exceptions.ApplicationException(result.Errors.ToString());
 
         var roleResult = await _userManager.AddToRoleAsync(user, model.Role);
 
         if (!roleResult.Succeeded)
-            throw new ApplicationException("There was a problem assigning the role");
+            throw new Application.Exceptions.ApplicationException("There was a problem assigning the role");
 
         _logger.LogInformation("Solicitud de registro exitosa");
         return new RegisterModel.ResponseRegister();

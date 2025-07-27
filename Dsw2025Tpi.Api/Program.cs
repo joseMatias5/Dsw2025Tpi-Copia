@@ -154,13 +154,13 @@ public class Program
 
         var app = builder.Build();
 
-        var rolesToCreate = new[] { "ADMIN", "USER" };
+        var rolesToCreate = builder.Configuration.GetSection("Roles").Get<List<string>>();
 
         using (var scope = app.Services.CreateScope())
         {
             var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-            foreach (var roleName in rolesToCreate)
+            foreach (var roleName in rolesToCreate!)
             {
                 if (!await roleManager.RoleExistsAsync(roleName))
                 {

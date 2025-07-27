@@ -55,7 +55,7 @@ public class ProductsManagementService : IProductsManagementService
     public async Task<ProductModel.ResponseProduct> AddProduct(ProductModel.RequestProduct request)
     {
         _logger.LogInformation("Solicitud de agregar productos");
-        ProductValidations.ValidateProduct(request);
+        Validations.GeneralValidations.ValidateNotNull(request, nameof(request));
         await ProductValidations.ValidateAddedProduct(request, _repository);
 
         var product = new Product(request.sku, request.internalCode, request.name, request.description, request.currentUnitPrice, request.stockQuantity);
@@ -75,9 +75,10 @@ public class ProductsManagementService : IProductsManagementService
     public async Task<ProductModel.ResponseProduct> UpdateProduct(Guid id, ProductModel.RequestProduct request)
     {
         _logger.LogInformation("Modificacion de producto con Id: {id}", id);
+        Validations.GeneralValidations.ValidateNotNull(request, nameof(request));
         await ProductValidations.ValidateExistingProduct(id, _repository);
+
         var product = await _repository.First<Product>(p => p.Id == id);
-        ProductValidations.ValidateProduct(request);
 
         product!.Sku = request.sku;
         product.InternalCode = request.internalCode;
@@ -85,6 +86,8 @@ public class ProductsManagementService : IProductsManagementService
         product.Description = request.description;
         product.CurrentUnitPrice = request.currentUnitPrice;
         product.StockQuantity = request.stockQuantity;
+
+        await ProductValidations.ValidateUpdatedProduct(product!, _repository);
 
         var updated = await _repository.Update(product);
         _logger.LogInformation("Modificacion de producto exitosa");

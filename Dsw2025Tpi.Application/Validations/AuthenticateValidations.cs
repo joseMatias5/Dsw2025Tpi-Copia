@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Dsw2025Tpi.Application.Dtos;
 using Microsoft.AspNetCore.Identity;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Dsw2025Tpi.Application.Validations;
 
@@ -13,7 +14,8 @@ public static class AuthenticateValidations
         ValidateUsername(request.Username);
         ValidatePassword(request.Password);
 
-        GeneralValidations.ValidateNotNull(user, nameof(user));
+        if (user == null)
+            throw new Application.Exceptions.ApplicationException("The username or password is incorrect");
     }
     public static void ValidateRegistration(RegisterModel.RequestRegister model, UserManager<IdentityUser> _userManager)
     {
@@ -35,6 +37,10 @@ public static class AuthenticateValidations
     public static void ValidatePassword(string password)
     {
         GeneralValidations.ValidateNotNull(password, nameof(password));
+        if (!Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"))
+        {
+            throw new ArgumentException($"{password}: invalid password");
+        }
     }
     public static void ValidateUsername(string username)
     {
@@ -45,7 +51,7 @@ public static class AuthenticateValidations
     public static void ValidateEmail(string email)
     {
         GeneralValidations.ValidateNotNull(email, nameof(email));
-        var pattern = @"^[a-zA-Z0-9.!#$%&'+-/=?^_`{|}~]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)$";
+        var pattern = @"^[a-zA-Z0-9.!#$%&'+-/=?^_`{|}~]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$";
 
         var regex = new Regex(pattern);
         if (!regex.IsMatch(email))

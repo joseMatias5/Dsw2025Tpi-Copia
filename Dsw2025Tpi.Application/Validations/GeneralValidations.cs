@@ -27,12 +27,18 @@ public static class GeneralValidations
     public static void ValidateText(string text, string paramName)
     {
         ValidateNotNull(text, paramName);
-        if (!Regex.IsMatch(text, @"^[a-zA-Z0-9]*$"))
+        if (!Regex.IsMatch(text, @"^[a-zA-Z0-9 ]*$"))
         {
             throw new ArgumentException($"{paramName}: invalid input, has to be an string of characters");
         }
     }
-
+    public static void ValidateOptionalText(string text, string paramName)
+    {
+        if (!Regex.IsMatch(text, @"^[a-zA-Z0-9\s,.\-°º#]*$"))
+        {
+            throw new ArgumentException($"{paramName}: invalid input, has to be an string of characters");
+        }
+    }
     public static void ValidateWholeNumber(string number, string paramName)
     {
         ValidateNotNull(number, paramName);
@@ -48,6 +54,14 @@ public static class GeneralValidations
         if (!Regex.IsMatch(number, @"^[0-9][0-9,\.]*$"))
         {
             throw new ArgumentException($"{paramName} invalid input, has to be a postive decimal number");
+        }
+    }
+    public static void ValidateGuidAndCodes(string text, string paramName)
+    {
+        ValidateNotNull(text, paramName);
+        if (!Regex.IsMatch(text, @"^[a-zA-Z0-9-\-]*$"))
+        {
+            throw new ArgumentException($"{paramName}: invalid guid");
         }
     }
 }

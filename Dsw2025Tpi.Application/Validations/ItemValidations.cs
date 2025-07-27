@@ -13,9 +13,7 @@ public class ItemValidations
     public static void ValidateItem(OrderItemModel.RequestItem item)
     {
         GeneralValidations.ValidateNotNull(item, nameof(item));
-        GeneralValidations.ValidateWholeNumber(item.ProductId.ToString(), nameof(item.ProductId));
-        if (item.ProductId == Guid.Empty)
-            throw new ArgumentException("Product ID cannot be empty", nameof(item.ProductId));
+        GeneralValidations.ValidateGuidAndCodes(item.ProductId.ToString(), nameof(item.ProductId));
         GeneralValidations.ValidateWholeNumber(item.Quantity.ToString(), nameof(item.Quantity));
 
         if (item.Quantity <= 0)
