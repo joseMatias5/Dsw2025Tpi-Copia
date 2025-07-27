@@ -21,7 +21,7 @@ public class ProductController : Controller
     }
 
     [HttpGet()]
-
+    [AllowAnonymous]
     public async Task<IActionResult> GetProducts()
     {
 
@@ -35,7 +35,7 @@ public class ProductController : Controller
     }
 
     [HttpGet("{id}")]
-
+    [Authorize(Roles = "ADMIN,USER")]
     public async Task<IActionResult> GetProductById(Guid id)
     {
         var product = await _service.GetProductById(id);
@@ -45,7 +45,7 @@ public class ProductController : Controller
     }
 
     [HttpPost()]
-
+    [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> AddProduct([FromBody] ProductModel.RequestProduct request)
     {
         if (request == null)
@@ -76,7 +76,7 @@ public class ProductController : Controller
 
     [HttpPut]
     [Route("{id:guid}")]
-
+    [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] ProductModel.RequestProduct request)
     {
         if (request == null)
@@ -106,7 +106,7 @@ public class ProductController : Controller
 
     [HttpPatch()]
     [Route("{id:guid}")]
-
+    [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> DeactivateProductAsync(Guid id)
     {
         try

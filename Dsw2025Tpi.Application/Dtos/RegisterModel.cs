@@ -8,7 +8,7 @@ namespace Dsw2025Tpi.Application.Dtos;
 
 public record RegisterModel
 {
-    public record RequestRegister(string Username, string Password, string Email);
+    public record RequestRegister(string Username, string Password, string Email, string Role);
     public record ResponseRegister();
 }
 

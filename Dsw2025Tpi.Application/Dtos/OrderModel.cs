@@ -14,4 +14,5 @@ public record OrderModel
     public record RequestOrder(string? ShippingAddress, string? BillingAddress, string? Notes, Guid CustomerId, List<RequestItem>? OrderItems);
     public record ResponseOrder(Guid id, DateTime date, string? shippingAddress, string? billingAddress,
         string? notes, Guid customerId, string status, List<ResponseItem> orderItems, decimal? totalAmount);
+
 }

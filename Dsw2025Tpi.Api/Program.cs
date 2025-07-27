@@ -15,23 +15,41 @@ using Microsoft.OpenApi.Models;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
+using System.Security.Claims;
 
 namespace Dsw2025Tpi.Api;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.AddFixedWindowLimiter("fixed", opt =>
+            {
+                opt.PermitLimit = 4;
+                opt.Window = TimeSpan.FromSeconds(12);
+                opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                opt.QueueLimit = 2;
+            });
+        });
 
         builder.Services.AddLogging(config =>
         {
             config.AddConsole()
                 .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Error)
-                .AddFilter("Microsoft.AspNetCore", LogLevel.Error);
-            config.AddFile(builder.Configuration.GetSection("LogPath").Value);
+                .AddFilter("Microsoft.AspNetCore", LogLevel.Error)
+                .AddFilter("Dsw2025Tpi", LogLevel.Information);
+            config.AddFile(builder.Configuration.GetSection("LogPath").Value)
+                .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Error)
+                .AddFilter("Microsoft.AspNetCore", LogLevel.Error)
+                .AddFilter("Dsw2025Tpi", LogLevel.Information); 
         });
-        // Add services to the container.
+        
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
 
@@ -94,7 +112,8 @@ public class Program
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtConfig["Issuer"],
                     ValidAudience = jwtConfig["Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    RoleClaimType = ClaimTypes.Role
                 };
             });
 
@@ -103,7 +122,7 @@ public class Program
             options.UseSqlServer(builder.Configuration.GetConnectionString("Dsw2025TpiDb"));
         });
 
-        builder.Services.AddTransient<IAuthenticateService, AuthenticateService>();
+        builder.Services.AddScoped<IAuthenticateService, AuthenticateService>();
 
         builder.Services.AddHealthChecks();
 
@@ -119,6 +138,7 @@ public class Program
                 ((Dsw2025TpiContext)c).SeedOrders(Path.Combine(dataDir, "orders.json"));
             });
         });
+
         builder.Services.AddScoped<IRepository, EfRepository>();
         builder.Services.AddTransient<IOrdersManagementService, OrdersManagementService>();
         builder.Services.AddTransient<IProductsManagementService, ProductsManagementService>();
@@ -134,6 +154,21 @@ public class Program
 
         var app = builder.Build();
 
+        var rolesToCreate = new[] { "ADMIN", "USER" };
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            foreach (var roleName in rolesToCreate)
+            {
+                if (!await roleManager.RoleExistsAsync(roleName))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+        }
+
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
@@ -145,10 +180,10 @@ public class Program
 
         app.UseCors("PermitirFrontend");
         app.UseAuthentication();
+        app.UseRateLimiter();
         app.UseAuthorization();
-        app.MapControllers();
+        app.MapControllers().RequireRateLimiting("fixed");
 
-        
 
         app.MapHealthChecks("/health-check");
 

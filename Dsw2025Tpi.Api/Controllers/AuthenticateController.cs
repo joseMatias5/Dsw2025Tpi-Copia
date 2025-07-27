@@ -13,22 +13,25 @@ namespace Dsw2025Tpi.Api.Controllers;
 public class AuthenticateController : ControllerBase
 {
     private readonly IAuthenticateService _service;
-    private readonly SignInManager<IdentityUser> _signInManager;
 
     public AuthenticateController(IAuthenticateService service,
         SignInManager<IdentityUser> signInManager)
     {
-        service = _service;
-        _signInManager = signInManager;
+        _service = service ?? throw new ArgumentNullException(nameof(service));
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginModel.RequestLogin request, SignInManager<IdentityUser> _signInManager)
+    public async Task<IActionResult> Login([FromBody] LoginModel.RequestLogin request)
     {
         try
         {
-            var token = await _service.Login(request, _signInManager);
+            var token = await _service.Login(request);
+
             return Ok(token);
+        }
+        catch (Application.Exceptions.ApplicationException ape)
+        {
+            return NotFound(ape.Message);
         }
         catch (ArgumentNullException ane)
         {
@@ -40,7 +43,7 @@ public class AuthenticateController : ControllerBase
         }
         catch (Exception)
         {
-            return Problem("There was a problem adding new user");
+            return Problem("There was a problem logging in");
         }
     }
 

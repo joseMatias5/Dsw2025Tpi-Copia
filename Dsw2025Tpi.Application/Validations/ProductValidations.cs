@@ -14,8 +14,13 @@ public class ProductValidations
 {
     public static void ValidateProduct(ProductModel.RequestProduct request)
     {
-        if (request == null)
-            throw new ArgumentException(nameof(request), "Product request cannot be null");
+        GeneralValidations.ValidateNotNull(request, nameof(request));
+        GeneralValidations.ValidateText(request.sku, nameof(request.sku));
+        GeneralValidations.ValidateText(request.internalCode, nameof(request.internalCode));
+        GeneralValidations.ValidateText(request.name, nameof(request.name));
+        GeneralValidations.ValidatePositiveDecimalNumber(request.currentUnitPrice.ToString(), nameof(request.currentUnitPrice));
+        GeneralValidations.ValidateWholeNumber(request.stockQuantity.ToString(), nameof(request.stockQuantity));
+
         if (string.IsNullOrWhiteSpace(request.sku))
             throw new ArgumentException("SKU cannot be null or empty", nameof(request.sku));
         if (string.IsNullOrWhiteSpace(request.internalCode))
@@ -45,8 +50,7 @@ public class ProductValidations
 
     public static void ValidateActiveProduct(Product product)
     {
-        if (product == null)
-            throw new ArgumentNullException(nameof(product), "Product cannot be null");
+        GeneralValidations.ValidateNotNull(product, nameof(product));
         if (!product.IsActive)
             throw new EntityNotFoundException($"Product with ID {product.Id} is not active");
     }

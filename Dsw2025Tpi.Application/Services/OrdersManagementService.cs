@@ -30,7 +30,8 @@ public class OrdersManagementService : IOrdersManagementService
         _logger.LogInformation("Consulta de ordenes");
         var orders = await _repository
             .GetFiltered<Order>(
-                o => o.Status.Value != OrderStatus.CANCELLED,
+                o => 
+                    o.Status.Value != OrderStatus.CANCELLED, 
                 include: new[] { "OrderItems" }
             );
         OrderValidations.ValidateNotNullOrders(orders);
@@ -72,7 +73,7 @@ public class OrdersManagementService : IOrdersManagementService
     public async Task<OrderModel.ResponseOrder> AddOrder(OrderModel.RequestOrder request)
     {
         _logger.LogInformation("Creacion de orden");
-        OrderValidations.ValidateItem(request);
+        GeneralValidations.ValidateNotNull(request, nameof(request));
         var items = request!.OrderItems!.Select(item => new RequestItem(
             item.ProductId,
             item.Quantity
@@ -130,7 +131,7 @@ public class OrdersManagementService : IOrdersManagementService
         await OrderValidations.ValidateExistingOrder(id, _repository);
         OrderValidations.ValidateOrderStatus(order!, request.newStatus.ToString());
 
-        order!.Status = Enum.Parse<OrderStatus>(request.newStatus.ToString(), true);
+        order!.Status = Enum.Parse<OrderStatus>(request.newStatus.ToString().ToUpper(), true);
         var updated = await _repository.Update(order);
         _logger.LogInformation("Modificacion de orden exitosa");
         return new OrderModel.ResponseOrder(

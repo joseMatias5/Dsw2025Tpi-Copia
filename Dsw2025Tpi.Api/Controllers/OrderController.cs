@@ -20,7 +20,7 @@ public class OrderController : Controller
     }
 
     [HttpGet()]
-
+    [Authorize(Roles = "ADMIN,USER")]
     public async Task<IActionResult> GetOrders()
     {
         try
@@ -52,7 +52,7 @@ public class OrderController : Controller
     }
 
     [HttpGet("{id}")]
-
+    [Authorize(Roles = "ADMIN,USER")]
     public async Task<IActionResult> GetOrderById(Guid id)
     {
         try
@@ -81,7 +81,7 @@ public class OrderController : Controller
     }
 
     [HttpPost()]
-
+    [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> AddOrder([FromBody] OrderModel.RequestOrder request)
     {
         if (request == null)
@@ -112,7 +112,7 @@ public class OrderController : Controller
 
     [HttpPut]
     [Route("{id:guid}")]
-
+    [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.RequestChangeStatus request)
     {
         if (request == null)

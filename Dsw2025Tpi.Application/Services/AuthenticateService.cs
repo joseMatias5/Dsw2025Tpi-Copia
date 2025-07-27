@@ -19,19 +19,23 @@ public class AuthenticateService : IAuthenticateService
 {
     private readonly IConfiguration _config;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
     private readonly ILogger<AuthenticateService> _logger;
 
     public AuthenticateService(
         IConfiguration config,
+        SignInManager<IdentityUser> signInManager,
         UserManager<IdentityUser> userManager,
+
         ILogger<AuthenticateService> logger)
     {
         _config = config;
         _userManager = userManager;
-        _logger = logger;
+        _signInManager = signInManager;
+        _logger = logger; 
     }
 
-    public string GenerateToken(string username)
+    public string GenerateToken(string userName, string role)
     {
         var jwtConfig = _config.GetSection("Jwt");
         var keyText = jwtConfig["Key"] ?? throw new ArgumentNullException("Jwt Key");
@@ -40,8 +44,9 @@ public class AuthenticateService : IAuthenticateService
 
         var claims = new[]
         {
-            new Claim(JwtRegisteredClaimNames.Sub, username),
+            new Claim(JwtRegisteredClaimNames.Sub,userName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role, role)
         };
 
         var token = new JwtSecurityToken(
@@ -54,36 +59,43 @@ public class AuthenticateService : IAuthenticateService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public async Task<LoginModel.ResponseLogin> Login(LoginModel.RequestLogin request, SignInManager<IdentityUser> _signInManager)
+    public async Task<LoginModel.ResponseLogin> Login(LoginModel.RequestLogin request)
     {
         _logger.LogInformation("Solicitud de ingreso");
 
         var user = await _userManager.FindByNameAsync(request.Username);
-        if (user == null)
-        {
-            _logger.LogWarning("Solicitud de ingreso rechazada");
-            throw new ApplicationException("The username or password is incorrect");
-        }
-        var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+        
+        Validations.AuthenticateValidations.ValidateLogin(request, user!);
+
+        var result = await _signInManager.CheckPasswordSignInAsync(user!, request.Password, false);
         if (!result.Succeeded)
         {
-            _logger.LogWarning("Solicitud de ingreso rechazada");
-            throw new ApplicationException("The username or password is incorrect");
+            throw new Application.Exceptions.ApplicationException("The username or password is incorrect");
         }
-        var token = GenerateToken(request.Username);
+
+        var roles = await _userManager.GetRolesAsync(user!);
+
+        var role = roles.FirstOrDefault() ?? throw new Application.Exceptions.ApplicationException("User has no assigned role");
+
+        var token = GenerateToken(user!.UserName!, role);
+
         _logger.LogInformation("Solicitud de ingreso exitosa");
         return new LoginModel.ResponseLogin(token);
     }
     public async Task<RegisterModel.ResponseRegister> Register(RegisterModel.RequestRegister model)
     {
         _logger.LogInformation("Solicitud de registro");
-
-        AuthenticateValidations.ValidateRegistration(model);
+        AuthenticateValidations.ValidateRegistration(model, _userManager);
         var user = new IdentityUser { UserName = model.Username, Email = model.Email };
         var result = await _userManager.CreateAsync(user, model.Password);
 
         if (!result.Succeeded)
             throw new ApplicationException(result.Errors.ToString());
+
+        var roleResult = await _userManager.AddToRoleAsync(user, model.Role);
+
+        if (!roleResult.Succeeded)
+            throw new ApplicationException("There was a problem assigning the role");
 
         _logger.LogInformation("Solicitud de registro exitosa");
         return new RegisterModel.ResponseRegister();
