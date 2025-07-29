@@ -20,8 +20,8 @@ public class OrderController : Controller
     }
 
     [HttpGet()]
-    //[Authorize(Roles = "ADMIN,USER")]
-    [AllowAnonymous]
+    [Authorize(Roles = "ADMIN,USER")]
+    //[AllowAnonymous]
     public async Task<IActionResult> GetOrders([FromQuery] OrderModel.SearchOrder request)
     {
         try

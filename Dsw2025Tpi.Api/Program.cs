@@ -18,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 using System.Security.Claims;
+using Serilog;
 
 namespace Dsw2025Tpi.Api;
 
@@ -25,7 +26,15 @@ public class Program
 {
     public static async Task Main(string[] args)
     {
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build())
+            .Enrich.FromLogContext()
+            .CreateLogger();
+
         var builder = WebApplication.CreateBuilder(args);
+        builder.Host.UseSerilog();
 
         builder.Services.AddRateLimiter(options =>
         {
@@ -38,12 +47,6 @@ public class Program
             });
         });
 
-        builder.Services.AddLogging(config =>
-        {
-            config.ClearProviders()
-            .AddConsole()
-            .AddFile(builder.Configuration.GetSection("LogPath").Value);
-        });
         
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();

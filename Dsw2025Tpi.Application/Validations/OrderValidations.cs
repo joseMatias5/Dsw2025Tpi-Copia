@@ -15,12 +15,13 @@ public class OrderValidations
 {
     public static void ValidateNotNullOrders(IEnumerable<Order>? orders, OrderModel.SearchOrder? request)
     {
+        if (orders == null || !orders.Any()  && request != null && request.CustomerId.HasValue)
+            throw new EntityNotFoundException($"No orders found for customer with ID {request.CustomerId}");
+        if (orders == null || !orders.Any() && request != null && !request.Status.IsNullOrEmpty())
+            throw new EntityNotFoundException($"No orders found with status {request.Status}");
         if (orders == null || !orders.Any())
             throw new EntityNotFoundException("No orders found");
-        if(request != null && request.CustomerId.HasValue)
-            throw new EntityNotFoundException($"No orders found for customer with ID {request.CustomerId}");
-        if (request != null && !request.Status.IsNullOrEmpty())
-            throw new EntityNotFoundException($"No orders found with status {request.Status}");
+
     }
     public static void ValidateOrder(OrderModel.RequestOrder request)
     {

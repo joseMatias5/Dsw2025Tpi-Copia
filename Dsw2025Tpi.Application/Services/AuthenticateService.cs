@@ -56,6 +56,7 @@ public class AuthenticateService : IAuthenticateService
             expires: DateTime.Now.AddMinutes(double.Parse(jwtConfig["ExpireInMinutes"] ?? "60")),
             signingCredentials: creds
          );
+        _logger.LogInformation("Token generado");
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 

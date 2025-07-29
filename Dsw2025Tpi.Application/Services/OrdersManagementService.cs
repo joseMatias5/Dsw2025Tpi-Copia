@@ -31,7 +31,15 @@ public class OrdersManagementService : IOrdersManagementService
         if (!string.IsNullOrWhiteSpace(request.Status))
             status = Enum.Parse<OrderStatus>(request.Status.ToUpper(), true);
 
-        _logger.LogInformation("Consulta de ordenes");
+        if (request is null)
+        {
+            _logger.LogInformation("Consulta de ordenes sin filtrar");
+        }
+        else
+        {
+            _logger.LogInformation("Consulta de ordenes filtradas");
+        }
+
         var orders = await _repository
             .GetFiltered<Order>(
                 o => 
