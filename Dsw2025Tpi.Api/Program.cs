@@ -40,14 +40,9 @@ public class Program
 
         builder.Services.AddLogging(config =>
         {
-            config.AddConsole()
-                .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Error)
-                .AddFilter("Microsoft.AspNetCore", LogLevel.Error)
-                .AddFilter("Dsw2025Tpi", LogLevel.Information);
-            config.AddFile(builder.Configuration.GetSection("LogPath").Value)
-                .AddFilter("Microsoft.EntityFrameworkCore", LogLevel.Error)
-                .AddFilter("Microsoft.AspNetCore", LogLevel.Error)
-                .AddFilter("Dsw2025Tpi", LogLevel.Information); 
+            config.ClearProviders()
+            .AddConsole()
+            .AddFile(builder.Configuration.GetSection("LogPath").Value);
         });
         
         builder.Services.AddControllers();

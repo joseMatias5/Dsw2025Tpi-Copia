@@ -25,16 +25,23 @@ public class OrdersManagementService : IOrdersManagementService
         _logger = logger;
     }
 
-    public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders()
+    public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders(OrderModel.SearchOrder request)
     {
+        OrderStatus? status = null;
+        if (!string.IsNullOrWhiteSpace(request.Status))
+            status = Enum.Parse<OrderStatus>(request.Status.ToUpper(), true);
+
         _logger.LogInformation("Consulta de ordenes");
         var orders = await _repository
             .GetFiltered<Order>(
                 o => 
-                    o.Status.Value != OrderStatus.CANCELLED, 
+                    o.Status.Value != OrderStatus.CANCELLED
+                    && (o.CustomerId == request.CustomerId || !request.CustomerId.HasValue)
+                    && (!status.HasValue || o.Status == status.Value)
+                    , 
                 include: new[] { "OrderItems" }
             );
-        OrderValidations.ValidateNotNullOrders(orders);
+        OrderValidations.ValidateNotNullOrders(orders, request);
 
         return orders?.Select(order => new OrderModel.ResponseOrder(
             order.Id,

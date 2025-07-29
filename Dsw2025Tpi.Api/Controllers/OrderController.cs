@@ -20,12 +20,13 @@ public class OrderController : Controller
     }
 
     [HttpGet()]
-    [Authorize(Roles = "ADMIN,USER")]
-    public async Task<IActionResult> GetOrders()
+    //[Authorize(Roles = "ADMIN,USER")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetOrders([FromQuery] OrderModel.SearchOrder request)
     {
         try
         {
-            var orders = await _service.GetOrders();
+            var orders = await _service.GetOrders(request);
             if (orders == null || !orders.Any())
             {
                 Response.Headers.Append("X-Message", "There are no active orders");
