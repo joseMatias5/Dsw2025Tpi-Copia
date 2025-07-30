@@ -21,7 +21,6 @@ public class OrderController : Controller
 
     [HttpGet()]
     [Authorize(Roles = "ADMIN,USER")]
-    //[AllowAnonymous]
     public async Task<IActionResult> GetOrders([FromQuery] OrderModel.SearchOrder request)
     {
         try
@@ -44,7 +43,7 @@ public class OrderController : Controller
         }
         catch (Application.Exceptions.ApplicationException de)
         {
-            return Conflict(de.Message);
+            return BadRequest(de.Message);
         }
         catch (Exception)
         {
@@ -73,7 +72,7 @@ public class OrderController : Controller
         }
         catch (Application.Exceptions.ApplicationException de)
         {
-            return Conflict(de.Message);
+            return BadRequest(de.Message);
         }
         catch (Exception)
         {
@@ -90,7 +89,7 @@ public class OrderController : Controller
         try
         {
             var order = await _service.AddOrder(request);
-            return CreatedAtAction(nameof(GetOrderById), new { id = order.id }, order);
+            return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
 
         }
         catch (EntityNotFoundException enf)
@@ -112,7 +111,6 @@ public class OrderController : Controller
     }
 
     [HttpPut]
-    [Route("{id:guid}")]
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.RequestChangeStatus request)
     {
@@ -121,10 +119,6 @@ public class OrderController : Controller
         try
         {
             var changedOrder = await _service.ChangeOrderStatus(id, request);
-            if (changedOrder == null)
-            {
-                return NotFound();
-            }
             return Ok(changedOrder);
         }
         catch (EntityNotFoundException enf)
@@ -137,7 +131,7 @@ public class OrderController : Controller
         }
         catch (Application.Exceptions.ApplicationException de)
         {
-            return Conflict(de.Message);
+            return BadRequest(de.Message);
         }
         catch (Exception)
         {

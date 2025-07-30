@@ -144,9 +144,9 @@ public class OrdersManagementService : IOrdersManagementService
         _logger.LogInformation("Cambiar estado de orden con Id: {id}", id);
         var order = await _repository.First<Order>(p => p.Id == id, include: new[] { "OrderItems" });
         await OrderValidations.ValidateExistingOrder(id, _repository);
-        OrderValidations.ValidateOrderStatus(order!, request.newStatus.ToString());
+        OrderValidations.ValidateOrderStatus(order!, request.NewStatus.ToString());
 
-        order!.Status = Enum.Parse<OrderStatus>(request.newStatus.ToString().ToUpper(), true);
+        order!.Status = Enum.Parse<OrderStatus>(request.NewStatus.ToString().ToUpper(), true);
         var updated = await _repository.Update(order);
         _logger.LogInformation("Modificacion de orden exitosa");
         return new OrderModel.ResponseOrder(

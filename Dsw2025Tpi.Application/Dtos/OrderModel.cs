@@ -10,10 +10,10 @@ namespace Dsw2025Tpi.Application.Dtos;
 
 public record OrderModel
 {
-    public record RequestChangeStatus(string newStatus);
+    public record RequestChangeStatus(string NewStatus);
     public record RequestOrder(string? ShippingAddress, string? BillingAddress, string? Notes, Guid CustomerId, List<RequestItem>? OrderItems);
-    public record ResponseOrder(Guid id, DateTime date, string? shippingAddress, string? billingAddress,
-        string? notes, Guid customerId, string status, List<ResponseItem> orderItems, decimal? totalAmount);
+    public record ResponseOrder(Guid Id, DateTime Date, string? ShippingAddress, string? BillingAddress,
+        string? Notes, Guid CustomerId, string Status, List<ResponseItem> OrderItems, decimal? TotalAmount);
 
     public record SearchOrder(string? Status, Guid? CustomerId);
 

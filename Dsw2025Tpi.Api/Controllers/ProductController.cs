@@ -53,7 +53,7 @@ public class ProductController : Controller
         try
         {
             var product = await _service.AddProduct(request);
-            return CreatedAtAction(nameof(GetProductById), new { id = product.id }, product);
+            return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
 
         }
         catch (DuplicatedEntityException de) 
@@ -75,7 +75,6 @@ public class ProductController : Controller
     }
 
     [HttpPut]
-    [Route("{id:guid}")]
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] ProductModel.RequestProduct request)
     {
@@ -84,11 +83,11 @@ public class ProductController : Controller
         try
         {
             var updatedProduct = await _service.UpdateProduct(id, request);
-            if (updatedProduct == null)
-            {
-                return NotFound();
-            }
             return Ok(updatedProduct);
+        }
+        catch (EntityNotFoundException enf)
+        {
+            return NotFound(enf.Message);
         }
         catch (ArgumentException ae)
         {
@@ -96,7 +95,7 @@ public class ProductController : Controller
         }
         catch (Application.Exceptions.ApplicationException de)
         {
-            return Conflict(de.Message);
+            return BadRequest(de.Message);
         }
         catch (Exception)
         {
@@ -105,7 +104,6 @@ public class ProductController : Controller
     }
 
     [HttpPatch()]
-    [Route("{id:guid}")]
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> DeactivateProductAsync(Guid id)
     {
@@ -128,7 +126,7 @@ public class ProductController : Controller
         }
         catch (Application.Exceptions.ApplicationException de)
         {
-            return Conflict(de.Message);
+            return BadRequest(de.Message);
         }
         catch (Exception)
         {

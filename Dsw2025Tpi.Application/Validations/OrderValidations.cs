@@ -26,9 +26,13 @@ public class OrderValidations
     public static void ValidateOrder(OrderModel.RequestOrder request)
     {
         GeneralValidations.ValidateNotNull(request, nameof(request));
-        GeneralValidations.ValidateText(request.ShippingAddress, nameof(request.ShippingAddress));
-        GeneralValidations.ValidateText(request.BillingAddress, nameof(request.BillingAddress));
-        GeneralValidations.ValidateOptionalText(request.Notes, nameof(request.Notes));
+        GeneralValidations.ValidateNotNull(request.OrderItems, nameof(request.OrderItems));
+        GeneralValidations.ValidateNotNull(request.ShippingAddress, nameof(request.ShippingAddress));
+        GeneralValidations.ValidateNotNull(request.BillingAddress, nameof(request.BillingAddress));
+        GeneralValidations.ValidateNotNull(request.CustomerId, nameof(request.CustomerId));
+        GeneralValidations.ValidateText(request.ShippingAddress!, nameof(request.ShippingAddress));
+        GeneralValidations.ValidateText(request.BillingAddress!, nameof(request.BillingAddress));
+        GeneralValidations.ValidateOptionalText(request.Notes!, nameof(request.Notes));
         GeneralValidations.ValidateGuidAndCodes(request.CustomerId.ToString(), nameof(request.CustomerId));
     }
 
@@ -44,17 +48,29 @@ public class OrderValidations
         GeneralValidations.ValidateNotNull(order, nameof(order));
         GeneralValidations.ValidateText(status, nameof(status));
 
-        if (order.Status.ToString().ToLower() == status)
+        var statusUpper = status.ToUpper();
+
+        if (order.Status.ToString() == statusUpper)
             throw new ArgumentException($"Order is already in {status} status");
+
         var validStatuses = Enum.GetNames(typeof(OrderStatus))
             .Select(s => s.ToLowerInvariant());
         if (!validStatuses.Contains(status.ToLower()))
             throw new ArgumentException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", validStatuses)}");
+
+        if (order.Status == OrderStatus.PENDING && statusUpper != "PROCESSING" && statusUpper != "CANCELLED")
+            throw new Application.Exceptions.ApplicationException($"Order status is PENDING, it cannot be changed to: {status}");
+        if (order.Status == OrderStatus.PROCESSING && statusUpper != "SHIPPED" && statusUpper != "CANCELLED")
+            throw new Application.Exceptions.ApplicationException($"Order status is PROCESSING, it cannot be changed to: {status}");
+        if (order.Status == OrderStatus.SHIPPED && statusUpper != "DELIVERED" && statusUpper != "CANCELLED")
+            throw new Application.Exceptions.ApplicationException($"Order status is SHIPPED, it cannot be changed to: {status}");
+        if(order.Status == OrderStatus.CANCELLED)
+            throw new Application.Exceptions.ApplicationException($"Order status is CANCELLED, it cannot be changed to: {status}");
     }
     public static void ValidateCancelledOrder(Order order)
     {
-        if (order.Status.ToString().ToLower() == "cancelled")
-            throw new ArgumentException($"Order with ID {order.Id} is cancelled");
+        if (order.Status.ToString() == "CANCELLED")
+            throw new ArgumentException($"Order with ID {order.Id} is CANCELLED");
     }
 
     public static void ValidateCustomer(Guid customerId, IRepository _repository)

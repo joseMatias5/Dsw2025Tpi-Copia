@@ -14,7 +14,7 @@ public class ItemValidations
     {
         GeneralValidations.ValidateNotNull(item, nameof(item));
         GeneralValidations.ValidateGuidAndCodes(item.ProductId.ToString(), nameof(item.ProductId));
-        GeneralValidations.ValidateWholeNumber(item.Quantity.ToString(), nameof(item.Quantity));
+        GeneralValidations.ValidatePositiveWholeNumberAndCero(item.Quantity.ToString(), nameof(item.Quantity));
 
         if (item.Quantity <= 0)
             throw new ArgumentOutOfRangeException(nameof(item.Quantity), "Quantity must be greater than zero");

@@ -58,7 +58,7 @@ public class ProductsManagementService : IProductsManagementService
         Validations.GeneralValidations.ValidateNotNull(request, nameof(request));
         await ProductValidations.ValidateAddedProduct(request, _repository);
 
-        var product = new Product(request.sku, request.internalCode, request.name, request.description, request.currentUnitPrice, request.stockQuantity);
+        var product = new Product(request.Sku, request.InternalCode, request.Name, request.Description, request.CurrentUnitPrice, request.StockQuantity);
         await _repository.Add(product);
         _logger.LogInformation("Creacion de producto exitosa");
         return new ProductModel.ResponseProduct(
@@ -77,15 +77,15 @@ public class ProductsManagementService : IProductsManagementService
         _logger.LogInformation("Modificacion de producto con Id: {id}", id);
         Validations.GeneralValidations.ValidateNotNull(request, nameof(request));
         await ProductValidations.ValidateExistingProduct(id, _repository);
-
+        ProductValidations.ValidateProduct(request);
         var product = await _repository.First<Product>(p => p.Id == id);
 
-        product!.Sku = request.sku;
-        product.InternalCode = request.internalCode;
-        product.Name = request.name;
-        product.Description = request.description;
-        product.CurrentUnitPrice = request.currentUnitPrice;
-        product.StockQuantity = request.stockQuantity;
+        product!.Sku = request.Sku;
+        product.InternalCode = request.InternalCode;
+        product.Name = request.Name;
+        product.Description = request.Description;
+        product.CurrentUnitPrice = request.CurrentUnitPrice;
+        product.StockQuantity = request.StockQuantity;
 
         await ProductValidations.ValidateUpdatedProduct(product!, _repository);
 

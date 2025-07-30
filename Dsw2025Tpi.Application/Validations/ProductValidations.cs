@@ -18,32 +18,32 @@ public class ProductValidations
     {
         GeneralValidations.ValidateNotNull(request, nameof(request));
         
-        GeneralValidations.ValidateNotNull(request.sku, nameof(request.sku));
-        if (!Regex.IsMatch(request.sku, @"^SKU-\d{4}$"))
+        GeneralValidations.ValidateNotNull(request.Sku, nameof(request.Sku));
+        if (!Regex.IsMatch(request.Sku, @"^SKU-\d{4}$"))
         {
-            throw new ArgumentException("Invalid sku input, valid format = 'SKU-XXXX'");
+            throw new ArgumentException("Invalid Sku input, valid format = 'SKU-XXXX'");
         }
 
-        GeneralValidations.ValidateNotNull(request.internalCode, nameof(request.internalCode));
-        if (!Regex.IsMatch(request.internalCode, @"^INT-\d{4}$"))
+        GeneralValidations.ValidateNotNull(request.InternalCode, nameof(request.InternalCode));
+        if (!Regex.IsMatch(request.InternalCode, @"^INT-\d{4}$"))
         {
-            throw new ArgumentException("Invalid internalCode input, valid format = 'INT-XXXX'");
+            throw new ArgumentException("Invalid InternalCode input, valid format = 'INT-XXXX'");
         }
 
-        GeneralValidations.ValidateText(request.name, nameof(request.name));
-        GeneralValidations.ValidatePositiveDecimalNumber(request.currentUnitPrice.ToString(), nameof(request.currentUnitPrice));
-        if (request.currentUnitPrice <= 0)
-            throw new ArgumentException("current unit price cannot be negative or 0");
-        GeneralValidations.ValidateWholeNumber(request.stockQuantity.ToString(), nameof(request.stockQuantity));
-        GeneralValidations.ValidateOptionalText(request.description, nameof(request.description));
+        GeneralValidations.ValidateText(request.Name, nameof(request.Name));
+        GeneralValidations.ValidatePositiveDecimalNumber(request.CurrentUnitPrice.ToString(), nameof(request.CurrentUnitPrice));
+        if (request.CurrentUnitPrice <= 0)
+            throw new ArgumentException("Current unit price cannot be negative or 0");
+        GeneralValidations.ValidatePositiveWholeNumberAndCero(request.StockQuantity.ToString(), nameof(request.StockQuantity));
+        GeneralValidations.ValidateOptionalText(request.Description!, nameof(request.Description));
     }
     public async static Task ValidateAddedProduct(ProductModel.RequestProduct request, IRepository _repository)
     {
         ValidateProduct(request);
-        if (await _repository.First<Product>(p => p.Sku == request.sku) != null)
-            throw new DuplicatedEntityException($"A product with this SKU already exists {request.sku}");
-        if (await _repository.First<Product>(p => p.InternalCode == request.internalCode) != null)
-            throw new DuplicatedEntityException($"A product with this Internal Code already exists {request.internalCode}");
+        if (await _repository.First<Product>(p => p.Sku == request.Sku) != null)
+            throw new DuplicatedEntityException($"A product with this SKU already exists {request.Sku}");
+        if (await _repository.First<Product>(p => p.InternalCode == request.InternalCode) != null)
+            throw new DuplicatedEntityException($"A product with this Internal Code already exists {request.InternalCode}");
     }
 
     public async static Task ValidateUpdatedProduct(Product product, IRepository _repository)
