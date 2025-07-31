@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Dsw2025Tpi.Application.Dtos
 {
-    public record LoginModel {
+    public record LoginModel 
+    {
         public record RequestLogin(string Username, string Password);
         public record ResponseLogin(string Token);
     }

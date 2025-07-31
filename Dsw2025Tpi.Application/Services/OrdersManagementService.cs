@@ -123,7 +123,7 @@ public class OrdersManagementService : IOrdersManagementService
         OrderValidations.ValidateOrder(request);
         OrderValidations.ValidateCustomer(request.CustomerId, _repository);
         
-        var order = new Order(request!.ShippingAddress!, request.BillingAddress!, request.Notes, request.CustomerId, orderItems);
+        var order = new Order(request.ShippingAddress, request.BillingAddress, request.Notes!, request.CustomerId, orderItems);
         await _repository.Add(order);
         _logger.LogInformation("Creacion de orden exitosa");
         return new OrderModel.ResponseOrder(

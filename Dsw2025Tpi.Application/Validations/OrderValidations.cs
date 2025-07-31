@@ -18,7 +18,8 @@ public class OrderValidations
         GeneralValidations.ValidateNotNull(request, nameof(request));
         if(request.CustomerId is not null)
         {
-            GeneralValidations.ValidateGuidAndCodes(request.CustomerId!.ToString(), nameof(request.CustomerId));
+            var customer = request.CustomerId.ToString() ?? throw new ArgumentNullException("Customer id is null");
+            GeneralValidations.ValidateGuidAndCodes(customer, nameof(request.CustomerId));
             Guid customerId = (Guid)request.CustomerId;
             ValidateCustomer(customerId, _repository);
         }
@@ -32,9 +33,9 @@ public class OrderValidations
     {
         GeneralValidations.ValidateNotNull(request, nameof(request));
         if (orders == null || !orders.Any()  && request != null && request.CustomerId.HasValue)
-            throw new NotFoundException($"No orders found for customer with ID {request.CustomerId}");
+            throw new NotFoundException($"No orders found for customer with ID {request!.CustomerId}");
         if (orders == null || !orders.Any() && request != null && !request.Status.IsNullOrEmpty())
-            throw new NotFoundException($"No orders found with status {request.Status}");
+            throw new NotFoundException($"No orders found with status {request!.Status}");
         if (orders == null || !orders.Any())
             throw new NotFoundException("No orders found");
 
