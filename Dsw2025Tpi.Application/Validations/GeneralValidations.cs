@@ -13,14 +13,14 @@ public static class GeneralValidations
     public static void ValidateNotNull<T>(T obj, string paramName)
     {
         if (obj == null)
-            throw new ArgumentException($"{paramName} cannot be null");
+            throw new ArgumentNullException($"{paramName} cannot be null");
         if(string.IsNullOrWhiteSpace(obj.ToString())
             && obj is not IFormFile
             && obj is not IEnumerable<string>
             && obj is not IEnumerable<int>
             && obj is not IEnumerable<Guid>)
         {
-            throw new ArgumentException($"{paramName} cannot be empty or whitespace");
+            throw new ArgumentNullException($"{paramName} cannot be empty or whitespace");
         }
     }
 

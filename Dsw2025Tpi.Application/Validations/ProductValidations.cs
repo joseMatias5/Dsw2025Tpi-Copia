@@ -66,7 +66,7 @@ public class ProductValidations
     {
         GeneralValidations.ValidateNotNull(product, nameof(product));
         if (!product.IsActive)
-            throw new EntityNotFoundException($"Product with ID {product.Id} is not active");
+            throw new InvalidStatusException($"Product with ID {product.Id} is not active");
     }
 }
 

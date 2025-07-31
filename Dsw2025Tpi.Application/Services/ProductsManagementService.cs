@@ -9,6 +9,8 @@ using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using Dsw2025Tpi.Application.Validations;
 using Microsoft.Extensions.Logging;
+using System.Net;
+using Dsw2025Tpi.Application.Exceptions;
 
 
 namespace Dsw2025Tpi.Application.Services;
@@ -39,7 +41,8 @@ public class ProductsManagementService : IProductsManagementService
     {
         _logger.LogInformation("Consulta de productos");
         var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
-        Validations.GeneralValidations.ValidateNotNull(activeProducts, nameof(activeProducts));
+        if (activeProducts is null || !activeProducts.Any())
+            throw new NotFoundException("No products were found");
 
         return (await _repository
             .GetFiltered<Product>(p => p.IsActive))?

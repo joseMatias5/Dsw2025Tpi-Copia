@@ -40,88 +40,28 @@ public class ProductController : Controller
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> AddProduct([FromBody] ProductModel.RequestProduct request)
     {
-        try
-        {
-            var product = await _service.AddProduct(request);
-            return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
-
-        }
-        catch (DuplicatedEntityException de) 
-        {
-            return BadRequest(de.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Application.Exceptions.ApplicationException ape)
-        {
-            return BadRequest(ape.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem saving the product");
-        }
+        var product = await _service.AddProduct(request);
+        return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
     }
 
     [HttpPut]
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] ProductModel.RequestProduct request)
     {
-        if (request == null)
-            return BadRequest("Product data is required");
-        try
-        {
-            var updatedProduct = await _service.UpdateProduct(id, request);
-            return Ok(updatedProduct);
-        }
-        catch (EntityNotFoundException enf)
-        {
-            return NotFound(enf.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Application.Exceptions.ApplicationException de)
-        {
-            return BadRequest(de.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem updating the product");
-        }
+        var updatedProduct = await _service.UpdateProduct(id, request);
+        return Ok(updatedProduct);
     }
 
     [HttpPatch()]
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> DeactivateProductAsync(Guid id)
     {
-        try
-        {
-            var deactivatedProduct = await _service.DeactivateProduct(id);
-            if (deactivatedProduct == null)
-            {
-                return NotFound();
-            }
-            return NoContent();
+        var deactivatedProduct = await _service.DeactivateProduct(id);
+        if (deactivatedProduct == null)
+        { 
+            return NotFound();
         }
-        catch(EntityNotFoundException en)
-        {
-            return NotFound(en.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Application.Exceptions.ApplicationException de)
-        {
-            return BadRequest(de.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem deactivating the product");
-        }
+        return NoContent();
     }
 }
 

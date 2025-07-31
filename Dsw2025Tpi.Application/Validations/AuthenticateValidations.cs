@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -15,7 +16,7 @@ public static class AuthenticateValidations
         ValidatePassword(request.Password);
 
         if (user == null)
-            throw new Application.Exceptions.ApplicationException("The username or password is incorrect");
+            throw new NotAuthenticatedException("The username or password is incorrect");
     }
     public static void ValidateRegistration(RegisterModel.RequestRegister model, UserManager<IdentityUser> _userManager)
     {

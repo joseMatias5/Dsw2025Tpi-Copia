@@ -11,6 +11,7 @@ using Dsw2025Tpi.Application.Validations;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static Dsw2025Tpi.Application.Dtos.OrderItemModel;
 using Microsoft.Extensions.Logging;
+using System.Collections;
 
 namespace Dsw2025Tpi.Application.Services;
 
@@ -25,20 +26,21 @@ public class OrdersManagementService : IOrdersManagementService
         _logger = logger;
     }
 
-    public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders(OrderModel.SearchOrder request)
+    public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders(OrderModel.FilterOrder request)
     {
-        OrderStatus? status = null;
-        if (!string.IsNullOrWhiteSpace(request.Status))
-            status = Enum.Parse<OrderStatus>(request.Status.ToUpper(), true);
-
-        if (request is null)
+        if (request.Status is null && request.CustomerId is null)
         {
             _logger.LogInformation("Consulta de ordenes sin filtrar");
         }
         else
         {
             _logger.LogInformation("Consulta de ordenes filtradas");
+            Validations.OrderValidations.ValidateFilteredArguments(request, _repository);
         }
+
+        OrderStatus? status = null;
+        if (!string.IsNullOrWhiteSpace(request.Status))
+            status = Enum.Parse<OrderStatus>(request.Status.ToUpper(), true);
 
         var orders = await _repository
             .GetFiltered<Order>(
@@ -148,6 +150,12 @@ public class OrdersManagementService : IOrdersManagementService
 
         order!.Status = Enum.Parse<OrderStatus>(request.NewStatus.ToString().ToUpper(), true);
         var updated = await _repository.Update(order);
+        
+        if(updated.Status == OrderStatus.CANCELLED)
+        {
+            await ItemValidations.AddStock(updated.OrderItems, _repository);
+        }
+        
         _logger.LogInformation("Modificacion de orden exitosa");
         return new OrderModel.ResponseOrder(
             updated.Id,

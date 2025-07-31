@@ -13,23 +13,36 @@ namespace Dsw2025Tpi.Application.Validations;
 
 public class OrderValidations
 {
-    public static void ValidateNotNullOrders(IEnumerable<Order>? orders, OrderModel.SearchOrder? request)
+    public static void ValidateFilteredArguments(OrderModel.FilterOrder request, IRepository _repository)
     {
+        GeneralValidations.ValidateNotNull(request, nameof(request));
+        if(request.CustomerId is not null)
+        {
+            GeneralValidations.ValidateGuidAndCodes(request.CustomerId!.ToString(), nameof(request.CustomerId));
+            Guid customerId = (Guid)request.CustomerId;
+            ValidateCustomer(customerId, _repository);
+        }
+
+        if (request.Status != null)
+        {
+            ValidateFilteredStatus(request.Status);
+        }
+    }
+    public static void ValidateNotNullOrders(IEnumerable<Order>? orders, OrderModel.FilterOrder? request)
+    {
+        GeneralValidations.ValidateNotNull(request, nameof(request));
         if (orders == null || !orders.Any()  && request != null && request.CustomerId.HasValue)
-            throw new EntityNotFoundException($"No orders found for customer with ID {request.CustomerId}");
+            throw new NotFoundException($"No orders found for customer with ID {request.CustomerId}");
         if (orders == null || !orders.Any() && request != null && !request.Status.IsNullOrEmpty())
-            throw new EntityNotFoundException($"No orders found with status {request.Status}");
+            throw new NotFoundException($"No orders found with status {request.Status}");
         if (orders == null || !orders.Any())
-            throw new EntityNotFoundException("No orders found");
+            throw new NotFoundException("No orders found");
 
     }
     public static void ValidateOrder(OrderModel.RequestOrder request)
     {
         GeneralValidations.ValidateNotNull(request, nameof(request));
         GeneralValidations.ValidateNotNull(request.OrderItems, nameof(request.OrderItems));
-        GeneralValidations.ValidateNotNull(request.ShippingAddress, nameof(request.ShippingAddress));
-        GeneralValidations.ValidateNotNull(request.BillingAddress, nameof(request.BillingAddress));
-        GeneralValidations.ValidateNotNull(request.CustomerId, nameof(request.CustomerId));
         GeneralValidations.ValidateText(request.ShippingAddress!, nameof(request.ShippingAddress));
         GeneralValidations.ValidateText(request.BillingAddress!, nameof(request.BillingAddress));
         GeneralValidations.ValidateOptionalText(request.Notes!, nameof(request.Notes));
@@ -51,26 +64,35 @@ public class OrderValidations
         var statusUpper = status.ToUpper();
 
         if (order.Status.ToString() == statusUpper)
-            throw new ArgumentException($"Order is already in {status} status");
+            throw new InvalidStatusException($"Order is already in {status} status");
 
         var validStatuses = Enum.GetNames(typeof(OrderStatus))
             .Select(s => s.ToLowerInvariant());
         if (!validStatuses.Contains(status.ToLower()))
-            throw new ArgumentException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", validStatuses)}");
+            throw new InvalidStatusException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", validStatuses)}");
 
         if (order.Status == OrderStatus.PENDING && statusUpper != "PROCESSING" && statusUpper != "CANCELLED")
-            throw new Application.Exceptions.ApplicationException($"Order status is PENDING, it cannot be changed to: {status}");
+            throw new InvalidStatusException($"Order status is PENDING, it cannot be changed to: {status}");
         if (order.Status == OrderStatus.PROCESSING && statusUpper != "SHIPPED" && statusUpper != "CANCELLED")
-            throw new Application.Exceptions.ApplicationException($"Order status is PROCESSING, it cannot be changed to: {status}");
+            throw new InvalidStatusException($"Order status is PROCESSING, it cannot be changed to: {status}");
         if (order.Status == OrderStatus.SHIPPED && statusUpper != "DELIVERED" && statusUpper != "CANCELLED")
-            throw new Application.Exceptions.ApplicationException($"Order status is SHIPPED, it cannot be changed to: {status}");
+            throw new InvalidStatusException($"Order status is SHIPPED, it cannot be changed to: {status}");
         if(order.Status == OrderStatus.CANCELLED)
-            throw new Application.Exceptions.ApplicationException($"Order status is CANCELLED, it cannot be changed to: {status}");
+            throw new InvalidStatusException($"Order status is CANCELLED, it cannot be changed to: {status}");
+    }
+
+    public static void ValidateFilteredStatus(string status)
+    {
+        GeneralValidations.ValidateText(status, nameof(status));
+        var validStatuses = Enum.GetNames(typeof(OrderStatus))
+            .Select(s => s.ToLowerInvariant());
+        if (!validStatuses.Contains(status.ToLower()))
+            throw new InvalidStatusException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", validStatuses)}");
     }
     public static void ValidateCancelledOrder(Order order)
     {
         if (order.Status.ToString() == "CANCELLED")
-            throw new ArgumentException($"Order with ID {order.Id} is CANCELLED");
+            throw new InvalidStatusException($"Order with ID {order.Id} is CANCELLED");
     }
 
     public static void ValidateCustomer(Guid customerId, IRepository _repository)

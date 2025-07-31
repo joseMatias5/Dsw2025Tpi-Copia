@@ -20,14 +20,18 @@ public class CustomExceptionHandlingMiddleware : IMiddleware
         }
         catch (Exception e)
         {
-            _logger.LogError(e, e.Message);
+            _logger.LogError(e.Message);
             context.Response.ContentType = "application/json";
 
             var statusCode = e switch
             {
                 EntityNotFoundException => HttpStatusCode.NotFound,
+                ArgumentNullException => HttpStatusCode.BadRequest,
                 ArgumentException => HttpStatusCode.BadRequest,
                 DuplicatedEntityException => HttpStatusCode.BadRequest,
+                InvalidStatusException => HttpStatusCode.BadRequest,
+                NotAuthenticatedException => HttpStatusCode.BadRequest,
+                NotFoundException => HttpStatusCode.NotFound,
                 Dsw2025Tpi.Application.Exceptions.ApplicationException => HttpStatusCode.BadRequest,
                 _ => HttpStatusCode.InternalServerError
             };

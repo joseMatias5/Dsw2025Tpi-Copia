@@ -15,6 +15,6 @@ public record OrderModel
     public record ResponseOrder(Guid Id, DateTime Date, string? ShippingAddress, string? BillingAddress,
         string? Notes, Guid CustomerId, string Status, List<ResponseItem> OrderItems, decimal? TotalAmount);
 
-    public record SearchOrder(string? Status, Guid? CustomerId);
+    public record FilterOrder(string? Status, Guid? CustomerId);
 
 }

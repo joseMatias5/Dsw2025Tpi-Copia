@@ -20,123 +20,42 @@ public class OrderController : Controller
     }
 
     [HttpGet()]
-    //[Authorize(Roles = "ADMIN,USER")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetOrders([FromQuery] OrderModel.SearchOrder request)
+    [Authorize(Roles = "ADMIN,USER")]
+    //[AllowAnonymous]
+    public async Task<IActionResult> GetOrders([FromQuery] OrderModel.FilterOrder request)
     {
-        try
+        var orders = await _service.GetOrders(request);
+        if (orders == null || !orders.Any())
         {
-            var orders = await _service.GetOrders(request);
-            if (orders == null || !orders.Any())
-            {
-                Response.Headers.Append("X-Message", "There are no active orders");
-                return NoContent();
-            }
-            return Ok(orders);
+            Response.Headers.Append("X-Message", "There are no active orders");
+            return NoContent();
         }
-        catch (EntityNotFoundException enf)
-        {
-            return NotFound(enf.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Application.Exceptions.ApplicationException de)
-        {
-            return BadRequest(de.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem finding the Orders");
-        }
+        return Ok(orders);
     }
 
     [HttpGet("{id}")]
     [Authorize(Roles = "ADMIN,USER")]
     public async Task<IActionResult> GetOrderById(Guid id)
     {
-        try
-        {
-            var order = await _service.GetOrderById(id);
-            if (order == null)
-                return NotFound();
-            return Ok(order);
-        }
-        catch (EntityNotFoundException enf)
-        {
-            return NotFound(enf.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Application.Exceptions.ApplicationException de)
-        {
-            return BadRequest(de.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem finding the Order");
-        }
+        var order = await _service.GetOrderById(id);
+        if (order == null)
+            return NotFound();
+        return Ok(order);
     }
 
     [HttpPost()]
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> AddOrder([FromBody] OrderModel.RequestOrder request)
     {
-        if (request == null)
-            return BadRequest("Order data is required");
-        try
-        {
-            var order = await _service.AddOrder(request);
-            return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
-
-        }
-        catch (EntityNotFoundException enf)
-        {
-            return NotFound(enf.Message);
-        }
-        catch (Application.Exceptions.ApplicationException de)
-        {
-            return BadRequest(de.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem saving the Order");
-        }
+        var order = await _service.AddOrder(request);
+        return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
     }
 
     [HttpPut]
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.RequestChangeStatus request)
     {
-        if (request == null)
-            return BadRequest("New order status is required");
-        try
-        {
-            var changedOrder = await _service.ChangeOrderStatus(id, request);
-            return Ok(changedOrder);
-        }
-        catch (EntityNotFoundException enf)
-        {
-            return NotFound(enf.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Application.Exceptions.ApplicationException de)
-        {
-            return BadRequest(de.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem changing the status of the Order");
-        }
+        var changedOrder = await _service.ChangeOrderStatus(id, request);
+        return Ok(changedOrder);
     }
 }
