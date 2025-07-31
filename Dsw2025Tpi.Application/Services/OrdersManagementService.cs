@@ -43,8 +43,8 @@ public class OrdersManagementService : IOrdersManagementService
         var orders = await _repository
             .GetFiltered<Order>(
                 o => 
-                    o.Status.Value != OrderStatus.CANCELLED
-                    && (o.CustomerId == request.CustomerId || !request.CustomerId.HasValue)
+                    o.Status!.Value != OrderStatus.CANCELLED
+                    && (o.CustomerId == request!.CustomerId || !request.CustomerId.HasValue)
                     && (!status.HasValue || o.Status == status.Value)
                     , 
                 include: new[] { "OrderItems" }
@@ -58,7 +58,7 @@ public class OrdersManagementService : IOrdersManagementService
             order.BillingAddress,
             order.Notes,
             order.CustomerId,
-            order.Status?.ToString(),
+            order.Status.ToString(),
             order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
                 i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
             order.TotalAmount)

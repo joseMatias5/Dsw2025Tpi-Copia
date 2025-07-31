@@ -149,6 +149,7 @@ public class Program
                       .AllowAnyMethod());
         });
         
+        builder.Services.AddTransient<CustomExceptionHandlingMiddleware>();
 
         var app = builder.Build();
 
@@ -180,6 +181,8 @@ public class Program
         app.UseAuthentication();
         app.UseRateLimiter();
         app.UseAuthorization();
+
+        app.UseMiddleware<CustomExceptionHandlingMiddleware>();
         app.MapControllers().RequireRateLimiting("fixed");
 
 

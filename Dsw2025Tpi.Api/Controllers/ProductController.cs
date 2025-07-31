@@ -24,13 +24,7 @@ public class ProductController : Controller
     [AllowAnonymous]
     public async Task<IActionResult> GetProducts()
     {
-
         var products = await _service.GetProducts();
-        if (products == null || !products.Any())
-        {
-            Response.Headers.Append("X-Message", "There are no active products");
-            return NoContent();
-        }
         return Ok(products);
     }
 
@@ -39,8 +33,6 @@ public class ProductController : Controller
     public async Task<IActionResult> GetProductById(Guid id)
     {
         var product = await _service.GetProductById(id);
-        if (product == null)
-            return NotFound();
         return Ok(product);
     }
 
@@ -48,8 +40,6 @@ public class ProductController : Controller
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> AddProduct([FromBody] ProductModel.RequestProduct request)
     {
-        if (request == null)
-            return BadRequest("Product data is required");
         try
         {
             var product = await _service.AddProduct(request);
@@ -66,7 +56,7 @@ public class ProductController : Controller
         }
         catch (Application.Exceptions.ApplicationException ape)
         {
-            return Conflict(ape.Message);
+            return BadRequest(ape.Message);
         }
         catch (Exception)
         {

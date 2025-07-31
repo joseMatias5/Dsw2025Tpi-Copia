@@ -26,7 +26,9 @@ public class ProductsManagementService : IProductsManagementService
     public async Task<ProductModel.ResponseProduct?> GetProductById(Guid id)
     {
         _logger.LogInformation("Consulta de producto por Id: {id}", id);
+        await ProductValidations.ValidateExistingProduct(id, _repository);
         var product = await _repository.GetById<Product>(id);
+        
         return product != null ?
             new ProductModel.ResponseProduct(product.Id, product.Sku, product.InternalCode, product.Name, product.Description,
                 product.CurrentUnitPrice, product.StockQuantity, product.IsActive) :
@@ -37,6 +39,7 @@ public class ProductsManagementService : IProductsManagementService
     {
         _logger.LogInformation("Consulta de productos");
         var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
+        Validations.GeneralValidations.ValidateNotNull(activeProducts, nameof(activeProducts));
 
         return (await _repository
             .GetFiltered<Product>(p => p.IsActive))?
