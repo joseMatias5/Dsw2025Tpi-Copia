@@ -20,7 +20,7 @@ public static class GeneralValidations
             && obj is not IEnumerable<int>
             && obj is not IEnumerable<Guid>)
         {
-            throw new ArgumentException($"{paramName} cannot be empty or whitespace");
+            throw new ArgumentNullException($"{paramName} cannot be empty or whitespace");
         }
     }
 
@@ -29,22 +29,22 @@ public static class GeneralValidations
         ValidateNotNull(text, paramName);
         if (!Regex.IsMatch(text, @"^[a-zA-Z0-9 ]*$"))
         {
-            throw new ArgumentException($"{paramName}: invalid input, has to be an string of characters");
+            throw new ArgumentException($"{paramName}: invalid input, has to be an string of letters and/or numbers");
         }
     }
     public static void ValidateOptionalText(string text, string paramName)
     {
         if (!Regex.IsMatch(text, @"^[a-zA-Z0-9\s,.\-°º#]*$"))
         {
-            throw new ArgumentException($"{paramName}: invalid input, has to be an string of characters");
+            throw new ArgumentException($"{paramName}: invalid input, has to be an string of letters, numbers or certain symbols (.\\-°º#)");
         }
     }
-    public static void ValidateWholeNumber(string number, string paramName)
+    public static void ValidatePositiveWholeNumberAndCero(string number, string paramName)
     {
         ValidateNotNull(number, paramName);
-        if (!Regex.IsMatch(number, @"^\d+$"))
+        if (!Regex.IsMatch(number, @"^(0|[1-9]\d*)$"))
         {
-            throw new ArgumentException($"{paramName} invalid input, has to be a whole number");
+            throw new ArgumentException($"{paramName} invalid input, has to be a whole number or cero");
         }
     }
 
@@ -53,7 +53,7 @@ public static class GeneralValidations
         ValidateNotNull(number, paramName);
         if (!Regex.IsMatch(number, @"^[0-9][0-9,\.]*$"))
         {
-            throw new ArgumentException($"{paramName} invalid input, has to be a postive decimal number");
+            throw new ArgumentException($"{paramName} invalid input, has to be a positive decimal number");
         }
     }
     public static void ValidateGuidAndCodes(string text, string paramName)

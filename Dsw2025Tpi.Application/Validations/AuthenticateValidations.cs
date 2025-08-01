@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Dsw2025Tpi.Application.Dtos;
+using Dsw2025Tpi.Application.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -15,7 +16,7 @@ public static class AuthenticateValidations
         ValidatePassword(request.Password);
 
         if (user == null)
-            throw new Application.Exceptions.ApplicationException("The username or password is incorrect");
+            throw new NotAuthenticatedException("The username or password is incorrect");
     }
     public static void ValidateRegistration(RegisterModel.RequestRegister model, UserManager<IdentityUser> _userManager)
     {
@@ -28,11 +29,11 @@ public static class AuthenticateValidations
 
         var user = _userManager.FindByNameAsync(model.Username).Result;
         if (user != null)
-            throw new ArgumentException($"Username {model.Username} already exists");
+            throw new Exceptions.ApplicationException($"Username {model.Username} already exists");
 
         user = _userManager.FindByEmailAsync(model.Email).Result;
         if (user != null)
-            throw new ArgumentException($"Email {model.Email} already exists");
+            throw new Exceptions.ApplicationException($"Email {model.Email} already exists");
     }
     public static void ValidatePassword(string password)
     {
@@ -63,6 +64,6 @@ public static class AuthenticateValidations
         GeneralValidations.ValidateText(role, nameof(role));
         var validRoles = new[] { "ADMIN", "USER" };
         if (!validRoles.Contains(role.ToUpper()))
-            throw new ArgumentException($"Invalid role: {role}. Valid roles are: {string.Join(", ", validRoles)}");
+            throw new Exceptions.ApplicationException($"Invalid role: {role}. Valid roles are: {string.Join(", ", validRoles)}");
     }
 }
