@@ -11,6 +11,7 @@ using Dsw2025Tpi.Application.Validations;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static Dsw2025Tpi.Application.Dtos.OrderItemModel;
 using Microsoft.Extensions.Logging;
+using System.Collections;
 
 namespace Dsw2025Tpi.Application.Services;
 
@@ -25,26 +26,27 @@ public class OrdersManagementService : IOrdersManagementService
         _logger = logger;
     }
 
-    public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders(OrderModel.SearchOrder request)
+    public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders(OrderModel.FilterOrder request)
     {
-        OrderStatus? status = null;
-        if (!string.IsNullOrWhiteSpace(request.Status))
-            status = Enum.Parse<OrderStatus>(request.Status.ToUpper(), true);
-
-        if (request is null)
+        if (request.Status is null && request.CustomerId is null)
         {
             _logger.LogInformation("Consulta de ordenes sin filtrar");
         }
         else
         {
             _logger.LogInformation("Consulta de ordenes filtradas");
+            Validations.OrderValidations.ValidateFilteredArguments(request, _repository);
         }
+
+        OrderStatus? status = null;
+        if (!string.IsNullOrWhiteSpace(request.Status))
+            status = Enum.Parse<OrderStatus>(request.Status.ToUpper(), true);
 
         var orders = await _repository
             .GetFiltered<Order>(
                 o => 
-                    o.Status.Value != OrderStatus.CANCELLED
-                    && (o.CustomerId == request.CustomerId || !request.CustomerId.HasValue)
+                    o.Status!.Value != OrderStatus.CANCELLED
+                    && (o.CustomerId == request!.CustomerId || !request.CustomerId.HasValue)
                     && (!status.HasValue || o.Status == status.Value)
                     , 
                 include: new[] { "OrderItems" }
@@ -58,7 +60,7 @@ public class OrdersManagementService : IOrdersManagementService
             order.BillingAddress,
             order.Notes,
             order.CustomerId,
-            order.Status?.ToString(),
+            order.Status.ToString(),
             order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
                 i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
             order.TotalAmount)
@@ -121,7 +123,7 @@ public class OrdersManagementService : IOrdersManagementService
         OrderValidations.ValidateOrder(request);
         OrderValidations.ValidateCustomer(request.CustomerId, _repository);
         
-        var order = new Order(request!.ShippingAddress!, request.BillingAddress!, request.Notes, request.CustomerId, orderItems);
+        var order = new Order(request.ShippingAddress, request.BillingAddress, request.Notes!, request.CustomerId, orderItems);
         await _repository.Add(order);
         _logger.LogInformation("Creacion de orden exitosa");
         return new OrderModel.ResponseOrder(
@@ -138,16 +140,21 @@ public class OrdersManagementService : IOrdersManagementService
         );
     }
 
-    //Para el PUT
     public async Task<OrderModel.ResponseOrder?> ChangeOrderStatus(Guid id, OrderModel.RequestChangeStatus request)
     {
         _logger.LogInformation("Cambiar estado de orden con Id: {id}", id);
         var order = await _repository.First<Order>(p => p.Id == id, include: new[] { "OrderItems" });
         await OrderValidations.ValidateExistingOrder(id, _repository);
-        OrderValidations.ValidateOrderStatus(order!, request.newStatus.ToString());
+        OrderValidations.ValidateOrderStatus(order!, request.NewStatus);
 
-        order!.Status = Enum.Parse<OrderStatus>(request.newStatus.ToString().ToUpper(), true);
+        order!.Status = Enum.Parse<OrderStatus>(request.NewStatus.ToUpper(), true);
         var updated = await _repository.Update(order);
+        
+        if(updated.Status == OrderStatus.CANCELLED)
+        {
+            await ItemValidations.AddStock(updated.OrderItems, _repository);
+        }
+        
         _logger.LogInformation("Modificacion de orden exitosa");
         return new OrderModel.ResponseOrder(
             updated.Id,

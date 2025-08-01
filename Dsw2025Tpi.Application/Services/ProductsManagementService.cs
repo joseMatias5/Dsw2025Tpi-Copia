@@ -9,6 +9,8 @@ using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
 using Dsw2025Tpi.Application.Validations;
 using Microsoft.Extensions.Logging;
+using System.Net;
+using Dsw2025Tpi.Application.Exceptions;
 
 
 namespace Dsw2025Tpi.Application.Services;
@@ -26,7 +28,9 @@ public class ProductsManagementService : IProductsManagementService
     public async Task<ProductModel.ResponseProduct?> GetProductById(Guid id)
     {
         _logger.LogInformation("Consulta de producto por Id: {id}", id);
+        await ProductValidations.ValidateExistingProduct(id, _repository);
         var product = await _repository.GetById<Product>(id);
+        
         return product != null ?
             new ProductModel.ResponseProduct(product.Id, product.Sku, product.InternalCode, product.Name, product.Description,
                 product.CurrentUnitPrice, product.StockQuantity, product.IsActive) :
@@ -37,6 +41,8 @@ public class ProductsManagementService : IProductsManagementService
     {
         _logger.LogInformation("Consulta de productos");
         var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
+        if (activeProducts is null || !activeProducts.Any())
+            throw new NotFoundException("No products were found");
 
         return (await _repository
             .GetFiltered<Product>(p => p.IsActive))?
@@ -58,7 +64,7 @@ public class ProductsManagementService : IProductsManagementService
         Validations.GeneralValidations.ValidateNotNull(request, nameof(request));
         await ProductValidations.ValidateAddedProduct(request, _repository);
 
-        var product = new Product(request.sku, request.internalCode, request.name, request.description, request.currentUnitPrice, request.stockQuantity);
+        var product = new Product(request.Sku, request.InternalCode, request.Name, request.Description, request.CurrentUnitPrice, request.StockQuantity);
         await _repository.Add(product);
         _logger.LogInformation("Creacion de producto exitosa");
         return new ProductModel.ResponseProduct(
@@ -77,15 +83,15 @@ public class ProductsManagementService : IProductsManagementService
         _logger.LogInformation("Modificacion de producto con Id: {id}", id);
         Validations.GeneralValidations.ValidateNotNull(request, nameof(request));
         await ProductValidations.ValidateExistingProduct(id, _repository);
-
+        ProductValidations.ValidateProduct(request);
         var product = await _repository.First<Product>(p => p.Id == id);
 
-        product!.Sku = request.sku;
-        product.InternalCode = request.internalCode;
-        product.Name = request.name;
-        product.Description = request.description;
-        product.CurrentUnitPrice = request.currentUnitPrice;
-        product.StockQuantity = request.stockQuantity;
+        product!.Sku = request.Sku;
+        product.InternalCode = request.InternalCode;
+        product.Name = request.Name;
+        product.Description = request.Description;
+        product.CurrentUnitPrice = request.CurrentUnitPrice;
+        product.StockQuantity = request.StockQuantity;
 
         await ProductValidations.ValidateUpdatedProduct(product!, _repository);
 

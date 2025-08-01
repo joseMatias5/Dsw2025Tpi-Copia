@@ -28,13 +28,13 @@ public class Product : EntityBase
         Description = description;
         CurrentUnitPrice = currentUnitPrice <= 0? 
             throw new ArgumentOutOfRangeException(nameof(stockQuantity), "The Unit Price must be positive") : currentUnitPrice;
-        StockQuantity = stockQuantity <= 0 ?
+        StockQuantity = stockQuantity < 0 ?
             throw new ArgumentOutOfRangeException(nameof(stockQuantity), "The Quantity must be positive") : stockQuantity;
         IsActive = true;
     }
     public bool StockControl(int quantity)
     {
-        if (quantity < StockQuantity)
+        if (quantity <= StockQuantity)
         {
             StockQuantity -= quantity;
             return true;
