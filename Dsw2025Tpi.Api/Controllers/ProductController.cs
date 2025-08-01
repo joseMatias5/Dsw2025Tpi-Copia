@@ -3,11 +3,13 @@ using System.Security.Claims;
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/products")]
 public class ProductController : Controller
 {
@@ -19,119 +21,47 @@ public class ProductController : Controller
     }
 
     [HttpGet()]
-
+    [AllowAnonymous]
     public async Task<IActionResult> GetProducts()
     {
-
         var products = await _service.GetProducts();
-        if (products == null || !products.Any())
-        {
-            Response.Headers.Append("X-Message", "There are no active products");
-            return NoContent();
-        }
         return Ok(products);
     }
 
     [HttpGet("{id}")]
-
+    [Authorize(Roles = "ADMIN,USER")]
     public async Task<IActionResult> GetProductById(Guid id)
     {
         var product = await _service.GetProductById(id);
-        if (product == null)
-            return NotFound();
         return Ok(product);
     }
 
     [HttpPost()]
-
+    [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> AddProduct([FromBody] ProductModel.RequestProduct request)
     {
-        if (request == null)
-            return BadRequest("Product data is required");
-        try
-        {
-            var product = await _service.AddProduct(request);
-            return CreatedAtAction(nameof(GetProductById), new { id = product.id }, product);
-
-        }
-        catch (DuplicatedEntityException de) 
-        {
-            return BadRequest(de.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Application.Exceptions.ApplicationException ape)
-        {
-            return Conflict(ape.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem saving the product");
-        }
+        var product = await _service.AddProduct(request);
+        return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
     }
 
-    [HttpPut]
-    [Route("{id:guid}")]
-
+    [HttpPut("{id}")]
+    [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] ProductModel.RequestProduct request)
     {
-        if (request == null)
-            return BadRequest("Product data is required");
-        try
-        {
-            var updatedProduct = await _service.UpdateProduct(id, request);
-            if (updatedProduct == null)
-            {
-                return NotFound();
-            }
-            return Ok(updatedProduct);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Application.Exceptions.ApplicationException de)
-        {
-            return Conflict(de.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem updating the product");
-        }
+        var updatedProduct = await _service.UpdateProduct(id, request);
+        return Ok(updatedProduct);
     }
 
-    [HttpPatch()]
-    [Route("{id:guid}")]
-
+    [HttpPatch("{id}")]
+    [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> DeactivateProductAsync(Guid id)
     {
-        try
-        {
-            var deactivatedProduct = await _service.DeactivateProduct(id);
-            if (deactivatedProduct == null)
-            {
-                return NotFound();
-            }
-            return NoContent();
+        var deactivatedProduct = await _service.DeactivateProduct(id);
+        if (deactivatedProduct == null)
+        { 
+            return NotFound();
         }
-        catch(EntityNotFoundException en)
-        {
-            return NotFound(en.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Application.Exceptions.ApplicationException de)
-        {
-            return Conflict(de.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem deactivating the product");
-        }
+        return NoContent();
     }
 }
 

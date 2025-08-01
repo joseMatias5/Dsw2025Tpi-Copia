@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Domain.Entities;
+using Dsw2025Tpi.Domain.Interfaces;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Dsw2025Tpi.Application.Validations;
 
@@ -12,17 +14,31 @@ public class ItemValidations
 {
     public static void ValidateItem(OrderItemModel.RequestItem item)
     {
-        if (item == null)
-            throw new ArgumentNullException(nameof(item), "Order item cannot be null");
+        GeneralValidations.ValidateNotNull(item, nameof(item));
+        GeneralValidations.ValidateGuidAndCodes(item.ProductId.ToString(), nameof(item.ProductId));
+        GeneralValidations.ValidatePositiveWholeNumberAndCero(item.Quantity.ToString(), nameof(item.Quantity));
+
         if (item.Quantity <= 0)
-            throw new ArgumentOutOfRangeException(nameof(item.Quantity), "Quantity must be greater than zero");
+            throw new ArgumentException(nameof(item.Quantity), "Quantity must be greater than zero");
     }
 
     public static void StockControl(int quantity, Product product)
     {
         if (quantity > product.StockQuantity)
         {
-            throw new Exceptions.ApplicationException("Not enough stock");
+            throw new Exceptions.ApplicationException($"Not enough stock, product {product.Id} has {product.StockQuantity} items in existence");
+        }
+    }
+    public static async Task AddStock(List<OrderItem> orderItems, IRepository _repository)
+    {
+        foreach (var item in orderItems)
+        {
+            var product = await _repository.GetById<Product>(item.ProductId);
+            if (product != null)
+            {
+                product.StockQuantity += item.Quantity;
+                await _repository.Update(product);
+            }
         }
     }
 }

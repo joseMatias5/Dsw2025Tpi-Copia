@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Dsw2025Tpi.Application.Validations;
 
@@ -14,41 +16,57 @@ public class ProductValidations
 {
     public static void ValidateProduct(ProductModel.RequestProduct request)
     {
-        if (request == null)
-            throw new ArgumentException(nameof(request), "Product request cannot be null");
-        if (string.IsNullOrWhiteSpace(request.sku))
-            throw new ArgumentException("SKU cannot be null or empty", nameof(request.sku));
-        if (string.IsNullOrWhiteSpace(request.internalCode))
-            throw new ArgumentException("Internal code cannot be null or empty", nameof(request.internalCode));
-        if (string.IsNullOrWhiteSpace(request.name))
-            throw new ArgumentException("Name cannot be null or empty", nameof(request.name));
-        if (request.currentUnitPrice <= 0)
-            throw new ArgumentException("Current unit price must be greater than zero", nameof(request.currentUnitPrice));
-        if (request.stockQuantity < 0)
-            throw new ArgumentException("Stock quantity cannot be negative", nameof(request.stockQuantity));
+        GeneralValidations.ValidateNotNull(request, nameof(request));
+        
+        GeneralValidations.ValidateNotNull(request.Sku, nameof(request.Sku));
+        if (!Regex.IsMatch(request.Sku, @"^SKU-\d{4}$"))
+        {
+            throw new ArgumentException("Invalid Sku input, valid format = 'SKU-XXXX'");
+        }
+
+        GeneralValidations.ValidateNotNull(request.InternalCode, nameof(request.InternalCode));
+        if (!Regex.IsMatch(request.InternalCode, @"^INT-\d{4}$"))
+        {
+            throw new ArgumentException("Invalid InternalCode input, valid format = 'INT-XXXX'");
+        }
+
+        GeneralValidations.ValidateText(request.Name, nameof(request.Name));
+        GeneralValidations.ValidatePositiveDecimalNumber(request.CurrentUnitPrice.ToString(), nameof(request.CurrentUnitPrice));
+        if (request.CurrentUnitPrice <= 0)
+            throw new ArgumentException("Current unit price cannot be negative or 0");
+        GeneralValidations.ValidatePositiveWholeNumberAndCero(request.StockQuantity.ToString(), nameof(request.StockQuantity));
+        GeneralValidations.ValidateOptionalText(request.Description!, nameof(request.Description));
     }
     public async static Task ValidateAddedProduct(ProductModel.RequestProduct request, IRepository _repository)
     {
-        if (await _repository.First<Product>(p => p.Sku == request.sku) != null)
-            throw new DuplicatedEntityException($"A product with this SKU already exists {request.sku}");
-        if (await _repository.First<Product>(p => p.InternalCode == request.internalCode) != null)
-            throw new DuplicatedEntityException($"A product with this Internal Code already exists {request.internalCode}");
+        ValidateProduct(request);
+        if (await _repository.First<Product>(p => p.Sku == request.Sku) != null)
+            throw new DuplicatedEntityException($"A product with this SKU already exists {request.Sku}");
+        if (await _repository.First<Product>(p => p.InternalCode == request.InternalCode) != null)
+            throw new DuplicatedEntityException($"A product with this Internal Code already exists {request.InternalCode}");
     }
+
+    public async static Task ValidateUpdatedProduct(Product product, IRepository _repository)
+    {
+        ValidateActiveProduct(product);
+        if (await _repository.First<Product>(p => p.Sku == product.Sku && p.Id != product.Id) != null)
+            throw new DuplicatedEntityException($"A different product with this SKU already exists {product.Sku}");
+        if (await _repository.First<Product>(p => p.InternalCode == product.InternalCode && p.Id != product.Id) != null)
+            throw new DuplicatedEntityException($"A different product with this Internal Code already exists {product.InternalCode}");
+    }
+
     public async static Task ValidateExistingProduct(Guid id, IRepository _repository)
     {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Product ID cannot be empty", nameof(id));
+        GeneralValidations.ValidateGuidAndCodes(id.ToString(), nameof(id));
         if (await _repository.First<Product>(p => p.Id == id) == null)
             throw new EntityNotFoundException($"Product with ID {id} not found");
-
     }
 
     public static void ValidateActiveProduct(Product product)
     {
-        if (product == null)
-            throw new ArgumentNullException(nameof(product), "Product cannot be null");
+        GeneralValidations.ValidateNotNull(product, nameof(product));
         if (!product.IsActive)
-            throw new EntityNotFoundException($"Product with ID {product.Id} is not active");
+            throw new InvalidStatusException($"Product with ID {product.Id} is not active");
     }
 }
 

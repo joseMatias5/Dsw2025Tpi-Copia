@@ -7,66 +7,98 @@ using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Exceptions;
 using Dsw2025Tpi.Domain.Entities;
 using Dsw2025Tpi.Domain.Interfaces;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Dsw2025Tpi.Application.Validations;
 
 public class OrderValidations
 {
-    public static void ValidateNotNullOrders(IEnumerable<Order>? orders)
+    public static void ValidateFilteredArguments(OrderModel.FilterOrder request, IRepository _repository)
     {
+        GeneralValidations.ValidateNotNull(request, nameof(request));
+        if(request.CustomerId is not null)
+        {
+            var customer = request.CustomerId.ToString() ?? throw new ArgumentNullException("Customer id is null");
+            GeneralValidations.ValidateGuidAndCodes(customer, nameof(request.CustomerId));
+            Guid customerId = (Guid)request.CustomerId;
+            ValidateCustomer(customerId, _repository);
+        }
+
+        if (request.Status != null)
+        {
+            ValidateFilteredStatus(request.Status);
+        }
+    }
+    public static void ValidateNotNullOrders(IEnumerable<Order>? orders, OrderModel.FilterOrder? request)
+    {
+        GeneralValidations.ValidateNotNull(request, nameof(request));
+        if (orders == null || !orders.Any()  && request != null && request.CustomerId.HasValue)
+            throw new NotFoundException($"No orders found for customer with ID {request!.CustomerId}");
+        if (orders == null || !orders.Any() && request != null && !request.Status.IsNullOrEmpty())
+            throw new NotFoundException($"No orders found with status {request!.Status}");
         if (orders == null || !orders.Any())
-            throw new EntityNotFoundException("No orders found");
+            throw new NoContentException("No orders found");
+
     }
     public static void ValidateOrder(OrderModel.RequestOrder request)
     {
-        if (request == null)
-            throw new ArgumentNullException(nameof(request), "Order request cannot be null");
-
-        if (request.OrderItems == null || !request.OrderItems.Any())
-            throw new ArgumentException("Order must contain at least one item", nameof(request.OrderItems));
-
-        if (string.IsNullOrWhiteSpace(request.ShippingAddress))
-            throw new ArgumentException("Shipping address cannot be null or empty", nameof(request.ShippingAddress));
-
-        if (string.IsNullOrWhiteSpace(request.BillingAddress))
-            throw new ArgumentException("Billing address cannot be null or empty", nameof(request.BillingAddress));
-
-        if (request.CustomerId == Guid.Empty)
-            throw new ArgumentException("Customer ID cannot be empty", nameof(request.CustomerId));
+        GeneralValidations.ValidateNotNull(request, nameof(request));
+        GeneralValidations.ValidateNotNull(request.OrderItems, nameof(request.OrderItems));
+        GeneralValidations.ValidateText(request.ShippingAddress!, nameof(request.ShippingAddress));
+        GeneralValidations.ValidateText(request.BillingAddress!, nameof(request.BillingAddress));
+        GeneralValidations.ValidateOptionalText(request.Notes!, nameof(request.Notes));
+        GeneralValidations.ValidateGuidAndCodes(request.CustomerId.ToString(), nameof(request.CustomerId));
     }
 
     public async static Task ValidateExistingOrder(Guid id, IRepository _repository)
     {
-        if (id == Guid.Empty)
-            throw new ArgumentException("Order ID cannot be empty", nameof(id));
+        GeneralValidations.ValidateGuidAndCodes(id.ToString(), nameof(id));
         if (await _repository.First<Order>(p => p.Id == id) == null)
             throw new Exceptions.EntityNotFoundException($"Order with ID {id} not found");
     }
 
     public static void ValidateOrderStatus(Order order, string status)
     {
-        if(order.Status.ToString() == status)
-            throw new ArgumentException($"Order is already in {status} status", nameof(status));
-        var validStatuses = Enum.GetNames(typeof(OrderStatus));
-        if (!validStatuses.Contains(status))
-            throw new ArgumentException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", validStatuses)}", nameof(status));
+        GeneralValidations.ValidateNotNull(order, nameof(order));
+        GeneralValidations.ValidateText(status, nameof(status));
+
+        var statusUpper = status.ToUpper();
+
+        if (order.Status.ToString() == statusUpper)
+            throw new InvalidStatusException($"Order is already in {status} status");
+
+        var validStatuses = Enum.GetNames(typeof(OrderStatus))
+            .Select(s => s.ToLowerInvariant());
+        if (!validStatuses.Contains(status.ToLower()))
+            throw new InvalidStatusException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", validStatuses)}");
+
+        if (order.Status == OrderStatus.PENDING && statusUpper != "PROCESSING" && statusUpper != "CANCELLED")
+            throw new InvalidStatusException($"Order status is PENDING, it cannot be changed to: {status}");
+        if (order.Status == OrderStatus.PROCESSING && statusUpper != "SHIPPED" && statusUpper != "CANCELLED")
+            throw new InvalidStatusException($"Order status is PROCESSING, it cannot be changed to: {status}");
+        if (order.Status == OrderStatus.SHIPPED && statusUpper != "DELIVERED" && statusUpper != "CANCELLED")
+            throw new InvalidStatusException($"Order status is SHIPPED, it cannot be changed to: {status}");
+        if(order.Status == OrderStatus.CANCELLED)
+            throw new InvalidStatusException($"Order status is CANCELLED, it cannot be changed to: {status}");
+    }
+
+    public static void ValidateFilteredStatus(string status)
+    {
+        GeneralValidations.ValidateText(status, nameof(status));
+        var validStatuses = Enum.GetNames(typeof(OrderStatus))
+            .Select(s => s.ToLowerInvariant());
+        if (!validStatuses.Contains(status.ToLower()))
+            throw new InvalidStatusException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", validStatuses)}");
     }
     public static void ValidateCancelledOrder(Order order)
     {
-        if (order.Status == OrderStatus.CANCELLED)
-            throw new ArgumentException($"Order with ID {order.Id} is cancelled", nameof(order));
-    }
-
-    public static void ValidateItem(OrderModel.RequestOrder order)
-    {
-        if (order.OrderItems == null || !order.OrderItems.Any())
-            throw new ArgumentException("Order must contain at least one item", nameof(order.OrderItems));
+        if (order.Status.ToString() == "CANCELLED")
+            throw new InvalidStatusException($"Order with ID {order.Id} is CANCELLED");
     }
 
     public static void ValidateCustomer(Guid customerId, IRepository _repository)
     {
-        if (customerId == Guid.Empty)
-            throw new ArgumentException("Customer ID cannot be empty", nameof(customerId));
+        GeneralValidations.ValidateGuidAndCodes(customerId.ToString(), nameof(customerId));
         var customer = _repository.First<Customer>(c => c.Id == customerId).Result;
         if (customer == null)
             throw new Exceptions.EntityNotFoundException($"Customer with ID {customerId} not found");
