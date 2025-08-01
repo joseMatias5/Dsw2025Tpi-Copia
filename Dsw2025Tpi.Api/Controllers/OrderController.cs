@@ -44,7 +44,7 @@ public class OrderController : Controller
     }
 
     [HttpPost()]
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "USER")]
     public async Task<IActionResult> AddOrder([FromBody] OrderModel.RequestOrder request)
     {
         var order = await _service.AddOrder(request);

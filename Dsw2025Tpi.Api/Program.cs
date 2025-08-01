@@ -2,24 +2,11 @@
 using System.Text;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Application.Services;
-using Dsw2025Tpi.Data;
-using Dsw2025Tpi.Data.Helpers;
-using Dsw2025Tpi.Data.Repositories;
-using Dsw2025Tpi.Domain.Entities;
-using Dsw2025Tpi.Domain.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Dsw2025Tpi.Api.Configurations;
 
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.RateLimiting;
-using System.Threading.RateLimiting;
-using System.Security.Claims;
 using Serilog;
+using Microsoft.Extensions.Configuration;
 
 namespace Dsw2025Tpi.Api;
 
@@ -70,6 +57,32 @@ public class Program
                 if (!await roleManager.RoleExistsAsync(roleName))
                 {
                     await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+
+            var admin = builder.Configuration.GetSection("DefaultAdmin");
+            var adminEmail = admin.GetValue<string>("email");
+            var adminPassword = admin.GetValue<string>("password");
+            var adminName = admin.GetValue<string>("username");
+
+            UserManager<IdentityUser> manager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+            var userAdmin = manager.FindByNameAsync(adminName!);
+            if (userAdmin is null)
+            {
+                var user = new IdentityUser
+                {
+                    UserName = adminName,
+                    Email = adminEmail
+                };
+
+                var result = await manager.CreateAsync(user, adminPassword!);
+
+                var roleResult = await manager.AddToRoleAsync(user, "ADMIN");
+
+                if (!result.Succeeded || !roleResult.Succeeded)
+                {
+                    Log.Error(string.Join(", ", result.Errors.Select(e => e.Description)));
+                    throw new Exception();
                 }
             }
         }

@@ -111,8 +111,6 @@ public class ProductsManagementService : IProductsManagementService
             updated.IsActive
         );
     }
-
-    //Para el PATCH
     public async Task<ProductModel.ResponseProduct?> DeactivateProduct(Guid id)
     {
         _logger.LogInformation("Desactivacion de producto con Id: {id}", id);
