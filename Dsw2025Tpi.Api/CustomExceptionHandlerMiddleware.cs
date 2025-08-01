@@ -26,12 +26,14 @@ public class CustomExceptionHandlingMiddleware : IMiddleware
             var statusCode = e switch
             {
                 EntityNotFoundException => HttpStatusCode.NotFound,
+                ArgumentOutOfRangeException => HttpStatusCode.BadRequest,
                 ArgumentNullException => HttpStatusCode.BadRequest,
                 ArgumentException => HttpStatusCode.BadRequest,
                 DuplicatedEntityException => HttpStatusCode.BadRequest,
                 InvalidStatusException => HttpStatusCode.BadRequest,
                 NotAuthenticatedException => HttpStatusCode.BadRequest,
                 NotFoundException => HttpStatusCode.NotFound,
+                NoContentException => HttpStatusCode.NoContent,
                 Dsw2025Tpi.Application.Exceptions.ApplicationException => HttpStatusCode.BadRequest,
                 _ => HttpStatusCode.InternalServerError
             };

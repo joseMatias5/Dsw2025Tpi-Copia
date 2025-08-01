@@ -38,6 +38,11 @@ public static class GeneralValidations
         {
             throw new ArgumentException($"{paramName}: invalid input, has to be an string of letters, numbers or certain symbols (.\\-°º#)");
         }
+        if(text.Length >= 100)
+        {
+            throw new ArgumentOutOfRangeException($"{paramName}: invalid input, too long");
+        }
+
     }
     public static void ValidatePositiveWholeNumberAndCero(string number, string paramName)
     {

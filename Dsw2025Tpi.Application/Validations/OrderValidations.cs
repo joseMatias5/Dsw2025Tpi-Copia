@@ -37,7 +37,7 @@ public class OrderValidations
         if (orders == null || !orders.Any() && request != null && !request.Status.IsNullOrEmpty())
             throw new NotFoundException($"No orders found with status {request!.Status}");
         if (orders == null || !orders.Any())
-            throw new NotFoundException("No orders found");
+            throw new NoContentException("No orders found");
 
     }
     public static void ValidateOrder(OrderModel.RequestOrder request)
