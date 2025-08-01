@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Dsw2025Tpi.Application.Validations;
 using Dsw2025Tpi.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Dsw2025Tpi.Api.Controllers;
 
@@ -48,6 +49,7 @@ public class AuthenticateController : ControllerBase
     }
 
     [HttpPost("register")]
+    [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> Register([FromBody] RegisterModel.RequestRegister model)
     {
         try

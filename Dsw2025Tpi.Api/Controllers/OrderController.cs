@@ -51,11 +51,11 @@ public class OrderController : Controller
         return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
     }
 
-    [HttpPut]
+    [HttpPut("{id}/status")]
     [Authorize(Roles = "ADMIN")]
-    public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.RequestChangeStatus request)
+    public async Task<IActionResult> ChangeOrderStatusAsync(Guid id, [FromBody] OrderModel.RequestChangeStatus status)
     {
-        var changedOrder = await _service.ChangeOrderStatus(id, request);
+        var changedOrder = await _service.ChangeOrderStatus(id, status);
         return Ok(changedOrder);
     }
 }

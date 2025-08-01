@@ -44,7 +44,7 @@ public class ProductController : Controller
         return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
     }
 
-    [HttpPut]
+    [HttpPut("{id}")]
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> UpdateProductAsync(Guid id, [FromBody] ProductModel.RequestProduct request)
     {
@@ -52,7 +52,7 @@ public class ProductController : Controller
         return Ok(updatedProduct);
     }
 
-    [HttpPatch()]
+    [HttpPatch("{id}")]
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> DeactivateProductAsync(Guid id)
     {
