@@ -44,9 +44,10 @@ public class ProductsManagementService : IProductsManagementService
         if (activeProducts is null || !activeProducts.Any())
             throw new NoContentException("No products were found");
 
-        return (await _repository
-            .GetFiltered<Product>(p => p.IsActive))?
-            .Select(p => new ProductModel.ResponseProduct(
+        var allProducts = await _repository
+            .GetFiltered<Product>(p => p.IsActive) ?? throw new NoContentException("No products were found"); 
+
+        var products = allProducts.Select(p => new ProductModel.ResponseProduct(
                 p.Id,
                 p.Sku,
                 p.InternalCode,
@@ -55,7 +56,9 @@ public class ProductsManagementService : IProductsManagementService
                 p.CurrentUnitPrice,
                 p.StockQuantity,
                 p.IsActive)
-            );
+        ).OrderBy(p=> p.Sku);
+
+        return products;
     }
 
     public async Task<ProductModel.ResponseProduct> AddProduct(ProductModel.RequestProduct request)
