@@ -28,7 +28,7 @@ public class OrdersManagementService : IOrdersManagementService
 
     public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders(OrderModel.FilterOrder request)
     {
-        if (request.Status is null && request.CustomerId is null && request.PageSize is null && request.Page is null)
+        if (request.Status is null && request.CustomerId is null && request.PageSize is null && request.PageNumber is null)
         {
             _logger.LogInformation("Consulta de ordenes sin filtrar");
         }
@@ -65,7 +65,7 @@ public class OrdersManagementService : IOrdersManagementService
                     i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
                 order.TotalAmount))
             .OrderByDescending(o => o.Date)
-            .Skip((request.Page -1) * request.PageSize ?? 0).Take(request.PageSize ?? orders.Count());
+            .Skip((request.PageNumber -1) * request.PageSize ?? 0).Take(request.PageSize ?? orders.Count());
 
         return allOrders;
     }

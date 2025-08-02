@@ -29,17 +29,17 @@ public class OrderValidations
             ValidateFilteredStatus(request.Status);
         }
 
-        if (!string.IsNullOrEmpty(request.Page.ToString()))
+        if (!string.IsNullOrEmpty(request.PageNumber.ToString()))
         {
-            GeneralValidations.ValidatePositiveWholeNumberAndCero(request.Page.ToString()!, nameof(request.Page));
-            if(request.Page > 1000)
-                throw new ArgumentOutOfRangeException(nameof(request.Page), "Page number cannot be greater than 1000");
+            GeneralValidations.ValidatePositiveWholeNumberAndCero(request.PageNumber.ToString()!, nameof(request.PageNumber));
+            if(request.PageNumber > 1000)
+                throw new ArgumentOutOfRangeException(nameof(request.PageNumber), "PageNumber number cannot be greater than 1000");
         }
         if (request.PageSize is not null)
         {
             GeneralValidations.ValidatePositiveWholeNumberAndCero(request.PageSize.ToString()!, nameof(request.PageSize));
             if (request.PageSize > 15)
-                throw new ArgumentOutOfRangeException(nameof(request.PageSize), "Page size cannot be greater than 15");
+                throw new ArgumentOutOfRangeException(nameof(request.PageSize), "PageNumber size cannot be greater than 15");
         }
     }
     public static void ValidateNotNullOrders(IEnumerable<Order>? orders, OrderModel.FilterOrder? request)
