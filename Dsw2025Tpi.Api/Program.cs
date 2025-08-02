@@ -66,7 +66,7 @@ public class Program
             var adminName = admin.GetValue<string>("username");
 
             UserManager<IdentityUser> manager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-            var userAdmin = manager.FindByNameAsync(adminName!);
+            var userAdmin = await manager.FindByNameAsync(adminName!);
             if (userAdmin is null)
             {
                 var user = new IdentityUser
