@@ -11,7 +11,8 @@ namespace Dsw2025Tpi.Application.Dtos;
 public record OrderModel
 {
     public record RequestChangeStatus(string NewStatus);
-    public record RequestOrder(string ShippingAddress, string BillingAddress, string? Notes, Guid CustomerId, List<RequestItem> OrderItems);
+    public record RequestOrder(string ShippingAddress, string BillingAddress, string? Notes, Guid CustomerId, 
+        List<RequestItem> OrderItems);
     public record ResponseOrder(Guid Id, DateTime Date, string? ShippingAddress, string? BillingAddress,
         string? Notes, Guid CustomerId, string? Status, List<ResponseItem> OrderItems, decimal? TotalAmount);
 

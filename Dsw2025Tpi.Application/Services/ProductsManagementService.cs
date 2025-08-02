@@ -44,10 +44,7 @@ public class ProductsManagementService : IProductsManagementService
         if (activeProducts is null || !activeProducts.Any())
             throw new NoContentException("No products were found");
 
-        var allProducts = await _repository
-            .GetFiltered<Product>(p => p.IsActive) ?? throw new NoContentException("No products were found"); 
-
-        var products = allProducts.Select(p => new ProductModel.ResponseProduct(
+        var products = activeProducts.Select(p => new ProductModel.ResponseProduct(
                 p.Id,
                 p.Sku,
                 p.InternalCode,
@@ -84,7 +81,7 @@ public class ProductsManagementService : IProductsManagementService
     public async Task<ProductModel.ResponseProduct> UpdateProduct(Guid id, ProductModel.RequestProduct request)
     {
         _logger.LogInformation("Modificacion de producto con Id: {id}", id);
-        Validations.GeneralValidations.ValidateNotNull(request, nameof(request));
+        GeneralValidations.ValidateNotNull(request, nameof(request));
         await ProductValidations.ValidateExistingProduct(id, _repository);
         ProductValidations.ValidateProduct(request);
         var product = await _repository.First<Product>(p => p.Id == id);

@@ -12,9 +12,7 @@ public static class GeneralValidations
 {
     public static void ValidateNotNull<T>(T obj, string paramName)
     {
-        if (obj == null)
-            throw new ArgumentNullException($"{paramName} cannot be null");
-        if(string.IsNullOrWhiteSpace(obj.ToString())
+        if(string.IsNullOrWhiteSpace(obj!.ToString())
             && obj is not IFormFile
             && obj is not IEnumerable<string>
             && obj is not IEnumerable<int>
@@ -52,6 +50,14 @@ public static class GeneralValidations
             throw new ArgumentException($"{paramName} invalid input, has to be a whole number or cero");
         }
     }
+    public static void ValidatePositiveWholeNumber(string number, string paramName)
+    {
+        ValidateNotNull(number, paramName);
+        if (!Regex.IsMatch(number, @"^[1-9]\d*$"))
+        {
+            throw new ArgumentException($"{paramName} invalid input, has to be a positive whole number");
+        }
+    }
 
     public static void ValidatePositiveDecimalNumber(string number, string paramName)
     {
@@ -61,7 +67,7 @@ public static class GeneralValidations
             throw new ArgumentException($"{paramName} invalid input, has to be a positive decimal number");
         }
     }
-    public static void ValidateGuidAndCodes(string text, string paramName)
+    public static void ValidateGuid(string text, string paramName)
     {
         ValidateNotNull(text, paramName);
         if (!Regex.IsMatch(text, @"^[a-zA-Z0-9-\-]*$"))

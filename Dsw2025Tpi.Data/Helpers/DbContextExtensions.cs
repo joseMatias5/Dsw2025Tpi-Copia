@@ -42,7 +42,7 @@ public static class DbContextExtensions
             var customer = context.Customers.Find(dto.CustomerId);
             if (customer == null) continue;
 
-            var order = new Order(dto.ShippingAddress, dto.BillingAddress, dto.Notes, dto.CustomerId);
+            var order = new Order(dto.ShippingAddress!, dto.BillingAddress!, dto.Notes, dto.CustomerId, null);
 
             foreach (var item in dto.OrderItems)
             {

@@ -57,7 +57,7 @@ public class ProductValidations
 
     public async static Task ValidateExistingProduct(Guid id, IRepository _repository)
     {
-        GeneralValidations.ValidateGuidAndCodes(id.ToString(), nameof(id));
+        GeneralValidations.ValidateGuid(id.ToString(), nameof(id));
         if (await _repository.First<Product>(p => p.Id == id) == null)
             throw new EntityNotFoundException($"Product with ID {id} not found");
     }

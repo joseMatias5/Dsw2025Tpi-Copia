@@ -34,6 +34,7 @@ public class CustomExceptionHandlingMiddleware : IMiddleware
                 NotAuthenticatedException => HttpStatusCode.BadRequest,
                 NotFoundException => HttpStatusCode.NotFound,
                 NoContentException => HttpStatusCode.NoContent,
+                InvalidOperationException => HttpStatusCode.BadRequest,
                 Dsw2025Tpi.Application.Exceptions.ApplicationException => HttpStatusCode.BadRequest,
                 _ => HttpStatusCode.InternalServerError
             };
