@@ -28,7 +28,7 @@ public class OrdersManagementService : IOrdersManagementService
 
     public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders(OrderModel.FilterOrder request)
     {
-        if (request.Status is null && request.CustomerId is null)
+        if (request.Status is null && request.CustomerId is null && request.PageSize is null && request.PageNumber is null)
         {
             _logger.LogInformation("Consulta de ordenes sin filtrar");
         }
@@ -53,20 +53,22 @@ public class OrdersManagementService : IOrdersManagementService
             );
         OrderValidations.ValidateNotNullOrders(orders, request);
 
-        return orders?.Select(order => new OrderModel.ResponseOrder(
-            order.Id,
-            order.Date,
-            order.ShippingAddress,
-            order.BillingAddress,
-            order.Notes,
-            order.CustomerId,
-            order.Status.ToString(),
-            order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
-                i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
-            order.TotalAmount)
-        );
-    }
+        var allOrders = orders?.Select(order => new OrderModel.ResponseOrder(
+                order.Id,
+                order.Date,
+                order.ShippingAddress,
+                order.BillingAddress,
+                order.Notes,
+                order.CustomerId,
+                order.Status.ToString(),
+                order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
+                    i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
+                order.TotalAmount))
+            .OrderByDescending(o => o.Date)
+            .Skip((request.PageNumber -1) * request.PageSize ?? 0).Take(request.PageSize ?? orders.Count());
 
+        return allOrders;
+    }
     public async Task<OrderModel.ResponseOrder?> GetOrderById(Guid id)
     {
         _logger.LogInformation("Consulta de orden por Id: {id}", id);
@@ -105,8 +107,8 @@ public class OrdersManagementService : IOrdersManagementService
             ProductValidations.ValidateActiveProduct(product!);
 
             ItemValidations.ValidateItem(item);
-            ItemValidations.StockControl(item.Quantity, product!);
-
+            //ItemValidations.StockControl(item.Quantity, product!);
+            //esto se tendria que hacer en el dominio, PREGUNTAR AL PROFE
             OrderItem orderItem= new OrderItem(
                 item.ProductId,
                 product!,

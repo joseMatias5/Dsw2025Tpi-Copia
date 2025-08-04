@@ -15,20 +15,17 @@ public class ItemValidations
     public static void ValidateItem(OrderItemModel.RequestItem item)
     {
         GeneralValidations.ValidateNotNull(item, nameof(item));
-        GeneralValidations.ValidateGuidAndCodes(item.ProductId.ToString(), nameof(item.ProductId));
-        GeneralValidations.ValidatePositiveWholeNumberAndCero(item.Quantity.ToString(), nameof(item.Quantity));
-
-        if (item.Quantity <= 0)
-            throw new ArgumentException(nameof(item.Quantity), "Quantity must be greater than zero");
+        GeneralValidations.ValidateGuid(item.ProductId.ToString(), nameof(item.ProductId));
+        GeneralValidations.ValidatePositiveWholeNumber(item.Quantity.ToString(), nameof(item.Quantity));
     }
-
+    /*
     public static void StockControl(int quantity, Product product)
     {
         if (quantity > product.StockQuantity)
         {
             throw new Exceptions.ApplicationException($"Not enough stock, product {product.Id} has {product.StockQuantity} items in existence");
         }
-    }
+    }*/
     public static async Task AddStock(List<OrderItem> orderItems, IRepository _repository)
     {
         foreach (var item in orderItems)

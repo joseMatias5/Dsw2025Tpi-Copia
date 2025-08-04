@@ -24,50 +24,15 @@ public class AuthenticateController : ControllerBase
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel.RequestLogin request)
     {
-        try
-        {
-            var token = await _service.Login(request);
-
-            return Ok(token);
-        }
-        catch (Application.Exceptions.ApplicationException ape)
-        {
-            return NotFound(ape.Message);
-        }
-        catch (ArgumentNullException ane)
-        {
-            return NotFound(ane.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem logging in");
-        }
+        var token = await _service.Login(request);
+        return Ok(token);
     }
 
     [HttpPost("register")]
     [Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> Register([FromBody] RegisterModel.RequestRegister model)
     {
-        try
-        {
-            await _service.Register(model);
-            return Ok("New user successfully created.");
-        }
-        catch (ArgumentNullException ane)
-        {
-            return NotFound(ane.Message);
-        }
-        catch (ArgumentException ae)
-        {
-            return BadRequest(ae.Message);
-        }
-        catch (Exception)
-        {
-            return Problem("There was a problem adding new user");
-        }
+        await _service.Register(model);
+        return Ok("New user successfully created.");
     }
 }

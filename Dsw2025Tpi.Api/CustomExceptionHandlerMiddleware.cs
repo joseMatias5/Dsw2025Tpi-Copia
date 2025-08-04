@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Dsw2025Tpi.Application.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dsw2025Tpi.Api;
@@ -34,7 +35,9 @@ public class CustomExceptionHandlingMiddleware : IMiddleware
                 NotAuthenticatedException => HttpStatusCode.BadRequest,
                 NotFoundException => HttpStatusCode.NotFound,
                 NoContentException => HttpStatusCode.NoContent,
+                InvalidOperationException => HttpStatusCode.BadRequest,
                 Dsw2025Tpi.Application.Exceptions.ApplicationException => HttpStatusCode.BadRequest,
+                System.ApplicationException => HttpStatusCode.BadRequest,
                 _ => HttpStatusCode.InternalServerError
             };
 

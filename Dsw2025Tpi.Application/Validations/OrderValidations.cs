@@ -19,7 +19,7 @@ public class OrderValidations
         if(request.CustomerId is not null)
         {
             var customer = request.CustomerId.ToString() ?? throw new ArgumentNullException("Customer id is null");
-            GeneralValidations.ValidateGuidAndCodes(customer, nameof(request.CustomerId));
+            GeneralValidations.ValidateGuid(customer, nameof(request.CustomerId));
             Guid customerId = (Guid)request.CustomerId;
             ValidateCustomer(customerId, _repository);
         }
@@ -27,6 +27,19 @@ public class OrderValidations
         if (request.Status != null)
         {
             ValidateFilteredStatus(request.Status);
+        }
+
+        if (!string.IsNullOrEmpty(request.PageNumber.ToString()))
+        {
+            GeneralValidations.ValidatePositiveWholeNumberAndCero(request.PageNumber.ToString()!, nameof(request.PageNumber));
+            if(request.PageNumber > 1000)
+                throw new ArgumentOutOfRangeException(nameof(request.PageNumber), "PageNumber number cannot be greater than 1000");
+        }
+        if (request.PageSize is not null)
+        {
+            GeneralValidations.ValidatePositiveWholeNumberAndCero(request.PageSize.ToString()!, nameof(request.PageSize));
+            if (request.PageSize > 15)
+                throw new ArgumentOutOfRangeException(nameof(request.PageSize), "PageNumber size cannot be greater than 15");
         }
     }
     public static void ValidateNotNullOrders(IEnumerable<Order>? orders, OrderModel.FilterOrder? request)
@@ -47,12 +60,12 @@ public class OrderValidations
         GeneralValidations.ValidateText(request.ShippingAddress!, nameof(request.ShippingAddress));
         GeneralValidations.ValidateText(request.BillingAddress!, nameof(request.BillingAddress));
         GeneralValidations.ValidateOptionalText(request.Notes!, nameof(request.Notes));
-        GeneralValidations.ValidateGuidAndCodes(request.CustomerId.ToString(), nameof(request.CustomerId));
+        GeneralValidations.ValidateGuid(request.CustomerId.ToString(), nameof(request.CustomerId));
     }
 
     public async static Task ValidateExistingOrder(Guid id, IRepository _repository)
     {
-        GeneralValidations.ValidateGuidAndCodes(id.ToString(), nameof(id));
+        GeneralValidations.ValidateGuid(id.ToString(), nameof(id));
         if (await _repository.First<Order>(p => p.Id == id) == null)
             throw new Exceptions.EntityNotFoundException($"Order with ID {id} not found");
     }
@@ -98,7 +111,7 @@ public class OrderValidations
 
     public static void ValidateCustomer(Guid customerId, IRepository _repository)
     {
-        GeneralValidations.ValidateGuidAndCodes(customerId.ToString(), nameof(customerId));
+        GeneralValidations.ValidateGuid(customerId.ToString(), nameof(customerId));
         var customer = _repository.First<Customer>(c => c.Id == customerId).Result;
         if (customer == null)
             throw new Exceptions.EntityNotFoundException($"Customer with ID {customerId} not found");

@@ -43,7 +43,7 @@ public class OrderItem : EntityBase
             throw new ArgumentOutOfRangeException(nameof(quantity), "The quantity must be greater than zero");
         
         if (!product.StockControl(quantity))
-            throw new ApplicationException("Not enough stock");
+            throw new System.ApplicationException($"Not enough stock, product {product.Id} has {product.StockQuantity} items in existence");
 
         ProductId = productId;
         Name = name ?? throw new ArgumentNullException(nameof(name));

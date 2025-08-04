@@ -12,4 +12,5 @@ public record ProductModel
         decimal CurrentUnitPrice, int StockQuantity);
     public record ResponseProduct(Guid Id, string? Sku, string? InternalCode, string? Name, string? Description,
         decimal? CurrentUnitPrice, int? StockQuantity, bool IsActive);
+
 }

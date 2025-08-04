@@ -99,7 +99,7 @@ public class AuthenticateService : IAuthenticateService
             throw new Application.Exceptions.ApplicationException("There was a problem assigning the role");
 
         _logger.LogInformation("Solicitud de registro exitosa");
-        return new RegisterModel.ResponseRegister();
+        return new RegisterModel.ResponseRegister(user.UserName, user.Email, model.Role);
 
     }
 }

@@ -30,7 +30,8 @@ public class ProductsManagementService : IProductsManagementService
         _logger.LogInformation("Consulta de producto por Id: {id}", id);
         await ProductValidations.ValidateExistingProduct(id, _repository);
         var product = await _repository.GetById<Product>(id);
-        
+        ProductValidations.ValidateActiveProduct(product!);
+
         return product != null ?
             new ProductModel.ResponseProduct(product.Id, product.Sku, product.InternalCode, product.Name, product.Description,
                 product.CurrentUnitPrice, product.StockQuantity, product.IsActive) :
@@ -44,9 +45,7 @@ public class ProductsManagementService : IProductsManagementService
         if (activeProducts is null || !activeProducts.Any())
             throw new NoContentException("No products were found");
 
-        return (await _repository
-            .GetFiltered<Product>(p => p.IsActive))?
-            .Select(p => new ProductModel.ResponseProduct(
+        var products = activeProducts.Select(p => new ProductModel.ResponseProduct(
                 p.Id,
                 p.Sku,
                 p.InternalCode,
@@ -55,7 +54,9 @@ public class ProductsManagementService : IProductsManagementService
                 p.CurrentUnitPrice,
                 p.StockQuantity,
                 p.IsActive)
-            );
+        ).OrderBy(p=> p.Sku);
+
+        return products;
     }
 
     public async Task<ProductModel.ResponseProduct> AddProduct(ProductModel.RequestProduct request)
@@ -81,7 +82,7 @@ public class ProductsManagementService : IProductsManagementService
     public async Task<ProductModel.ResponseProduct> UpdateProduct(Guid id, ProductModel.RequestProduct request)
     {
         _logger.LogInformation("Modificacion de producto con Id: {id}", id);
-        Validations.GeneralValidations.ValidateNotNull(request, nameof(request));
+        GeneralValidations.ValidateNotNull(request, nameof(request));
         await ProductValidations.ValidateExistingProduct(id, _repository);
         ProductValidations.ValidateProduct(request);
         var product = await _repository.First<Product>(p => p.Id == id);
@@ -108,8 +109,6 @@ public class ProductsManagementService : IProductsManagementService
             updated.IsActive
         );
     }
-
-    //Para el PATCH
     public async Task<ProductModel.ResponseProduct?> DeactivateProduct(Guid id)
     {
         _logger.LogInformation("Desactivacion de producto con Id: {id}", id);

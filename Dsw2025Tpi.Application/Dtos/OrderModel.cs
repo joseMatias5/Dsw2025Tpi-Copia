@@ -11,10 +11,12 @@ namespace Dsw2025Tpi.Application.Dtos;
 public record OrderModel
 {
     public record RequestChangeStatus(string NewStatus);
-    public record RequestOrder(string ShippingAddress, string BillingAddress, string? Notes, Guid CustomerId, List<RequestItem> OrderItems);
+    public record RequestOrder(string ShippingAddress, string BillingAddress, string? Notes, Guid CustomerId, 
+        List<RequestItem> OrderItems);
     public record ResponseOrder(Guid Id, DateTime Date, string? ShippingAddress, string? BillingAddress,
         string? Notes, Guid CustomerId, string? Status, List<ResponseItem> OrderItems, decimal? TotalAmount);
 
-    public record FilterOrder(string? Status, Guid? CustomerId);
-
+    public record FilterOrder(string? Status, Guid? CustomerId, int? PageNumber, int? PageSize);
+    //No deberia ser nulleable los parametros del filter, principalmente el PageNumber y el pageSize
+    //tiene que tener valor por defecto. Debido a que la validacion esta antes
 }

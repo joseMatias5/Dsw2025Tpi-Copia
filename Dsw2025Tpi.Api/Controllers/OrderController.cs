@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dsw2025Tpi.Api.Controllers;
 
 [ApiController]
-[Authorize]
 [Route("api/orders")]
 public class OrderController : Controller
 {
@@ -21,7 +20,6 @@ public class OrderController : Controller
 
     [HttpGet()]
     [Authorize(Roles = "ADMIN,USER")]
-    //[AllowAnonymous]
     public async Task<IActionResult> GetOrders([FromQuery] OrderModel.FilterOrder request)
     {
         var orders = await _service.GetOrders(request);
@@ -44,7 +42,7 @@ public class OrderController : Controller
     }
 
     [HttpPost()]
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "USER")]
     public async Task<IActionResult> AddOrder([FromBody] OrderModel.RequestOrder request)
     {
         var order = await _service.AddOrder(request);
