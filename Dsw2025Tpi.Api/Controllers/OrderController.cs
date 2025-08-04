@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Dsw2025Tpi.Api.Controllers;
 
 [ApiController]
-[Authorize]
 [Route("api/orders")]
 public class OrderController : Controller
 {

@@ -18,14 +18,14 @@ public class ItemValidations
         GeneralValidations.ValidateGuid(item.ProductId.ToString(), nameof(item.ProductId));
         GeneralValidations.ValidatePositiveWholeNumber(item.Quantity.ToString(), nameof(item.Quantity));
     }
-
+    /*
     public static void StockControl(int quantity, Product product)
     {
         if (quantity > product.StockQuantity)
         {
             throw new Exceptions.ApplicationException($"Not enough stock, product {product.Id} has {product.StockQuantity} items in existence");
         }
-    }
+    }*/
     public static async Task AddStock(List<OrderItem> orderItems, IRepository _repository)
     {
         foreach (var item in orderItems)

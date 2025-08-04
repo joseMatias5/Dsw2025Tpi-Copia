@@ -69,7 +69,6 @@ public class OrdersManagementService : IOrdersManagementService
 
         return allOrders;
     }
-
     public async Task<OrderModel.ResponseOrder?> GetOrderById(Guid id)
     {
         _logger.LogInformation("Consulta de orden por Id: {id}", id);
@@ -108,8 +107,8 @@ public class OrdersManagementService : IOrdersManagementService
             ProductValidations.ValidateActiveProduct(product!);
 
             ItemValidations.ValidateItem(item);
-            ItemValidations.StockControl(item.Quantity, product!);
-
+            //ItemValidations.StockControl(item.Quantity, product!);
+            //esto se tendria que hacer en el dominio, PREGUNTAR AL PROFE
             OrderItem orderItem= new OrderItem(
                 item.ProductId,
                 product!,

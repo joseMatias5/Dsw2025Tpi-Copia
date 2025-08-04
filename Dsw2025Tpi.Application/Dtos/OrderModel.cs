@@ -17,5 +17,6 @@ public record OrderModel
         string? Notes, Guid CustomerId, string? Status, List<ResponseItem> OrderItems, decimal? TotalAmount);
 
     public record FilterOrder(string? Status, Guid? CustomerId, int? PageNumber, int? PageSize);
-
+    //No deberia ser nulleable los parametros del filter, principalmente el PageNumber y el pageSize
+    //tiene que tener valor por defecto. Debido a que la validacion esta antes
 }

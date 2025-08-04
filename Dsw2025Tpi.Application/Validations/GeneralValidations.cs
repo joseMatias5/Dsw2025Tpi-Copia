@@ -25,7 +25,7 @@ public static class GeneralValidations
     public static void ValidateText(string text, string paramName)
     {
         ValidateNotNull(text, paramName);
-        if (!Regex.IsMatch(text, @"^[a-zA-Z0-9 ]*$"))
+        if (!Regex.IsMatch(text, @"^[a-zA-Z0-9\s,.]*$"))
         {
             throw new ArgumentException($"{paramName}: invalid input, has to be an string of letters and/or numbers");
         }

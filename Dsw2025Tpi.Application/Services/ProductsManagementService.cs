@@ -30,7 +30,8 @@ public class ProductsManagementService : IProductsManagementService
         _logger.LogInformation("Consulta de producto por Id: {id}", id);
         await ProductValidations.ValidateExistingProduct(id, _repository);
         var product = await _repository.GetById<Product>(id);
-        
+        ProductValidations.ValidateActiveProduct(product!);
+
         return product != null ?
             new ProductModel.ResponseProduct(product.Id, product.Sku, product.InternalCode, product.Name, product.Description,
                 product.CurrentUnitPrice, product.StockQuantity, product.IsActive) :
