@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Application.Exceptions;
 
-public class NotFoundException : Exception
+public class ArgumentOutOfRangeException: Exception
 {
-    public NotFoundException(string message) : base(message)
+    public ArgumentOutOfRangeException(string message) : base(message)
     {
-
+        
     }
 }

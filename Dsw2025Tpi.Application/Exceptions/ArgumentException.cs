@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Dsw2025Tpi.Application.Exceptions;
 
-public class NotFoundException : Exception
+public class ArgumentException : Exception
 {
-    public NotFoundException(string message) : base(message)
+    public ArgumentException(string message) : base(message)
     {
-
     }
 }

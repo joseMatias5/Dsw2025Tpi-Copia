@@ -11,7 +11,7 @@ public class CustomExceptionHandlingMiddleware : IMiddleware
     private readonly ILogger<CustomExceptionHandlingMiddleware> _logger;
     public CustomExceptionHandlingMiddleware(ILogger<CustomExceptionHandlingMiddleware> logger)
     {
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger = logger ?? throw new Application.Exceptions.ArgumentNullException(nameof(logger));
     }
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
@@ -26,27 +26,25 @@ public class CustomExceptionHandlingMiddleware : IMiddleware
 
             var statusCode = e switch
             {
-                EntityNotFoundException => HttpStatusCode.NotFound,
-                ArgumentOutOfRangeException => HttpStatusCode.BadRequest,
-                ArgumentNullException => HttpStatusCode.BadRequest,
-                ArgumentException => HttpStatusCode.BadRequest,
-                DuplicatedEntityException => HttpStatusCode.BadRequest,
-                InvalidStatusException => HttpStatusCode.BadRequest,
-                NotAuthenticatedException => HttpStatusCode.BadRequest,
-                NotFoundException => HttpStatusCode.NotFound,
-                NoContentException => HttpStatusCode.NoContent,
-                InvalidOperationException => HttpStatusCode.BadRequest,
-                Dsw2025Tpi.Application.Exceptions.ApplicationException => HttpStatusCode.BadRequest,
-                System.ApplicationException => HttpStatusCode.BadRequest,
-                _ => HttpStatusCode.InternalServerError
+                Application.Exceptions.EntityNotFoundException => "200",
+                Application.Exceptions.ArgumentOutOfRangeException => "300",
+                Application.Exceptions.ArgumentNullException => "300",
+                Application.Exceptions.ArgumentException => "300",
+                Application.Exceptions.DuplicatedEntityException => "300",
+                Application.Exceptions.InvalidStatusException => "300",
+                Application.Exceptions.NotAuthenticatedException => "300",
+                Application.Exceptions.NotFoundException => "200",
+                Application.Exceptions.NoContentException => "100",
+                InvalidOperationException => "300",
+                Application.Exceptions.ApplicationException => "300",
+                _ => "400"
             };
 
-            context.Response.StatusCode = (int)statusCode;
+            context.Response.StatusCode = int.Parse(statusCode);
 
             var errorResponse = new
             {
-                status = (int)statusCode,
-                title = statusCode.ToString(),
+                status = statusCode,
                 detail = e.Message
             };
 

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Dsw2025Tpi.Application.Validations;
 using Dsw2025Tpi.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
+using System;
 
 namespace Dsw2025Tpi.Api.Controllers;
 
@@ -18,7 +19,7 @@ public class AuthenticateController : ControllerBase
     public AuthenticateController(IAuthenticateService service,
         SignInManager<IdentityUser> signInManager)
     {
-        _service = service ?? throw new ArgumentNullException(nameof(service));
+        _service = service ?? throw new Application.Exceptions.ArgumentNullException(nameof(service));
     }
 
     [HttpPost("login")]

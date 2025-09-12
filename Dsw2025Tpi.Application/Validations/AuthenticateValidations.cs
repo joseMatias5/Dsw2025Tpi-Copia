@@ -16,7 +16,7 @@ public static class AuthenticateValidations
         ValidatePassword(request.Password);
 
         if (user == null)
-            throw new NotAuthenticatedException("The username or password is incorrect");
+            throw new Exceptions.NotAuthenticatedException("The username or password is incorrect");
     }
     public static void ValidateRegistration(RegisterModel.RequestRegister model, UserManager<IdentityUser> _userManager)
     {
@@ -40,14 +40,14 @@ public static class AuthenticateValidations
         GeneralValidations.ValidateNotNull(password, nameof(password));
         if (!Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"))
         {
-            throw new ArgumentException($"{password}: invalid password");
+            throw new Application.Exceptions.ArgumentException($"{password}: invalid password");
         }
     }
     public static void ValidateUsername(string username)
     {
         GeneralValidations.ValidateText(username, nameof(username));
         if (username.Length < 6)
-            throw new ArgumentException("Username must have at least 6 characters");
+            throw new Exceptions.ArgumentException("Username must have at least 6 characters");
     }
     public static void ValidateEmail(string email)
     {
@@ -56,7 +56,7 @@ public static class AuthenticateValidations
 
         var regex = new Regex(pattern);
         if (!regex.IsMatch(email))
-            throw new ArgumentException("Invalid email adress");
+            throw new Exceptions.ArgumentException("Invalid email adress");
     }
 
     public static void ValidateRole(string role)
