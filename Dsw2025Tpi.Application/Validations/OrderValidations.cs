@@ -18,7 +18,7 @@ public class OrderValidations
         GeneralValidations.ValidateNotNull(request, nameof(request));
         if(request.CustomerId is not null)
         {
-            var customer = request.CustomerId.ToString() ?? throw new Exceptions.ArgumentNullException("Customer id is null");
+            var customer = request.CustomerId.ToString() ?? throw new Exceptions.ArgumentNullException("Id del cliente no puede ser nulo");
             GeneralValidations.ValidateGuid(customer, nameof(request.CustomerId));
             Guid customerId = (Guid)request.CustomerId;
             ValidateCustomer(customerId, _repository);
@@ -33,24 +33,24 @@ public class OrderValidations
         {
             GeneralValidations.ValidatePositiveWholeNumberAndCero(request.PageNumber.ToString()!, nameof(request.PageNumber));
             if(request.PageNumber > 1000)
-                throw new Exceptions.ArgumentOutOfRangeException("PageNumber number cannot be greater than 1000");
+                throw new Exceptions.ArgumentOutOfRangeException("El numero de pagina no puede ser mayor a 1000");
         }
         if (request.PageSize is not null)
         {
             GeneralValidations.ValidatePositiveWholeNumberAndCero(request.PageSize.ToString()!, nameof(request.PageSize));
             if (request.PageSize > 15)
-                throw new Exceptions.ArgumentOutOfRangeException("PageNumber size cannot be greater than 15");
+                throw new Exceptions.ArgumentOutOfRangeException("El tamaño de la pagina no puede ser mayor a 15");
         }
     }
     public static void ValidateNotNullOrders(IEnumerable<Order>? orders, OrderModel.FilterOrder? request)
     {
         GeneralValidations.ValidateNotNull(request, nameof(request));
         if (orders == null || !orders.Any()  && request != null && request.CustomerId.HasValue)
-            throw new Exceptions.NotFoundException($"No orders found for customer with ID {request!.CustomerId}");
+            throw new Exceptions.NotFoundException($"No se encontraron ordenes del cliente {request!.CustomerId}");
         if (orders == null || !orders.Any() && request != null && !request.Status.IsNullOrEmpty())
-            throw new Exceptions.NotFoundException($"No orders found with status {request!.Status}");
+            throw new Exceptions.NotFoundException($"No se encontraron con estado {request!.Status}");
         if (orders == null || !orders.Any())
-            throw new Exceptions.NoContentException("No orders found");
+            throw new Exceptions.NoContentException("No se encontraron ordenes");
 
     }
     public static void ValidateOrder(OrderModel.RequestOrder request)
@@ -67,7 +67,7 @@ public class OrderValidations
     {
         GeneralValidations.ValidateGuid(id.ToString(), nameof(id));
         if (await _repository.First<Order>(p => p.Id == id) == null)
-            throw new Exceptions.EntityNotFoundException($"Order with ID {id} not found");
+            throw new Exceptions.EntityNotFoundException($"Orden con ID {id} no encontrada");
     }
 
     public static void ValidateOrderStatus(Order order, string status)
@@ -78,21 +78,21 @@ public class OrderValidations
         var statusUpper = status.ToUpper();
 
         if (order.Status.ToString() == statusUpper)
-            throw new Exceptions.InvalidStatusException($"Order is already in {status} status");
+            throw new Exceptions.InvalidStatusException($"Orden ya se encuentra en estado {status}");
 
         var validStatuses = Enum.GetNames(typeof(OrderStatus))
             .Select(s => s.ToLowerInvariant());
         if (!validStatuses.Contains(status.ToLower()))
-            throw new Exceptions.InvalidStatusException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", validStatuses)}");
+            throw new Exceptions.InvalidStatusException($"Estado {status} no valido. Los estados validos son: {string.Join(", ", validStatuses)}");
 
         if (order.Status == OrderStatus.PENDING && statusUpper != "PROCESSING" && statusUpper != "CANCELLED")
-            throw new Exceptions.InvalidStatusException($"Order status is PENDING, it cannot be changed to: {status}");
+            throw new Exceptions.InvalidStatusException($"El estado de la orden es PENDING, no puede ser cambiado a: {status}");
         if (order.Status == OrderStatus.PROCESSING && statusUpper != "SHIPPED" && statusUpper != "CANCELLED")
-            throw new Exceptions.InvalidStatusException($"Order status is PROCESSING, it cannot be changed to: {status}");
+            throw new Exceptions.InvalidStatusException($"El estado de la orden es PROCESSING, no puede ser cambiado a: {status}");
         if (order.Status == OrderStatus.SHIPPED && statusUpper != "DELIVERED" && statusUpper != "CANCELLED")
-            throw new Exceptions.InvalidStatusException($"Order status is SHIPPED, it cannot be changed to: {status}");
+            throw new Exceptions.InvalidStatusException($"El estado de la orden es SHIPPED, no puede ser cambiado a: {status}");
         if(order.Status == OrderStatus.CANCELLED)
-            throw new Exceptions.InvalidStatusException($"Order status is CANCELLED, it cannot be changed to: {status}");
+            throw new Exceptions.InvalidStatusException($"El estado de la orden es CANCELLED, no puede ser cambiado a: {status}");
     }
 
     public static void ValidateFilteredStatus(string status)
@@ -101,12 +101,12 @@ public class OrderValidations
         var validStatuses = Enum.GetNames(typeof(OrderStatus))
             .Select(s => s.ToLowerInvariant());
         if (!validStatuses.Contains(status.ToLower()))
-            throw new Exceptions.InvalidStatusException($"Invalid order status: {status}. Valid statuses are: {string.Join(", ", validStatuses)}");
+            throw new Exceptions.InvalidStatusException($"Estado {status} no valido. Los estados validos son: {string.Join(", ", validStatuses)}");
     }
     public static void ValidateCancelledOrder(Order order)
     {
         if (order.Status.ToString() == "CANCELLED")
-            throw new Exceptions.InvalidStatusException($"Order with ID {order.Id} is CANCELLED");
+            throw new Exceptions.InvalidStatusException($"Order con ID {order.Id} esta cancelada");
     }
 
     public static void ValidateCustomer(Guid customerId, IRepository _repository)
@@ -114,6 +114,6 @@ public class OrderValidations
         GeneralValidations.ValidateGuid(customerId.ToString(), nameof(customerId));
         var customer = _repository.First<Customer>(c => c.Id == customerId).Result;
         if (customer == null)
-            throw new Exceptions.EntityNotFoundException($"Customer with ID {customerId} not found");
+            throw new Exceptions.EntityNotFoundException($"No se encontro un cliente con ID {customerId}");
     }
 }

@@ -43,7 +43,7 @@ public class ProductsManagementService : IProductsManagementService
         _logger.LogInformation("Consulta de productos");
         var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
         if (activeProducts is null || !activeProducts.Any())
-            throw new NoContentException("No products were found");
+            throw new NoContentException("No se encontraron productos");
 
         var products = activeProducts.Select(p => new ProductModel.ResponseProduct(
                 p.Id,

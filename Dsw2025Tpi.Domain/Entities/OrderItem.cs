@@ -21,7 +21,7 @@ public class OrderItem : EntityBase
         {
             if (Product?.IsActive == false)
             {
-                throw new InvalidOperationException("Product has to be active");
+                throw new InvalidOperationException("El producto debe estar activo");
             }
             _product = value;
         }
@@ -37,13 +37,13 @@ public class OrderItem : EntityBase
     public OrderItem(Guid productId, Product product, string name, string? description, decimal unitPrice, int quantity)
     {
         if (productId == Guid.Empty)
-            throw new ArgumentNullException(nameof(productId), "ProductId cannot be empty");
+            throw new ArgumentNullException(nameof(productId), "El ID del producto no puede estar vacio");
 
         if (quantity <= 0)
-            throw new ArgumentOutOfRangeException(nameof(quantity), "The quantity must be greater than zero");
+            throw new ArgumentOutOfRangeException(nameof(quantity), "La cantidad debe ser mayor a 0");
         
         if (!product.StockControl(quantity))
-            throw new System.ApplicationException($"Not enough stock, product {product.Id} has {product.StockQuantity} items in existence");
+            throw new System.ApplicationException($"No hay suficiente stock, el producto {product.Id} tiene {product.StockQuantity} items en existencia");
 
         ProductId = productId;
         Name = name ?? throw new ArgumentNullException(nameof(name));

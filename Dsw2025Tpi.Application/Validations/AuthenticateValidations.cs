@@ -16,7 +16,7 @@ public static class AuthenticateValidations
         ValidatePassword(request.Password);
 
         if (user == null)
-            throw new Exceptions.NotAuthenticatedException("The username or password is incorrect");
+            throw new Exceptions.NotAuthenticatedException("El nombre de usuario o contraseña son incorrectos");
     }
     public static void ValidateRegistration(RegisterModel.RequestRegister model, UserManager<IdentityUser> _userManager)
     {
@@ -29,25 +29,25 @@ public static class AuthenticateValidations
 
         var user = _userManager.FindByNameAsync(model.Username).Result;
         if (user != null)
-            throw new Exceptions.ApplicationException($"Username {model.Username} already exists");
+            throw new Exceptions.ApplicationException($"El usuario {model.Username} ya existe");
 
         user = _userManager.FindByEmailAsync(model.Email).Result;
         if (user != null)
-            throw new Exceptions.ApplicationException($"Email {model.Email} already exists");
+            throw new Exceptions.ApplicationException($"El email {model.Email} ya fue registrado");
     }
     public static void ValidatePassword(string password)
     {
         GeneralValidations.ValidateNotNull(password, nameof(password));
         if (!Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"))
         {
-            throw new Application.Exceptions.ArgumentException($"{password}: invalid password");
+            throw new Application.Exceptions.ArgumentException($"{password} contraseña no valida");
         }
     }
     public static void ValidateUsername(string username)
     {
         GeneralValidations.ValidateText(username, nameof(username));
         if (username.Length < 6)
-            throw new Exceptions.ArgumentException("Username must have at least 6 characters");
+            throw new Exceptions.ArgumentException("El nombre de usuario debe tener al menos 6 caracteres");
     }
     public static void ValidateEmail(string email)
     {
@@ -56,7 +56,7 @@ public static class AuthenticateValidations
 
         var regex = new Regex(pattern);
         if (!regex.IsMatch(email))
-            throw new Exceptions.ArgumentException("Invalid email adress");
+            throw new Exceptions.ArgumentException("Direccion de correo no valida");
     }
 
     public static void ValidateRole(string role)
@@ -64,6 +64,6 @@ public static class AuthenticateValidations
         GeneralValidations.ValidateText(role, nameof(role));
         var validRoles = new[] { "ADMIN", "USER" };
         if (!validRoles.Contains(role.ToUpper()))
-            throw new Exceptions.ApplicationException($"Invalid role: {role}. Valid roles are: {string.Join(", ", validRoles)}");
+            throw new Exceptions.ApplicationException($"El rol: {role} no es valido. Los validos son: {string.Join(", ", validRoles)}");
     }
 }

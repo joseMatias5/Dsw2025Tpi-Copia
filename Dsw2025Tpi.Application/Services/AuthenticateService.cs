@@ -71,12 +71,12 @@ public class AuthenticateService : IAuthenticateService
         var result = await _signInManager.CheckPasswordSignInAsync(user!, request.Password, false);
         if (!result.Succeeded)
         {
-            throw new Application.Exceptions.ApplicationException("The username or password is incorrect");
+            throw new Application.Exceptions.ApplicationException("El nombre de usuario o contraseña son incorrectos");
         }
 
         var roles = await _userManager.GetRolesAsync(user!);
 
-        var role = roles.FirstOrDefault() ?? throw new Application.Exceptions.ApplicationException("User has no assigned role");
+        var role = roles.FirstOrDefault() ?? throw new Application.Exceptions.ApplicationException("El usuario no tiene asignado un rol");
 
         var token = GenerateToken(user!.UserName!, role);
 
@@ -96,7 +96,7 @@ public class AuthenticateService : IAuthenticateService
         var roleResult = await _userManager.AddToRoleAsync(user, model.Role);
 
         if (!roleResult.Succeeded)
-            throw new Application.Exceptions.ApplicationException("There was a problem assigning the role");
+            throw new Application.Exceptions.ApplicationException("Hubo un problame asignando el rol");
 
         _logger.LogInformation("Solicitud de registro exitosa");
         return new RegisterModel.ResponseRegister(user.UserName, user.Email, model.Role);

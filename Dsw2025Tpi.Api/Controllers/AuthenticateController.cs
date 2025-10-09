@@ -34,6 +34,6 @@ public class AuthenticateController : ControllerBase
     public async Task<IActionResult> Register([FromBody] RegisterModel.RequestRegister model)
     {
         await _service.Register(model);
-        return Ok("New user successfully created.");
+        return Ok("Nuevo usuario creado con exito");
     }
 }

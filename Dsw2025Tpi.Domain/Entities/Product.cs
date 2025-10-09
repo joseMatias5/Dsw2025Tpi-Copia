@@ -26,9 +26,9 @@ public class Product : EntityBase
         Name = name;
         Description = description;
         CurrentUnitPrice = currentUnitPrice <= 0? 
-            throw new ArgumentOutOfRangeException(nameof(stockQuantity), "The Unit Price must be positive") : currentUnitPrice;
+            throw new ArgumentOutOfRangeException(nameof(stockQuantity), "El precio unitario debe ser positivo") : currentUnitPrice;
         StockQuantity = stockQuantity < 0 ?
-            throw new ArgumentOutOfRangeException(nameof(stockQuantity), "The Quantity must be positive") : stockQuantity;
+            throw new ArgumentOutOfRangeException(nameof(stockQuantity), "La cantidad debe ser positiva") : stockQuantity;
         IsActive = true;
     }
     public bool StockControl(int quantity)

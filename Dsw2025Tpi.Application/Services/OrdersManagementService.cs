@@ -107,8 +107,6 @@ public class OrdersManagementService : IOrdersManagementService
             ProductValidations.ValidateActiveProduct(product!);
 
             ItemValidations.ValidateItem(item);
-            //ItemValidations.StockControl(item.Quantity, product!);
-            //esto se tendria que hacer en el dominio, PREGUNTAR AL PROFE
             OrderItem orderItem= new OrderItem(
                 item.ProductId,
                 product!,
