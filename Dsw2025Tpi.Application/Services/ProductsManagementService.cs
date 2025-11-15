@@ -38,14 +38,20 @@ public class ProductsManagementService : IProductsManagementService
             null;
     }
 
-    public async Task<IEnumerable<ProductModel.ResponseProduct>?> GetProducts()
+    public async Task<ProductModel.ResponsePagination?> GetProducts(ProductModel.FilterProduct request)
     {
+        //usuario normal no puede ver porductos inactivos
         _logger.LogInformation("Consulta de productos");
-        var activeProducts = await _repository.GetFiltered<Product>(p => p.IsActive);
-        if (activeProducts is null || !activeProducts.Any())
+        var filterredProducts = await _repository.GetFiltered<Product>(p =>
+            (
+                p.IsActive
+                && (string.IsNullOrEmpty(request.Search) || p.Name!.Contains(request.Search!) || p.Sku!.Contains(request.Search!)))
+            );
+        
+        if (filterredProducts is null || !filterredProducts.Any())
             throw new NoContentException("No se encontraron productos");
 
-        var products = activeProducts.Select(p => new ProductModel.ResponseProduct(
+        var products = filterredProducts.Select(p => new ProductModel.ResponseProduct(
                 p.Id,
                 p.Sku,
                 p.InternalCode,
@@ -53,10 +59,45 @@ public class ProductsManagementService : IProductsManagementService
                 p.Description,
                 p.CurrentUnitPrice,
                 p.StockQuantity,
-                p.IsActive)
-        ).OrderBy(p=> p.Sku);
+                p.IsActive))
+            .OrderBy(p => p.Sku)
+            .Skip(((request.PageNumber??1) - 1) * request.PageSize ?? 0)
+            .Take(request.PageSize ?? filterredProducts.Count());
 
-        return products;
+        return new ProductModel.ResponsePagination(products.ToList(), filterredProducts.Count());
+    }
+    public async Task<ProductModel.ResponsePagination?> GetAuthProducts(ProductModel.FilterAuthProduct request)
+    {
+        var isActive = request.Status == "active"
+            ? (bool?)true
+            : request.Status == "inactive"
+                ? (bool?)false
+                : null;
+
+        _logger.LogInformation("Consulta de productos");
+        var filterredProducts = await _repository.GetFiltered<Product>(p =>
+            (
+                (isActive == null) || (p.IsActive == isActive)
+                && string.IsNullOrEmpty(request.Search) || p.Name!.Contains(request.Search!) || p.Sku!.Contains(request.Search!) || p.InternalCode!.Contains(request.Search!))
+            );
+        
+        if (filterredProducts is null || !filterredProducts.Any())
+            throw new NoContentException("No se encontraron productos");
+
+        var products = filterredProducts.Select(p => new ProductModel.ResponseProduct(
+                p.Id,
+                p.Sku,
+                p.InternalCode,
+                p.Name,
+                p.Description,
+                p.CurrentUnitPrice,
+                p.StockQuantity,
+                p.IsActive))
+            .OrderBy(p => p.Sku)
+            .Skip(((request.PageNumber??1) - 1) * request.PageSize ?? 0)
+            .Take(request.PageSize ?? filterredProducts.Count());
+
+        return new ProductModel.ResponsePagination(products.ToList(), filterredProducts.Count());
     }
 
     public async Task<ProductModel.ResponseProduct> AddProduct(ProductModel.RequestProduct request)

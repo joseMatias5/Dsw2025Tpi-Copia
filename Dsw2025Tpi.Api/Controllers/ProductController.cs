@@ -21,11 +21,39 @@ public class ProductController : Controller
 
     [HttpGet()]
     [AllowAnonymous]
-    public async Task<IActionResult> GetProducts()
+    //public async Task<IActionResult> GetProducts()
+    //{
+    //    var products = await _service.GetProducts(request);
+    //    return Ok(products);
+    //}
+
+    public async Task<IActionResult> GetProducts([FromQuery] ProductModel.FilterProduct request)
     {
-        var products = await _service.GetProducts();
+        var products = await _service.GetProducts(request);
+        if (products == null)
+        {
+            Response.Headers.Append("X-Message", "No hay productos activos");
+            return NoContent();
+        }
+
         return Ok(products);
     }
+
+    [HttpGet("admin")]
+    [Authorize(Roles = "ADMIN")]
+    public async Task<IActionResult> GetAuthProducts([FromQuery] ProductModel.FilterAuthProduct request)
+    {
+        var products = await _service.GetAuthProducts(request);
+
+        if (products == null)
+        {
+            Response.Headers.Append("X-Message", "No hay productos activos");
+            return NoContent();
+        }
+        
+        return Ok(products);
+    }
+
 
     [HttpGet("{id}")]
     [Authorize(Roles = "ADMIN,USER")]
