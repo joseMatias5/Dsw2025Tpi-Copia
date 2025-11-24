@@ -143,9 +143,10 @@ public static class DomainServicesConfigurationExtension
         services.AddCors(options =>
         {
             options.AddPolicy("PermitirFrontend", policy =>
-                policy.WithOrigins("http://localhost:3000")
+                policy.WithOrigins("http://localhost:5173")
                       .AllowAnyHeader()
-                      .AllowAnyMethod());
+                      .AllowAnyMethod()
+                      .AllowCredentials());
         });
         return services;
     }
