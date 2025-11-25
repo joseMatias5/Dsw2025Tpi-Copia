@@ -30,6 +30,7 @@ public class ProductController : Controller
     public async Task<IActionResult> GetProducts([FromQuery] ProductModel.FilterProduct request)
     {
         var products = await _service.GetProducts(request);
+
         if (products == null)
         {
             Response.Headers.Append("X-Message", "No hay productos activos");
@@ -47,7 +48,7 @@ public class ProductController : Controller
 
         if (products == null)
         {
-            Response.Headers.Append("X-Message", "No hay productos activos");
+            Response.Headers.Append("X-Message", "No hay productos");
             return NoContent();
         }
         

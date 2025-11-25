@@ -33,22 +33,22 @@ public class OrderValidations
         {
             GeneralValidations.ValidatePositiveWholeNumberAndCero(request.PageNumber.ToString()!, nameof(request.PageNumber));
             if(request.PageNumber > 1000)
-                throw new Exceptions.ArgumentOutOfRangeException("El numero de pagina no puede ser mayor a 1000");
+                throw new Exceptions.PageNumberException("El numero de pagina no puede ser mayor a 1000");
         }
         if (request.PageSize is not null)
         {
             GeneralValidations.ValidatePositiveWholeNumberAndCero(request.PageSize.ToString()!, nameof(request.PageSize));
             if (request.PageSize > 15)
-                throw new Exceptions.ArgumentOutOfRangeException("El tamaño de la pagina no puede ser mayor a 15");
+                throw new Exceptions.PageSizeException("El tamaño de la pagina no puede ser mayor a 15");
         }
     }
     public static void ValidateNotNullOrders(IEnumerable<Order>? orders, OrderModel.FilterOrder? request)
     {
         GeneralValidations.ValidateNotNull(request, nameof(request));
         if (orders == null || !orders.Any()  && request != null && request.CustomerId.HasValue)
-            throw new Exceptions.NotFoundException($"No se encontraron ordenes del cliente {request!.CustomerId}");
+            throw new Exceptions.NoOrdersForClientException($"No se encontraron ordenes del cliente {request!.CustomerId}");
         if (orders == null || !orders.Any() && request != null && !request.Status.IsNullOrEmpty())
-            throw new Exceptions.NotFoundException($"No se encontraron con estado {request!.Status}");
+            throw new Exceptions.NoOrdersForStatusException($"No se encontraron con estado {request!.Status}");
         if (orders == null || !orders.Any())
             throw new Exceptions.NoContentException("No se encontraron ordenes");
 
@@ -67,7 +67,7 @@ public class OrderValidations
     {
         GeneralValidations.ValidateGuid(id.ToString(), nameof(id));
         if (await _repository.First<Order>(p => p.Id == id) == null)
-            throw new Exceptions.EntityNotFoundException($"Orden con ID {id} no encontrada");
+            throw new Exceptions.OrderNotFoundException($"Orden con ID {id} no encontrada");
     }
 
     public static void ValidateOrderStatus(Order order, string status)
@@ -78,7 +78,7 @@ public class OrderValidations
         var statusUpper = status.ToUpper();
 
         if (order.Status.ToString() == statusUpper)
-            throw new Exceptions.InvalidStatusException($"Orden ya se encuentra en estado {status}");
+            throw new Exceptions.DuplicatedStatusException($"Orden ya se encuentra en estado {status}");
 
         var validStatuses = Enum.GetNames(typeof(OrderStatus))
             .Select(s => s.ToLowerInvariant());
@@ -106,7 +106,7 @@ public class OrderValidations
     public static void ValidateCancelledOrder(Order order)
     {
         if (order.Status.ToString() == "CANCELLED")
-            throw new Exceptions.InvalidStatusException($"Order con ID {order.Id} esta cancelada");
+            throw new Exceptions.CancelledOrderException($"Order con ID {order.Id} esta cancelada");
     }
 
     public static void ValidateCustomer(Guid customerId, IRepository _repository)
@@ -114,6 +114,6 @@ public class OrderValidations
         GeneralValidations.ValidateGuid(customerId.ToString(), nameof(customerId));
         var customer = _repository.First<Customer>(c => c.Id == customerId).Result;
         if (customer == null)
-            throw new Exceptions.EntityNotFoundException($"No se encontro un cliente con ID {customerId}");
+            throw new Exceptions.ClientNotFoundException($"No se encontro un cliente con ID {customerId}");
     }
 }

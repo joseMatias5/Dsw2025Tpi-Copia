@@ -25,7 +25,7 @@ public class OrderController : Controller
         var orders = await _service.GetOrders(request);
         if (orders == null || !orders.Any())
         {
-            Response.Headers.Append("X-Message", "No se tienen ordenes activas");
+            Response.Headers.Append("X-Message", "No se tienen ordenes");
             return NoContent();
         }
         return Ok(orders);

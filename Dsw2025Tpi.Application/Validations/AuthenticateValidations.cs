@@ -29,25 +29,25 @@ public static class AuthenticateValidations
 
         var user = _userManager.FindByNameAsync(model.Username).Result;
         if (user != null)
-            throw new Exceptions.ApplicationException($"El usuario {model.Username} ya existe");
+            throw new Exceptions.DuplicatedUsernameException($"El usuario {model.Username} ya existe");
 
         user = _userManager.FindByEmailAsync(model.Email).Result;
         if (user != null)
-            throw new Exceptions.ApplicationException($"El email {model.Email} ya fue registrado");
+            throw new Exceptions.DuplicatedEmailException($"El email {model.Email} ya fue registrado");
     }
     public static void ValidatePassword(string password)
     {
         GeneralValidations.ValidateNotNull(password, nameof(password));
         if (!Regex.IsMatch(password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$"))
         {
-            throw new Application.Exceptions.ArgumentException($"{password} contraseña no valida");
+            throw new Application.Exceptions.InvalidPasswordException($"{password} contraseña no valida");
         }
     }
     public static void ValidateUsername(string username)
     {
         GeneralValidations.ValidateText(username, nameof(username));
         if (username.Length < 6)
-            throw new Exceptions.ArgumentException("El nombre de usuario debe tener al menos 6 caracteres");
+            throw new Exceptions.ShortUsernameException("El nombre de usuario debe tener al menos 6 caracteres");
     }
     public static void ValidateEmail(string email)
     {
@@ -56,7 +56,7 @@ public static class AuthenticateValidations
 
         var regex = new Regex(pattern);
         if (!regex.IsMatch(email))
-            throw new Exceptions.ArgumentException("Direccion de correo no valida");
+            throw new Exceptions.InvalidEmailException("Direccion de correo no valida");
     }
 
     public static void ValidateRole(string role)
@@ -64,6 +64,6 @@ public static class AuthenticateValidations
         GeneralValidations.ValidateText(role, nameof(role));
         var validRoles = new[] { "ADMIN", "USER" };
         if (!validRoles.Contains(role.ToUpper()))
-            throw new Exceptions.ApplicationException($"El rol: {role} no es valido. Los validos son: {string.Join(", ", validRoles)}");
+            throw new Exceptions.InvalidRoleException($"El rol: {role} no es valido. Los validos son: {string.Join(", ", validRoles)}");
     }
 }

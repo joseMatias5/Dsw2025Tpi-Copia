@@ -30,7 +30,8 @@ public class AuthenticateController : ControllerBase
     }
 
     [HttpPost("register")]
-    [Authorize(Roles = "ADMIN")]
+    //[Authorize(Roles = "ADMIN")]
+    [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterModel.RequestRegister model)
     {
         await _service.Register(model);

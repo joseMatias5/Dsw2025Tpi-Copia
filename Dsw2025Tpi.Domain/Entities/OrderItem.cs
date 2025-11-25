@@ -44,7 +44,6 @@ public class OrderItem : EntityBase
         
         if (!product.StockControl(quantity))
             throw new System.ApplicationException($"No hay suficiente stock, el producto {product.Id} tiene {product.StockQuantity} items en existencia");
-
         ProductId = productId;
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Description = description ?? "";

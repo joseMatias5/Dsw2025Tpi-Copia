@@ -27,18 +27,18 @@ public static class GeneralValidations
         ValidateNotNull(text, paramName);
         if (!Regex.IsMatch(text, @"^[a-zA-Z0-9\s,.]*$"))
         {
-            throw new Exceptions.ArgumentException($"{paramName}: input no valido, debe ser una cadena de letras y/o numeros");
+            throw new Exceptions.NumbersAndLettersException($"{paramName}: input no valido, debe ser una cadena de letras y/o numeros");
         }
     }
     public static void ValidateOptionalText(string text, string paramName)
     {
         if (!Regex.IsMatch(text, @"^[a-zA-Z0-9\s,.\-°º#]*$"))
         {
-            throw new Exceptions.ArgumentException($"{paramName}: input no valido, debe ser una cadena de letras, numeros y/o ciertos simbolos (.\\-°º#)");
+            throw new Exceptions.NumbersSimbolsAndLettersException($"{paramName}: input no valido, debe ser una cadena de letras, numeros y/o ciertos simbolos (.\\-°º#)");
         }
         if(text.Length >= 100)
         {
-            throw new Exceptions.ArgumentOutOfRangeException($"{paramName}: input no valido, demasiado largo");
+            throw new Exceptions.TooLongException($"{paramName}: input no valido, demasiado largo");
         }
 
     }
@@ -47,7 +47,7 @@ public static class GeneralValidations
         ValidateNotNull(number, paramName);
         if (!Regex.IsMatch(number, @"^(0|[1-9]\d*)$"))
         {
-            throw new Exceptions.ArgumentException($"{paramName} input no valido, debe ser un numero entero o 0");
+            throw new Exceptions.PositiveWholeNumberAndCeroException($"{paramName} input no valido, debe ser un numero entero o 0");
         }
     }
     public static void ValidatePositiveWholeNumber(string number, string paramName)
@@ -55,7 +55,7 @@ public static class GeneralValidations
         ValidateNotNull(number, paramName);
         if (!Regex.IsMatch(number, @"^[1-9]\d*$"))
         {
-            throw new Exceptions.ArgumentException($"{paramName} input no valido, debe ser un numero entero positivo");
+            throw new Exceptions.PositiveWholeNumberException($"{paramName} input no valido, debe ser un numero entero positivo");
         }
     }
 
@@ -64,7 +64,7 @@ public static class GeneralValidations
         ValidateNotNull(number, paramName);
         if (!Regex.IsMatch(number, @"^[0-9][0-9,\.]*$"))
         {
-            throw new Exceptions.ArgumentException($"{paramName} input no valido, debe ser un numero decimal");
+            throw new Exceptions.PositiveDecimalNumberException($"{paramName} input no valido, debe ser un numero decimal positivo");
         }
     }
     public static void ValidateGuid(string text, string paramName)
@@ -72,7 +72,7 @@ public static class GeneralValidations
         ValidateNotNull(text, paramName);
         if (!Regex.IsMatch(text, @"^[a-zA-Z0-9-\-]*$"))
         {
-            throw new Exceptions.ArgumentException($"{paramName}: guid no valido");
+            throw new Exceptions.InvalidGuidException($"{paramName}: guid no valido");
         }
     }
 }
