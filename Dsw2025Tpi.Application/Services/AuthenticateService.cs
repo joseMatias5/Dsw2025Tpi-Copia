@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Dsw2025Tpi.Application.Dtos;
 using Dsw2025Tpi.Application.Interfaces;
 using Dsw2025Tpi.Application.Validations;
+using Dsw2025Tpi.Domain.Entities;
+using Dsw2025Tpi.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -21,18 +23,20 @@ public class AuthenticateService : IAuthenticateService
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly ILogger<AuthenticateService> _logger;
+    private readonly IRepository _repository;
 
     public AuthenticateService(
         IConfiguration config,
         SignInManager<IdentityUser> signInManager,
         UserManager<IdentityUser> userManager,
-
+        IRepository repository,
         ILogger<AuthenticateService> logger)
     {
         _config = config;
         _userManager = userManager;
         _signInManager = signInManager;
         _logger = logger; 
+        _repository = repository;
     }
 
     public string GenerateToken(string userName, string role)
@@ -97,6 +101,12 @@ public class AuthenticateService : IAuthenticateService
 
         if (!roleResult.Succeeded)
             throw new Application.Exceptions.InvalidRoleException("Hubo un problame asignando el rol");
+
+        if(model.Role == "USER")
+        {
+            var customer = new Customer(model.Email, model.Username, null);
+            await _repository.Add(customer);
+        }
 
         _logger.LogInformation("Solicitud de registro exitosa");
         return new RegisterModel.ResponseRegister(user.UserName, user.Email, model.Role);

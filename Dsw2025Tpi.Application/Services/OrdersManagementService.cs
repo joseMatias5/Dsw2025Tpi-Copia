@@ -26,8 +26,9 @@ public class OrdersManagementService : IOrdersManagementService
         _logger = logger;
     }
 
-    public async Task<IEnumerable<OrderModel.ResponseOrder>?> GetOrders(OrderModel.FilterOrder request)
+    public async Task<OrderModel.ResponsePagination>? GetOrders(OrderModel.FilterOrder request)
     {
+        Customer client = null;
         if (request.Status is null && request.CustomerId is null && request.PageSize is null && request.PageNumber is null)
         {
             _logger.LogInformation("Consulta de ordenes sin filtrar");
@@ -53,6 +54,17 @@ public class OrdersManagementService : IOrdersManagementService
             );
         OrderValidations.ValidateNotNullOrders(orders, request);
 
+        foreach(Order order in orders!)
+        {
+            client = await _repository.GetById<Customer>(order.CustomerId);
+            if (client == null)
+            {
+                throw new Application.Exceptions.NotFoundException("Cliente no encontrado");
+            }
+            _logger.LogInformation($"{order.CustomerId}: {client.Name}");
+        }
+        
+
         var allOrders = orders?.Select(order => new OrderModel.ResponseOrder(
                 order.Id,
                 order.Date,
@@ -60,6 +72,7 @@ public class OrdersManagementService : IOrdersManagementService
                 order.BillingAddress,
                 order.Notes,
                 order.CustomerId,
+                client!.Name, 
                 order.Status.ToString(),
                 order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
                     i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
@@ -67,14 +80,23 @@ public class OrdersManagementService : IOrdersManagementService
             .OrderByDescending(o => o.Date)
             .Skip((request.PageNumber -1) * request.PageSize ?? 0).Take(request.PageSize ?? orders.Count());
 
-        return allOrders;
+        return new OrderModel.ResponsePagination(allOrders!.ToList(), allOrders!.Count());
     }
     public async Task<OrderModel.ResponseOrder?> GetOrderById(Guid id)
     {
+        Customer client = null;
         _logger.LogInformation("Consulta de orden por Id: {id}", id);
         await OrderValidations.ValidateExistingOrder(id, _repository);
         var order = await _repository.GetById<Order>(id, include: new[] { "OrderItems" });
         OrderValidations.ValidateCancelledOrder(order!);
+        client = await _repository.GetById<Customer>(order.CustomerId);
+        if (client == null)
+        {
+            throw new Application.Exceptions.NotFoundException("Cliente no encontrado");
+        }
+        
+
+
         return order != null ?
             new OrderModel.ResponseOrder(
                 order.Id,
@@ -83,6 +105,7 @@ public class OrdersManagementService : IOrdersManagementService
                 order.BillingAddress,
                 order.Notes,
                 order.CustomerId,
+                client.Name,
                 order.Status?.ToString(),
                 order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
                     i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
@@ -124,6 +147,11 @@ public class OrdersManagementService : IOrdersManagementService
         OrderValidations.ValidateCustomer(request.CustomerId, _repository);
         
         var order = new Order(request.ShippingAddress, request.BillingAddress, request.Notes!, request.CustomerId, orderItems);
+        Customer client = await _repository.GetById<Customer>(order.CustomerId);
+        if (client == null)
+        {
+            throw new Application.Exceptions.NotFoundException("Cliente no encontrado");
+        }
         await _repository.Add(order);
         _logger.LogInformation("Creacion de orden exitosa");
         return new OrderModel.ResponseOrder(
@@ -133,6 +161,7 @@ public class OrdersManagementService : IOrdersManagementService
             order.BillingAddress,
             order.Notes,
             order.CustomerId,
+            client.Name,
             order.Status?.ToString(),
             order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
                 i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
@@ -154,7 +183,13 @@ public class OrdersManagementService : IOrdersManagementService
         {
             await ItemValidations.AddStock(updated.OrderItems, _repository);
         }
-        
+
+        Customer client = await _repository.GetById<Customer>(order.CustomerId);
+        if (client == null)
+        {
+            throw new Application.Exceptions.NotFoundException("Cliente no encontrado");
+        }
+
         _logger.LogInformation("Modificacion de orden exitosa");
         return new OrderModel.ResponseOrder(
             updated.Id,
@@ -163,6 +198,7 @@ public class OrdersManagementService : IOrdersManagementService
             updated.BillingAddress,
             updated.Notes,
             updated.CustomerId,
+            client.Name,
             updated.Status?.ToString(),
             updated.OrderItems.Select(i => new OrderItemModel.ResponseItem(
                 i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),

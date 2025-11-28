@@ -23,7 +23,7 @@ public class OrderController : Controller
     public async Task<IActionResult> GetOrders([FromQuery] OrderModel.FilterOrder request)
     {
         var orders = await _service.GetOrders(request);
-        if (orders == null || !orders.Any())
+        if (orders == null)
         {
             Response.Headers.Append("X-Message", "No se tienen ordenes");
             return NoContent();

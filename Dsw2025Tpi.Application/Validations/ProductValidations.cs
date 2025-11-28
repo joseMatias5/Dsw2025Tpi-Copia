@@ -88,8 +88,8 @@ public class ProductValidations
         if (request.PageSize is not null)
         {
             GeneralValidations.ValidatePositiveWholeNumberAndCero(request.PageSize.ToString()!, nameof(request.PageSize));
-            if (request.PageSize > 15)
-                throw new Exceptions.PageSizeException("El tamaño de la pagina no puede ser mayor a 15");
+            if (request.PageSize > 20)
+                throw new Exceptions.PageSizeException("El tamaño de la pagina no puede ser mayor a 20");
         }
     }
 
