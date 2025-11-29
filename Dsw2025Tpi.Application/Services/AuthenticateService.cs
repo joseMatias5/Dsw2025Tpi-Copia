@@ -67,7 +67,6 @@ public class AuthenticateService : IAuthenticateService
     public async Task<LoginModel.ResponseLogin> Login(LoginModel.RequestLogin request)
     {
         _logger.LogInformation("Solicitud de ingreso");
-
         var user = await _userManager.FindByNameAsync(request.Username);
         
         Validations.AuthenticateValidations.ValidateLogin(request, user!);
@@ -82,10 +81,30 @@ public class AuthenticateService : IAuthenticateService
 
         var role = roles.FirstOrDefault() ?? throw new Application.Exceptions.InvalidRoleException("El usuario no tiene asignado un rol");
 
-        var token = GenerateToken(user!.UserName!, role);
+        var email = user!.Email ?? string.Empty;
 
-        _logger.LogInformation("Solicitud de ingreso exitosa");
-        return new LoginModel.ResponseLogin(token);
+        if (role == "USER")
+        {
+            var customer = await _repository.GetByEmail<Customer>(email);
+
+            if (customer == null)
+            {
+                throw new Application.Exceptions.NotFoundException("El usuario no se encuentra asociado a un cliente");
+            }
+            
+            var token = GenerateToken(user!.UserName!, role);
+
+            _logger.LogInformation("Solicitud de ingreso de user exitosa");
+            return new LoginModel.ResponseLogin(token, customer!.Id, customer.Email!);
+
+        }
+        else
+        {
+            var tokenAdmin = GenerateToken(user!.UserName!, role);
+            _logger.LogInformation("Solicitud de ingreso de admin exitosa");
+            return new LoginModel.ResponseLogin(tokenAdmin);
+
+        }
     }
     public async Task<RegisterModel.ResponseRegister> Register(RegisterModel.RequestRegister model)
     {

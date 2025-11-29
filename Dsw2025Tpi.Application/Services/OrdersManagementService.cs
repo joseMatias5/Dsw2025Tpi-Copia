@@ -12,6 +12,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using static Dsw2025Tpi.Application.Dtos.OrderItemModel;
 using Microsoft.Extensions.Logging;
 using System.Collections;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Dsw2025Tpi.Application.Services;
 
@@ -29,7 +30,7 @@ public class OrdersManagementService : IOrdersManagementService
     public async Task<OrderModel.ResponsePagination>? GetOrders(OrderModel.FilterOrder request)
     {
         Customer client = null;
-        if (request.Status is null && request.CustomerId is null && request.PageSize is null && request.PageNumber is null)
+        if (request.Status is null && request.CustomerName is null && request.PageSize is null && request.PageNumber is null)
         {
             _logger.LogInformation("Consulta de ordenes sin filtrar");
         }
@@ -47,7 +48,7 @@ public class OrdersManagementService : IOrdersManagementService
             .GetFiltered<Order>(
                 o => 
                     o.Status!.Value != OrderStatus.CANCELLED
-                    && (o.CustomerId == request!.CustomerId || !request.CustomerId.HasValue)
+                    && (request.CustomerName.IsNullOrEmpty() || o.Customer!.Name.Contains(request!.CustomerName))
                     && (!status.HasValue || o.Status == status.Value)
                     , 
                 include: new[] { "OrderItems" }
@@ -62,6 +63,7 @@ public class OrdersManagementService : IOrdersManagementService
                 throw new Application.Exceptions.NotFoundException("Cliente no encontrado");
             }
             _logger.LogInformation($"{order.CustomerId}: {client.Name}");
+            order.Customer = client;
         }
         
 
@@ -72,7 +74,7 @@ public class OrdersManagementService : IOrdersManagementService
                 order.BillingAddress,
                 order.Notes,
                 order.CustomerId,
-                client!.Name, 
+                order.Customer.Name, 
                 order.Status.ToString(),
                 order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
                     i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
@@ -94,9 +96,7 @@ public class OrdersManagementService : IOrdersManagementService
         {
             throw new Application.Exceptions.NotFoundException("Cliente no encontrado");
         }
-        
-
-
+        order.Customer = client;
         return order != null ?
             new OrderModel.ResponseOrder(
                 order.Id,
@@ -105,7 +105,7 @@ public class OrdersManagementService : IOrdersManagementService
                 order.BillingAddress,
                 order.Notes,
                 order.CustomerId,
-                client.Name,
+                order.Customer.Name,
                 order.Status?.ToString(),
                 order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
                     i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
@@ -152,6 +152,7 @@ public class OrdersManagementService : IOrdersManagementService
         {
             throw new Application.Exceptions.NotFoundException("Cliente no encontrado");
         }
+        order.Customer = client;
         await _repository.Add(order);
         _logger.LogInformation("Creacion de orden exitosa");
         return new OrderModel.ResponseOrder(
@@ -161,7 +162,7 @@ public class OrdersManagementService : IOrdersManagementService
             order.BillingAddress,
             order.Notes,
             order.CustomerId,
-            client.Name,
+            order.Customer.Name,
             order.Status?.ToString(),
             order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
                 i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
@@ -189,6 +190,7 @@ public class OrdersManagementService : IOrdersManagementService
         {
             throw new Application.Exceptions.NotFoundException("Cliente no encontrado");
         }
+        updated.Customer = client;
 
         _logger.LogInformation("Modificacion de orden exitosa");
         return new OrderModel.ResponseOrder(
@@ -198,7 +200,7 @@ public class OrdersManagementService : IOrdersManagementService
             updated.BillingAddress,
             updated.Notes,
             updated.CustomerId,
-            client.Name,
+            updated.Customer.Name,
             updated.Status?.ToString(),
             updated.OrderItems.Select(i => new OrderItemModel.ResponseItem(
                 i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),

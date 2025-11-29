@@ -16,11 +16,13 @@ public class OrderValidations
     public static void ValidateFilteredArguments(OrderModel.FilterOrder request, IRepository _repository)
     {
         GeneralValidations.ValidateNotNull(request, nameof(request));
-        if(request.CustomerId is not null)
+        if(request.CustomerName is not null)
         {
-            var customer = request.CustomerId.ToString() ?? throw new Exceptions.ArgumentNullException("Id del cliente no puede ser nulo");
-            GeneralValidations.ValidateGuid(customer, nameof(request.CustomerId));
-            Guid customerId = (Guid)request.CustomerId;
+            GeneralValidations.ValidateText(request.CustomerName, nameof(request.CustomerName));
+            string customerName = request.CustomerName;
+            var customerId = _repository
+                .First<Customer>(c => c.Name == customerName || c.Name.Contains(customerName))
+                .Result?.Id ?? throw new Exceptions.ClientNotFoundException($"No se encontro un cliente con nombre {customerName}");
             ValidateCustomer(customerId, _repository);
         }
 
@@ -45,8 +47,8 @@ public class OrderValidations
     public static void ValidateNotNullOrders(IEnumerable<Order>? orders, OrderModel.FilterOrder? request)
     {
         GeneralValidations.ValidateNotNull(request, nameof(request));
-        if (orders == null || !orders.Any()  && request != null && request.CustomerId.HasValue)
-            throw new Exceptions.NoOrdersForClientException($"No se encontraron ordenes del cliente {request!.CustomerId}");
+        if (orders == null || !orders.Any()  && request != null && !request.CustomerName.IsNullOrEmpty())
+            throw new Exceptions.NoOrdersForClientException($"No se encontraron ordenes del cliente {request!.CustomerName}");
         if (orders == null || !orders.Any() && request != null && !request.Status.IsNullOrEmpty())
             throw new Exceptions.NoOrdersForStatusException($"No se encontraron con estado {request!.Status}");
         if (orders == null || !orders.Any())

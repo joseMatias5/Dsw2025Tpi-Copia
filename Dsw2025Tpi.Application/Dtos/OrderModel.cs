@@ -18,7 +18,7 @@ public record OrderModel
         string? Notes, Guid CustomerId, string? CustomerName, string? Status, List<ResponseItem> OrderItems, decimal? TotalAmount);
 
     public record ResponsePagination(List<ResponseOrder> Orders, int TotalCount);
-    public record FilterOrder(string? Status, Guid? CustomerId, int? PageNumber, int? PageSize);
+    public record FilterOrder(string? Status, string? CustomerName, int? PageNumber, int? PageSize);
     //No deberia ser nulleable los parametros del filter, principalmente el PageNumber y el pageSize
     //tiene que tener valor por defecto. Debido a que la validacion esta antes
 }

@@ -59,8 +59,8 @@ public class ProductsManagementService : IProductsManagementService
                 && (string.IsNullOrEmpty(request.Search) || p.Name!.Contains(request.Search!) || p.Sku!.Contains(request.Search!)))
             );
         
-        if (filterredProducts is null || !filterredProducts.Any())
-            throw new NoContentException("No se encontraron productos");
+        //if (filterredProducts is null || !filterredProducts.Any())
+        //    throw new NoContentException("No se encontraron productos");
 
         var products = filterredProducts!.Select(p => new ProductModel.ResponseProduct(
                 p.Id,
