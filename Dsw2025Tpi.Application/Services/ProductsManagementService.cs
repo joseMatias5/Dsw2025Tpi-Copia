@@ -61,6 +61,7 @@ public class ProductsManagementService : IProductsManagementService
         
         //if (filterredProducts is null || !filterredProducts.Any())
         //    throw new NoContentException("No se encontraron productos");
+        var allProducts = await _repository.GetAll<Product>();
 
         var products = filterredProducts!.Select(p => new ProductModel.ResponseProduct(
                 p.Id,
@@ -75,7 +76,7 @@ public class ProductsManagementService : IProductsManagementService
             .Skip(((request.PageNumber??1) - 1) * request.PageSize ?? 0)
             .Take(request.PageSize ?? filterredProducts!.Count());
 
-        return new ProductModel.ResponsePagination(products.ToList(), filterredProducts!.Count());
+        return new ProductModel.ResponsePagination(products.ToList(), filterredProducts!.Count(), allProducts!.Count());
     }
     public async Task<ProductModel.ResponsePagination?> GetAuthProducts(ProductModel.FilterAuthProduct request)
     {
@@ -101,7 +102,7 @@ public class ProductsManagementService : IProductsManagementService
 
         //if (filterredProducts is null || !filterredProducts.Any())
         //    throw new NoContentException("No se encontraron productos");
-
+        var allProducts = await _repository.GetAll<Product>();
         var products = filterredProducts!.Select(p => new ProductModel.ResponseProduct(
                 p.Id,
                 p.Sku,
@@ -115,7 +116,7 @@ public class ProductsManagementService : IProductsManagementService
             .Skip(((request.PageNumber??1) - 1) * request.PageSize ?? 0)
             .Take(request.PageSize ?? filterredProducts!.Count());
 
-        return new ProductModel.ResponsePagination(products.ToList(), filterredProducts!.Count());
+        return new ProductModel.ResponsePagination(products.ToList(), filterredProducts!.Count(), allProducts!.Count());
     }
 
     public async Task<ProductModel.ResponseProduct> AddProduct(ProductModel.RequestProduct request)

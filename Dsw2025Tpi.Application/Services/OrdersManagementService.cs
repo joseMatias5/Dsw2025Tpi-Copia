@@ -44,45 +44,41 @@ public class OrdersManagementService : IOrdersManagementService
         if (!string.IsNullOrWhiteSpace(request.Status))
             status = Enum.Parse<OrderStatus>(request.Status.ToUpper(), true);
 
-        var orders = await _repository
-            .GetFiltered<Order>(
-                o => 
-                    o.Status!.Value != OrderStatus.CANCELLED
-                    && (request.CustomerName.IsNullOrEmpty() || o.Customer!.Name.Contains(request!.CustomerName))
-                    && (!status.HasValue || o.Status == status.Value)
-                    , 
-                include: new[] { "OrderItems" }
-            );
-        OrderValidations.ValidateNotNullOrders(orders, request);
+        var filteredOrders = await _repository
+        .GetFiltered<Order>(
+            o =>
+                o.Status!.Value != OrderStatus.CANCELLED
+                && (request.CustomerName.IsNullOrEmpty() || o.Customer!.Name.Contains(request!.CustomerName))
+                && (!status.HasValue || o.Status == status.Value)
+                ,
+            include: new[] { "OrderItems", "Customer" } 
+        );
+        OrderValidations.ValidateNotNullOrders(filteredOrders, request);
+        int totalFiltered = filteredOrders!.Count();
 
-        foreach(Order order in orders!)
-        {
-            client = await _repository.GetById<Customer>(order.CustomerId);
-            if (client == null)
-            {
-                throw new Application.Exceptions.NotFoundException("Cliente no encontrado");
-            }
-            _logger.LogInformation($"{order.CustomerId}: {client.Name}");
-            order.Customer = client;
-        }
-        
+        var allOrders = await _repository.GetAll<Order>();
+        int totalCount = allOrders.Count(o => o.Status!.Value != OrderStatus.CANCELLED);
 
-        var allOrders = orders?.Select(order => new OrderModel.ResponseOrder(
-                order.Id,
-                order.Date,
-                order.ShippingAddress,
-                order.BillingAddress,
-                order.Notes,
-                order.CustomerId,
-                order.Customer.Name, 
-                order.Status.ToString(),
-                order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
-                    i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
-                order.TotalAmount))
+        var pagedOrders = filteredOrders
             .OrderByDescending(o => o.Date)
-            .Skip((request.PageNumber -1) * request.PageSize ?? 0).Take(request.PageSize ?? orders.Count());
+            .Skip((request.PageNumber - 1) * request.PageSize ?? 0)
+            .Take(request.PageSize ?? filteredOrders.Count())
+            .ToList();
 
-        return new OrderModel.ResponsePagination(allOrders!.ToList(), allOrders!.Count());
+        var responseOrders = pagedOrders.Select(order => new OrderModel.ResponseOrder(
+        order.Id,
+        order.Date,
+        order.ShippingAddress,
+        order.BillingAddress,
+        order.Notes,
+        order.CustomerId,
+        order.Customer.Name,
+        order.Status.ToString(),
+        order.OrderItems.Select(i => new OrderItemModel.ResponseItem(
+            i.ProductId, i.Name, i.Description, i.UnitPrice, i.Quantity)).ToList(),
+        order.TotalAmount));
+
+        return new OrderModel.ResponsePagination(responseOrders!.ToList(), totalFiltered, totalCount);
     }
     public async Task<OrderModel.ResponseOrder?> GetOrderById(Guid id)
     {

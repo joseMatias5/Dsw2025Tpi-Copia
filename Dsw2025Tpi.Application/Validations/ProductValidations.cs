@@ -65,6 +65,10 @@ public class ProductValidations
     public static void ValidateActiveProduct(Product product)
     {
         GeneralValidations.ValidateNotNull(product, nameof(product));
+        if(product.StockQuantity == 0)
+        {
+            product.IsActive = false;
+        }
         if (!product.IsActive)
             throw new Exceptions.InactiveProductException($"El producto con ID {product.Id} no esta activo");
     }

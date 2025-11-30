@@ -13,7 +13,7 @@ public record ProductModel
     public record ResponseProduct(Guid Id, string? Sku, string? InternalCode, string? Name, string? Description,
         decimal? CurrentUnitPrice, int? StockQuantity, bool IsActive);
 
-    public record ResponsePagination(List<ResponseProduct> Products, int TotalCount);
+    public record ResponsePagination(List<ResponseProduct> Products, int TotalFiltered, int TotalCount);
 
     public record FilterProduct(string? Search, int? PageNumber, int? PageSize);
 
