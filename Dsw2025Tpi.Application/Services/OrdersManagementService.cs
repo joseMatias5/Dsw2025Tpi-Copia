@@ -13,6 +13,7 @@ using static Dsw2025Tpi.Application.Dtos.OrderItemModel;
 using Microsoft.Extensions.Logging;
 using System.Collections;
 using Microsoft.IdentityModel.Tokens;
+using System.Text.Json;
 
 namespace Dsw2025Tpi.Application.Services;
 
@@ -111,6 +112,8 @@ public class OrdersManagementService : IOrdersManagementService
     public async Task<OrderModel.ResponseOrder> AddOrder(OrderModel.RequestOrder request)
     {
         _logger.LogInformation("Creacion de orden");
+        _logger.LogInformation("REQUEST RECIBIDO: " + JsonSerializer.Serialize(request));
+
         GeneralValidations.ValidateNotNull(request, nameof(request));
         var items = request!.OrderItems!.Select(item => new RequestItem(
             item.ProductId,
