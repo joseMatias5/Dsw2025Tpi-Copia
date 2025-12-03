@@ -95,14 +95,14 @@ public class AuthenticateService : IAuthenticateService
             var token = GenerateToken(user!.UserName!, role);
 
             _logger.LogInformation("Solicitud de ingreso de user exitosa");
-            return new LoginModel.ResponseLogin(token, customer!.Id, customer.Email!);
+            return new LoginModel.ResponseLogin(token, user.UserName!,customer!.Id, customer.Email!);
 
         }
         else
         {
             var tokenAdmin = GenerateToken(user!.UserName!, role);
             _logger.LogInformation("Solicitud de ingreso de admin exitosa");
-            return new LoginModel.ResponseLogin(tokenAdmin);
+            return new LoginModel.ResponseLogin(tokenAdmin, user.UserName!);
 
         }
     }
