@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Dsw2025Tpi.Application.Exceptions;
 using Microsoft.AspNetCore.Http;
 
 namespace Dsw2025Tpi.Application.Validations;
@@ -42,9 +43,21 @@ public static class GeneralValidations
         }
 
     }
+    public static void ValidateNumber(string number, string paramName)
+    {
+        ValidateText(number, paramName);
+        if(int.TryParse(number, out int numberInt) || (decimal.TryParse(number, out decimal numberDecimal)))
+        {
+            return;
+        }
+        else
+        {
+            throw new Application.Exceptions.NumbersException($"{paramName} no es valido, debe ser un numero");
+        }
+    }
     public static void ValidatePositiveWholeNumberAndCero(string number, string paramName)
     {
-        ValidateNotNull(number, paramName);
+        ValidateNumber(number, paramName);
         if (!Regex.IsMatch(number, @"^(0|[1-9]\d*)$"))
         {
             throw new Exceptions.PositiveWholeNumberAndCeroException($"{paramName} input no valido, debe ser un numero entero o 0");
@@ -52,7 +65,7 @@ public static class GeneralValidations
     }
     public static void ValidatePositiveWholeNumber(string number, string paramName)
     {
-        ValidateNotNull(number, paramName);
+        ValidateNumber(number, paramName);
         if (!Regex.IsMatch(number, @"^[1-9]\d*$"))
         {
             throw new Exceptions.PositiveWholeNumberException($"{paramName} input no valido, debe ser un numero entero positivo");
@@ -61,7 +74,7 @@ public static class GeneralValidations
 
     public static void ValidatePositiveDecimalNumber(string number, string paramName)
     {
-        ValidateNotNull(number, paramName);
+        ValidateNumber(number, paramName);
         if (!Regex.IsMatch(number, @"^[0-9][0-9,\.]*$"))
         {
             throw new Exceptions.PositiveDecimalNumberException($"{paramName} input no valido, debe ser un numero decimal positivo");
